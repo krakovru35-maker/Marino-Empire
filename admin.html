@@ -421,9 +421,7 @@
   <div class="app">
     <div id="loginCard" class="card login">
       <h2>Marino Empire Admin</h2>
-      <p>
-        Ödül taleplerini görüntülemek, onaylamak veya reddetmek için admin girişi yap.
-      </p>
+      <p>Ödül taleplerini görüntülemek, onaylamak veya reddetmek için admin girişi yap.</p>
 
       <input id="adminTelegramIdInput" placeholder="Admin Telegram ID" autocomplete="off" />
       <button id="adminLoginBtn" class="main-btn">ADMİN PANELE GİR</button>
@@ -474,7 +472,7 @@
       <button id="logoutBtn" class="main-btn ghost">ADMİN ÇIKIŞ</button>
 
       <div class="version">
-        GitHub Pages + Supabase Admin Panel v1.0
+        GitHub Pages + Supabase Admin Panel v1.1
       </div>
     </div>
   </div>
@@ -519,7 +517,8 @@
       admin: null,
       requests: [],
       usersMap: {},
-      busy: false
+      busy: false,
+      currentRenderedList: []
     };
 
     const tgUser = getTelegramUser();
@@ -531,6 +530,24 @@
       if (savedAdminId) {
         el.adminTelegramIdInput.value = savedAdminId;
       }
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
     }
 
     function getTelegramUser() {
@@ -680,7 +697,7 @@
       el.rejectedStat.textContent = fmt(rejected);
     }
 
-    function renderRequests() {
+    function getFilteredList() {
       const filter = el.statusFilter.value;
       const q = el.searchInput.value.trim().toLowerCase();
 
@@ -711,16 +728,33 @@
         });
       }
 
-      if (!list.length) {
+      return list;
+    }
+
+    function renderRequests() {
+      try {
+        const list = getFilteredList();
+        state.currentRenderedList = list;
+
+        if (!list.length) {
+          el.requestList.innerHTML = `
+            <div class="empty">
+              Kayıt bulunamadı. Bekleyen talep yoksa sistem doğru çalışıyor olabilir.
+            </div>
+          `;
+          return;
+        }
+
+        el.requestList.innerHTML = list.map((r, index) => renderRequestCard(r, index)).join("");
+      } catch (err) {
+        console.error(err);
         el.requestList.innerHTML = `
           <div class="empty">
-            Kayıt bulunamadı. Bekleyen talep yoksa sistem doğru çalışıyor olabilir.
+            Liste çizilirken hata oluştu: ${escapeHtml(err.message)}
           </div>
         `;
-        return;
+        toast(err.message || "Liste çizilemedi.");
       }
-
-      el.requestList.innerHTML = list.map((r, index) => renderRequestCard(r, index)).join("");
     }
 
     function renderRequestCard(r, index) {
@@ -772,7 +806,7 @@
             <h3>${escapeHtml(itemName)}</h3>
 
             <div class="meta">
-              <span class="tag ${status}">${statusText(status)}</span>
+              <span class="tag ${escapeAttr(status)}">${escapeHtml(statusText(status))}</span>
               <span class="tag">Site: ${escapeHtml(siteUsername)}</span>
               <span class="tag">TG: ${escapeHtml(String(r.telegram_id || "-"))}</span>
               <span class="tag">@${escapeHtml(telegramUsername)}</span>
@@ -811,7 +845,8 @@
     async function updateRequestStatus(field, value, newStatus) {
       if (!state.admin || state.busy) return;
 
-      const row = state.requests.find(r => String(r[field]) === String(value));
+      const row = state.currentRenderedList.find(r => String(r[field]) === String(value)) ||
+                  state.requests.find(r => String(r[field]) === String(value));
 
       if (!row) {
         toast("Talep kaydı bulunamadı.");
@@ -826,9 +861,9 @@
 
       if ("admin_note" in row) payload.admin_note = adminNote;
       if ("reviewed_at" in row) payload.reviewed_at = new Date().toISOString();
-      if ("reviewed_by" in row) payload.reviewed_by = state.admin.telegram_id;
-      if ("approved_by" in row && newStatus === "approved") payload.approved_by = state.admin.telegram_id;
-      if ("rejected_by" in row && newStatus === "rejected") payload.rejected_by = state.admin.telegram_id;
+      if ("reviewed_by" in row) payload.reviewed_by = String(state.admin.telegram_id);
+      if ("approved_by" in row && newStatus === "approved") payload.approved_by = String(state.admin.telegram_id);
+      if ("rejected_by" in row && newStatus === "rejected") payload.rejected_by = String(state.admin.telegram_id);
       if ("approved_at" in row && newStatus === "approved") payload.approved_at = new Date().toISOString();
       if ("rejected_at" in row && newStatus === "rejected") payload.rejected_at = new Date().toISOString();
       if ("updated_at" in row) payload.updated_at = new Date().toISOString();
@@ -836,28 +871,25 @@
       setBusy(true, newStatus === "approved" ? "Onaylanıyor..." : "Reddediliyor...");
 
       try {
-        let { data, error } = await db
+        let result = await db
           .from("reward_requests")
           .update(payload)
           .eq(field, value)
           .select();
 
-        if (error) {
-          const fallbackPayload = { status: newStatus };
-
+        if (result.error) {
           const fallback = await db
             .from("reward_requests")
-            .update(fallbackPayload)
+            .update({ status: newStatus })
             .eq(field, value)
             .select();
 
           if (fallback.error) throw fallback.error;
-
-          data = fallback.data;
         }
 
         toast(newStatus === "approved" ? "Talep onaylandı." : "Talep reddedildi.");
 
+        state.busy = false;
         await loadRequests();
       } catch (err) {
         console.error(err);
@@ -867,7 +899,8 @@
     }
 
     function copyRequestText(index) {
-      const r = getFilteredListForIndex(index);
+      const r = state.currentRenderedList[index];
+
       if (!r) {
         toast("Kopyalanacak talep bulunamadı.");
         return;
@@ -891,40 +924,6 @@ Admin Notu: ${el.adminNoteInput.value.trim() || r.admin_note || "-"}`;
       navigator.clipboard.writeText(text)
         .then(() => toast("Talep metni kopyalandı."))
         .catch(() => toast("Kopyalama başarısız."));
-    }
-
-    function getFilteredListForIndex(index) {
-      const filter = el.statusFilter.value;
-      const q = el.searchInput.value.trim().toLowerCase();
-
-      let list = [...state.requests];
-
-      if (filter !== "all") {
-        list = list.filter(r => normalizeStatus(r.status) === filter);
-      }
-
-      if (q) {
-        list = list.filter(r => {
-          const u = state.usersMap[String(r.telegram_id || "")] || {};
-          const text = [
-            r.telegram_id,
-            r.site_username,
-            r.item_code,
-            r.item_name,
-            r.status,
-            r.request_id,
-            r.id,
-            u.telegram_username,
-            u.site_username,
-            u.first_name,
-            u.last_name
-          ].join(" ").toLowerCase();
-
-          return text.includes(q);
-        });
-      }
-
-      return list[index];
     }
 
     function getRequestKey(row) {
@@ -984,6 +983,7 @@ Admin Notu: ${el.adminNoteInput.value.trim() || r.admin_note || "-"}`;
       state.admin = null;
       state.requests = [];
       state.usersMap = {};
+      state.currentRenderedList = [];
 
       el.adminPanel.classList.add("hidden");
       el.loginCard.classList.remove("hidden");
@@ -998,13 +998,9 @@ Admin Notu: ${el.adminNoteInput.value.trim() || r.admin_note || "-"}`;
     el.searchInput.addEventListener("input", renderRequests);
     el.statusFilter.addEventListener("change", renderRequests);
 
-    window.addEventListener("load", () => {
-      const savedAdminId = localStorage.getItem("marino_admin_telegram_id");
-
-      if (savedAdminId && !tgUser) {
-        el.adminTelegramIdInput.value = savedAdminId;
-      }
-    });
+    window.toggleRaw = toggleRaw;
+    window.updateRequestStatus = updateRequestStatus;
+    window.copyRequestText = copyRequestText;
   </script>
 </body>
 </html>
