@@ -1208,77 +1208,173 @@
      * ACTIONS
      ********************************************************/
     async function collectIncome() {
-      try {
-        showLoading(true);
-        const res = await api("collect", { request_id: makeReqId() });
+  const oldPlayer = structuredClone(state.player || {});
+  const claimable = Number(state.player?.claimable_coin || 0);
 
-        if (!res.ok) throw new Error(res.error || "Gelir toplanamadı.");
+  if (claimable <= 0) {
+    toast("Toplanacak gelir yok.");
+    beep("error");
+    return;
+  }
 
-        state.player = res.state;
-        await loadState();
+  // Ekranı anında güncelle
+  state.player.marino_coin = Number(state.player.marino_coin || 0) + claimable;
+  state.player.claimable_coin = 0;
+  renderStats();
 
-        if (Number(res.earned || 0) > 0) {
-          toast("Kasadan +" + fmt(res.earned) + " coin toplandı.");
-          beep("coin");
-        } else {
-          toast(res.message || "Toplanacak gelir yok.");
-        }
-      } catch (err) {
-        toast(err.message);
-        beep("error");
-      } finally {
-        showLoading(false);
-      }
+  el.syncPill.textContent = "Kaydediliyor...";
+  toast("Kasadan +" + fmt(claimable) + " coin toplandı.");
+  beep("coin");
+
+  try {
+    const res = await api("collect", { request_id: makeReqId() });
+
+    if (!res.ok) throw new Error(res.error || "Gelir toplanamadı.");
+
+    if (res.state) {
+      state.player = res.state;
+      renderStats();
     }
 
-    async function upgradeBuilding(buildingKey) {
-      try {
-        showLoading(true);
-        const res = await api("upgrade", {
-          building_key: buildingKey,
-          request_id: makeReqId()
-        });
+    el.syncPill.textContent = "Güncel";
+  } catch (err) {
+    state.player = oldPlayer;
+    renderStats();
 
-        if (!res.ok) throw new Error(res.error || "Yükseltme başarısız.");
+    toast("Kayıt başarısız, işlem geri alındı: " + err.message);
+    el.syncPill.textContent = "Hata";
+    beep("error");
+  }
+}
 
-        state.player = res.state;
-        state.upgrades = res.upgrades || state.upgrades;
+async function upgradeBuilding(buildingKey) {
+  const building = state.upgrades.find(x => x.building_key === buildingKey);
 
-        renderAll();
+  if (!building) {
+    toast("Bina bulunamadı.");
+    beep("error");
+    return;
+  }
 
-        toast("Yükseltildi: Level " + res.new_level);
-        beep("upgrade");
-      } catch (err) {
-        toast(err.message);
-        beep("error");
-      } finally {
-        showLoading(false);
-      }
+  const cost = Number(building.next_cost_coin || 0);
+  const coin = Number(state.player?.marino_coin || 0);
+
+  if (coin < cost) {
+    toast("Coin yetmiyor. Önce biraz daha kas.");
+    beep("error");
+    return;
+  }
+
+  const oldPlayer = structuredClone(state.player || {});
+  const oldUpgrades = structuredClone(state.upgrades || []);
+
+  // Ekranı anında güncelle
+  state.player.marino_coin = coin - cost;
+
+  building.level = Number(building.level || 0) + 1;
+
+  if (building.base_income_per_hour > 0) {
+    building.current_income_per_hour = Number(building.base_income_per_hour || 0) * Number(building.level || 0);
+  }
+
+  building.next_cost_coin = Math.ceil(cost * 1.65);
+
+  state.player.passive_income_per_hour = state.upgrades.reduce((sum, item) => {
+    return sum + Number(item.current_income_per_hour || 0);
+  }, 0);
+
+  renderAll();
+
+  el.syncPill.textContent = "Kaydediliyor...";
+  toast(building.building_name + " yükseltildi.");
+  beep("upgrade");
+
+  try {
+    const res = await api("upgrade", {
+      building_key: buildingKey,
+      request_id: makeReqId()
+    });
+
+    if (!res.ok) throw new Error(res.error || "Yükseltme başarısız.");
+
+    if (res.state) state.player = res.state;
+    if (res.upgrades) state.upgrades = res.upgrades;
+
+    renderAll();
+    el.syncPill.textContent = "Güncel";
+  } catch (err) {
+    // Hata olursa eski hale dön
+    state.player = oldPlayer;
+    state.upgrades = oldUpgrades;
+    renderAll();
+
+    toast("Kayıt başarısız, işlem geri alındı: " + err.message);
+    el.syncPill.textContent = "Hata";
+    beep("error");
+  }
+}
+
+async function requestReward(itemCode) {
+  const item = state.store.find(x => x.item_code === itemCode);
+
+  if (!item) {
+    toast("Ödül bulunamadı.");
+    beep("error");
+    return;
+  }
+
+  if (item.category !== "reward") {
+    toast("Bu ürün ödül talebi için uygun değil.");
+    beep("error");
+    return;
+  }
+
+  const costCoin = Number(item.cost_coin || 0);
+  const costToken = Number(item.cost_token || 0);
+  const playerCoin = Number(state.player?.marino_coin || 0);
+  const playerToken = Number(state.player?.reward_token || 0);
+
+  if (playerCoin < costCoin || playerToken < costToken) {
+    toast("Bu ödül için coin veya token yetmiyor.");
+    beep("error");
+    return;
+  }
+
+  const oldPlayer = structuredClone(state.player || {});
+
+  // Ekranı anında güncelle
+  state.player.marino_coin = playerCoin - costCoin;
+  state.player.reward_token = playerToken - costToken;
+
+  renderAll();
+
+  el.syncPill.textContent = "Kaydediliyor...";
+  toast("Ödül talebi alındı. Admin onayı bekliyor.");
+  beep("upgrade");
+
+  try {
+    const res = await api("requestReward", {
+      item_code: itemCode,
+      request_id: makeReqId()
+    });
+
+    if (!res.ok) throw new Error(res.error || "Ödül talebi başarısız.");
+
+    if (res.state) {
+      state.player = res.state;
+      renderAll();
     }
 
-    async function requestReward(itemCode) {
-      try {
-        showLoading(true);
+    el.syncPill.textContent = "Güncel";
+  } catch (err) {
+    state.player = oldPlayer;
+    renderAll();
 
-        const res = await api("requestReward", {
-          item_code: itemCode,
-          request_id: makeReqId()
-        });
-
-        if (!res.ok) throw new Error(res.error || "Ödül talebi başarısız.");
-
-        state.player = res.state;
-        await loadState();
-
-        toast("Ödül talebi alındı. Admin onayı bekliyor.");
-        beep("upgrade");
-      } catch (err) {
-        toast(err.message);
-        beep("error");
-      } finally {
-        showLoading(false);
-      }
-    }
+    toast("Kayıt başarısız, işlem geri alındı: " + err.message);
+    el.syncPill.textContent = "Hata";
+    beep("error");
+  }
+}
 
     /********************************************************
      * TAP SYSTEM
