@@ -14,18 +14,24 @@
 
   <style>
     :root {
-      --bg: #06111f;
-      --panel: rgba(8, 20, 38, .94);
-      --panel2: rgba(15, 33, 58, .95);
-      --line: rgba(114, 206, 255, .35);
-      --blue: #62cfff;
-      --blue2: #3b8cff;
+      --bg0: #020714;
+      --bg1: #06162b;
+      --panel: rgba(5, 16, 31, .88);
+      --panel2: rgba(11, 29, 54, .88);
+      --glass: rgba(255, 255, 255, .065);
+      --line: rgba(105, 204, 255, .28);
+      --line2: rgba(255, 220, 128, .22);
+      --blue: #62d7ff;
+      --blue2: #2e8bff;
       --gold: #ffe08a;
-      --green: #52ffad;
-      --red: #ff5d7a;
-      --text: #f4fbff;
-      --muted: #9fc3e6;
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --gold2: #ffbd35;
+      --green: #5dffb2;
+      --red: #ff617a;
+      --text: #f5fbff;
+      --muted: #9bbfe4;
+      --muted2: #6f91b9;
+      --shadow: 0 24px 80px rgba(0,0,0,.48);
+      --radius: 26px;
     }
 
     * {
@@ -33,124 +39,101 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    html,
     body {
       margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at top, rgba(50,130,255,.25), transparent 35%),
-        linear-gradient(180deg, #102d5a 0%, #04101d 45%, #020711 100%);
+      min-height: 100%;
+      background: #020714;
       color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
       overflow-x: hidden;
     }
 
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(83, 184, 255, .28), transparent 32%),
+        radial-gradient(circle at 85% 18%, rgba(255, 195, 64, .14), transparent 26%),
+        radial-gradient(circle at 55% 100%, rgba(29, 112, 255, .24), transparent 32%),
+        linear-gradient(180deg, #081c38 0%, #041020 45%, #020714 100%);
+    }
+
+    body:before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.75), transparent 80%);
+      opacity: .28;
+      z-index: 0;
+    }
+
+    body:after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at center, transparent 42%, rgba(0,0,0,.46) 100%);
+      z-index: 0;
+    }
+
     .app {
-      width: min(980px, 100%);
+      position: relative;
+      z-index: 1;
+      width: min(1080px, 100%);
       margin: 0 auto;
-      padding: 18px 12px 28px;
+      padding: 18px 12px 30px;
     }
 
-    .hero {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .logo {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      font-size: 30px;
-      font-weight: 900;
-      color: #04101d;
-      background: linear-gradient(135deg, #67d6ff, #aaf3ff);
-      box-shadow: 0 0 32px rgba(98,207,255,.45);
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: 28px;
-      line-height: 1.05;
-      text-shadow: 0 0 20px rgba(98,207,255,.35);
-    }
-
-    .hero p {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .pill {
-      margin-left: auto;
-      border: 1px solid var(--line);
-      background: rgba(12, 38, 70, .75);
-      color: #c8f3ff;
-      padding: 9px 12px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 12px;
-      white-space: nowrap;
+    .hidden {
+      display: none !important;
     }
 
     .card {
-      background: var(--panel);
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(12, 33, 62, .88), rgba(4, 13, 25, .92));
       border: 1px solid var(--line);
-      border-radius: 24px;
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 14px;
-      margin-bottom: 14px;
+      padding: 16px;
     }
 
-    .login {
-      max-width: 560px;
-      margin: 70px auto 0;
-      text-align: center;
-      padding: 26px;
+    .card:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(98, 215, 255, .16), transparent 30%),
+        radial-gradient(circle at 95% 18%, rgba(255, 224, 138, .13), transparent 26%);
+      pointer-events: none;
     }
 
-    .login h2 {
-      margin: 0 0 10px;
-      font-size: 32px;
-      color: #6be3ff;
-      text-shadow: 0 0 24px rgba(107,227,255,.45);
-    }
-
-    .login p {
-      color: #c7dcf7;
-      line-height: 1.5;
-      margin: 0 0 18px;
-    }
-
-    input {
-      width: 100%;
-      border: 1px solid rgba(150,210,255,.35);
-      background: rgba(255,255,255,.06);
-      color: white;
-      border-radius: 16px;
-      padding: 15px 16px;
-      font-size: 16px;
-      outline: none;
-      margin-bottom: 12px;
-    }
-
-    input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 4px rgba(98,207,255,.12);
+    .card > * {
+      position: relative;
+      z-index: 1;
     }
 
     button {
       border: 0;
       cursor: pointer;
-      border-radius: 16px;
+      border-radius: 18px;
       font-weight: 900;
       color: #03101e;
-      background: linear-gradient(135deg, #5db2ff, #91ecff);
-      box-shadow: 0 10px 26px rgba(68,172,255,.25);
-      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+      background: linear-gradient(135deg, #51a7ff, #92efff);
+      box-shadow: 0 14px 34px rgba(68,172,255,.24);
+      transition: transform .12s ease, filter .12s ease, opacity .12s ease, box-shadow .12s ease;
       user-select: none;
+    }
+
+    button:hover {
+      filter: brightness(1.04);
+      box-shadow: 0 16px 38px rgba(68,172,255,.32);
     }
 
     button:active {
@@ -158,15 +141,257 @@
     }
 
     button:disabled {
-      opacity: .55;
+      opacity: .48;
       cursor: not-allowed;
       filter: grayscale(.35);
+      box-shadow: none;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid rgba(150,210,255,.35);
+      background: rgba(255,255,255,.07);
+      color: white;
+      border-radius: 18px;
+      padding: 16px 16px;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    input::placeholder {
+      color: rgba(210,230,255,.55);
+    }
+
+    input:focus {
+      border-color: var(--blue);
+      box-shadow:
+        0 0 0 4px rgba(98,207,255,.12),
+        inset 0 1px 0 rgba(255,255,255,.06);
     }
 
     .main-btn {
       width: 100%;
+      min-height: 54px;
       padding: 15px 18px;
-      font-size: 17px;
+      font-size: 16px;
+      letter-spacing: .2px;
+    }
+
+    .gold {
+      background: linear-gradient(135deg, #ffbd35, #fff0a8);
+    }
+
+    .green {
+      background: linear-gradient(135deg, #35ff9b, #b8ffdc);
+    }
+
+    .danger {
+      background: linear-gradient(135deg, #ff5975, #ffc1cb);
+    }
+
+    .ghost-btn {
+      background: rgba(255,255,255,.07);
+      color: #d7f4ff;
+      border: 1px solid rgba(142,204,255,.22);
+      box-shadow: none;
+    }
+
+    .login {
+      max-width: 620px;
+      margin: 54px auto 0;
+      text-align: center;
+      padding: 22px;
+    }
+
+    .login-visual {
+      width: 146px;
+      height: 146px;
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      border-radius: 38px;
+      background:
+        radial-gradient(circle at 35% 22%, rgba(255,255,255,.22), transparent 24%),
+        linear-gradient(160deg, rgba(36, 116, 214, .65), rgba(5, 13, 26, .95));
+      border: 1px solid rgba(98, 215, 255, .34);
+      box-shadow:
+        0 0 50px rgba(98, 215, 255, .22),
+        inset 0 0 28px rgba(255,255,255,.05);
+    }
+
+    .login-visual img {
+      width: 118px;
+      height: 118px;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 22px rgba(0,0,0,.45));
+      animation: floatLogo 3.2s ease-in-out infinite;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.025); }
+    }
+
+    .login h2 {
+      margin: 0 0 10px;
+      font-size: clamp(32px, 7vw, 48px);
+      line-height: .95;
+      color: #dff8ff;
+      letter-spacing: -.8px;
+      text-shadow: 0 0 26px rgba(107,227,255,.48);
+    }
+
+    .login .tagline {
+      color: #c7dcf7;
+      line-height: 1.55;
+      margin: 0 0 18px;
+      font-size: 15px;
+    }
+
+    .login-badges {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 0 0 16px;
+    }
+
+    .login-badge {
+      border: 1px solid rgba(142,204,255,.22);
+      background: rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 10px 8px;
+      color: #cff3ff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .version {
+      text-align: center;
+      color: rgba(200,230,255,.55);
+      font-size: 11px;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: stretch;
+      margin-bottom: 14px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 128px;
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, rgba(5, 16, 31, .94), rgba(10, 31, 59, .78)),
+        radial-gradient(circle at 70% 30%, rgba(98, 215, 255, .18), transparent 28%);
+      box-shadow: var(--shadow);
+    }
+
+    .hero:after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(98,215,255,.24), transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      width: 76px;
+      height: 76px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 35% 24%, rgba(255,255,255,.26), transparent 24%),
+        linear-gradient(150deg, rgba(34, 110, 205, .75), rgba(2, 9, 19, .95));
+      border: 1px solid rgba(98,215,255,.36);
+      box-shadow:
+        0 0 34px rgba(98,215,255,.22),
+        inset 0 0 22px rgba(255,255,255,.05);
+    }
+
+    .hero-logo img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.45));
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(27px, 5vw, 42px);
+      line-height: .95;
+      letter-spacing: -1px;
+      text-shadow: 0 0 24px rgba(98,207,255,.36);
+    }
+
+    .hero p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .hero-meta {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .mini-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(142,204,255,.22);
+      background: rgba(255,255,255,.06);
+      color: #d8f7ff;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .side-actions {
+      display: grid;
+      gap: 8px;
+      min-width: 142px;
+    }
+
+    .pill,
+    .sound-btn {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      background: rgba(12, 38, 70, .75);
+      color: #c8f3ff;
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 12px;
+      white-space: nowrap;
+      box-shadow: none;
+      text-align: center;
+    }
+
+    .sound-btn {
+      cursor: pointer;
     }
 
     .grid {
@@ -177,11 +402,36 @@
     }
 
     .stat {
-      background: var(--panel2);
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(15, 37, 68, .92), rgba(7, 17, 32, .92));
       border: 1px solid rgba(142,204,255,.22);
-      border-radius: 18px;
+      border-radius: 22px;
       padding: 14px;
-      min-height: 82px;
+      min-height: 96px;
+      box-shadow: 0 14px 36px rgba(0,0,0,.18);
+    }
+
+    .stat:after {
+      content: "";
+      position: absolute;
+      right: -18px;
+      bottom: -22px;
+      width: 86px;
+      height: 86px;
+      background: radial-gradient(circle, rgba(98,215,255,.15), transparent 66%);
+    }
+
+    .stat img {
+      position: absolute;
+      right: 9px;
+      top: 9px;
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      opacity: .82;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,.35));
     }
 
     .stat small {
@@ -189,77 +439,151 @@
       color: #9fd7ff;
       font-weight: 900;
       font-size: 11px;
-      margin-bottom: 8px;
+      margin-bottom: 9px;
+      letter-spacing: .4px;
+      padding-right: 42px;
     }
 
     .stat strong {
       display: block;
-      font-size: 22px;
-      line-height: 1.1;
+      font-size: clamp(20px, 4vw, 27px);
+      line-height: 1.05;
+      letter-spacing: -.5px;
     }
 
     .tap-area {
-      position: relative;
-      overflow: hidden;
-      min-height: 230px;
+      min-height: 286px;
       display: grid;
       place-items: center;
       text-align: center;
+      margin-bottom: 14px;
       background:
-        radial-gradient(circle at 50% 40%, rgba(98,207,255,.16), transparent 36%),
-        linear-gradient(180deg, rgba(8,22,40,.95), rgba(2,8,15,.95));
+        radial-gradient(circle at 50% 42%, rgba(98,207,255,.22), transparent 34%),
+        linear-gradient(180deg, rgba(8,22,40,.94), rgba(2,8,15,.96));
+    }
+
+    .tap-stage {
+      position: relative;
+      width: min(360px, 100%);
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+    }
+
+    .tap-ring {
+      position: absolute;
+      width: 236px;
+      height: 236px;
+      border-radius: 50%;
+      border: 1px solid rgba(98,215,255,.28);
+      box-shadow:
+        0 0 46px rgba(98,215,255,.18),
+        inset 0 0 46px rgba(98,215,255,.06);
+      animation: ringPulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(.96); opacity: .7; }
+      50% { transform: scale(1.04); opacity: 1; }
     }
 
     .tap-core {
-      width: 180px;
-      height: 180px;
+      position: relative;
+      z-index: 2;
+      width: 186px;
+      height: 186px;
       border-radius: 50%;
       display: grid;
       place-items: center;
       background:
-        radial-gradient(circle at 35% 30%, #eaf9ff, #62cfff 30%, #1764c7 72%, #08264a 100%);
+        radial-gradient(circle at 35% 30%, #fff7ca, #ffc841 35%, #9d6614 72%, #201003 100%);
       box-shadow:
-        0 0 0 12px rgba(98,207,255,.08),
-        0 0 55px rgba(98,207,255,.5),
-        inset 0 -18px 35px rgba(0,0,0,.35);
+        0 0 0 12px rgba(255, 210, 72, .08),
+        0 0 55px rgba(255, 198, 57, .42),
+        inset 0 -18px 35px rgba(0,0,0,.38);
       color: #021021;
       font-size: 54px;
       font-weight: 1000;
       touch-action: manipulation;
       user-select: none;
+      cursor: pointer;
+    }
+
+    .tap-core img {
+      width: 176px;
+      height: 176px;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 18px rgba(0,0,0,.42));
+      pointer-events: none;
+    }
+
+    .tap-symbol {
+      display: none;
+      color: #07101d;
+      font-size: 58px;
+      font-weight: 1000;
     }
 
     .tap-label {
-      margin-top: 12px;
-      color: #d9f7ff;
-      font-weight: 900;
-      letter-spacing: .5px;
+      margin-top: 18px;
+      color: #e4fbff;
+      font-weight: 1000;
+      letter-spacing: .8px;
+      font-size: 17px;
+      text-shadow: 0 0 18px rgba(98,215,255,.3);
+    }
+
+    .tap-help {
+      color: #9fc3e6;
+      margin: 8px auto 0;
+      font-size: 13px;
+      max-width: 360px;
+      line-height: 1.45;
+    }
+
+    .float-coin {
+      position: fixed;
+      z-index: 999;
+      color: #fff2a5;
+      font-weight: 1000;
+      font-size: 21px;
+      text-shadow: 0 4px 18px rgba(0,0,0,.55);
+      pointer-events: none;
+      animation: floatCoin .88s ease-out forwards;
+    }
+
+    @keyframes floatCoin {
+      0% { transform: translate(-50%, -50%) scale(.8); opacity: 0; }
+      18% { opacity: 1; }
+      100% { transform: translate(-50%, -150%) scale(1.18); opacity: 0; }
     }
 
     .actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-top: 12px;
+      margin-bottom: 10px;
     }
 
     .section-title {
       display: flex;
-      align-items: center;
+      align-items: end;
       justify-content: space-between;
-      margin: 18px 0 10px;
+      margin: 20px 2px 10px;
       gap: 8px;
     }
 
     .section-title h3 {
       margin: 0;
-      font-size: 20px;
+      font-size: 22px;
+      letter-spacing: -.3px;
     }
 
     .section-title span {
       color: var(--muted);
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
+      text-align: right;
     }
 
     .list {
@@ -268,80 +592,87 @@
     }
 
     .item {
+      position: relative;
+      overflow: hidden;
       display: grid;
-      grid-template-columns: 58px 1fr auto;
+      grid-template-columns: 74px 1fr auto;
       gap: 12px;
       align-items: center;
-      background: rgba(15,33,58,.76);
-      border: 1px solid rgba(142,204,255,.22);
-      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(15,33,58,.82), rgba(8, 18, 34, .82));
+      border: 1px solid rgba(142,204,255,.2);
+      border-radius: 22px;
       padding: 12px;
+      box-shadow: 0 14px 34px rgba(0,0,0,.16);
     }
 
-    .icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
+    .item:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 94% 10%, rgba(98,215,255,.1), transparent 34%);
+      pointer-events: none;
+    }
+
+    .thumb {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
       display: grid;
       place-items: center;
-      background: rgba(98,207,255,.12);
-      border: 1px solid rgba(98,207,255,.25);
-      font-size: 26px;
+      background: rgba(98,207,255,.1);
+      border: 1px solid rgba(98,207,255,.24);
+      overflow: hidden;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.34));
+    }
+
+    .thumb.contain img {
+      object-fit: contain;
+      padding: 3px;
     }
 
     .item h4 {
       margin: 0 0 5px;
       font-size: 16px;
+      letter-spacing: -.15px;
     }
 
     .item p {
       margin: 0;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.35;
+      line-height: 1.38;
     }
 
     .small-btn {
-      min-width: 118px;
+      min-width: 124px;
+      min-height: 46px;
       padding: 12px 13px;
       font-size: 13px;
     }
 
-    .gold {
-      background: linear-gradient(135deg, #ffda69, #fff0a8);
-    }
-
-    .green {
-      background: linear-gradient(135deg, #45ff9c, #b9ffd8);
-    }
-
-    .danger {
-      background: linear-gradient(135deg, #ff6a86, #ffc1cc);
-    }
-
-    .ghost-btn {
-      margin-top: 10px;
-      background: rgba(255,255,255,.08);
-      color: #d7f4ff;
-      border: 1px solid rgba(142,204,255,.22);
-      box-shadow: none;
-    }
-
     .leader-row {
       display: grid;
-      grid-template-columns: 44px 1fr auto;
+      grid-template-columns: 46px 1fr auto;
       gap: 10px;
       align-items: center;
-      background: rgba(15,33,58,.62);
+      background:
+        linear-gradient(180deg, rgba(15,33,58,.68), rgba(7, 17, 32, .78));
       border: 1px solid rgba(142,204,255,.18);
-      border-radius: 16px;
-      padding: 10px 12px;
+      border-radius: 18px;
+      padding: 11px 12px;
     }
 
     .rank {
-      width: 34px;
-      height: 34px;
-      border-radius: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
       display: grid;
       place-items: center;
       background: rgba(255,224,138,.16);
@@ -357,16 +688,17 @@
       background: rgba(2, 8, 15, .94);
       color: #e9fbff;
       border: 1px solid rgba(98,207,255,.35);
-      padding: 12px 16px;
-      border-radius: 16px;
+      padding: 13px 16px;
+      border-radius: 18px;
       box-shadow: 0 16px 48px rgba(0,0,0,.45);
       opacity: 0;
       pointer-events: none;
       transition: opacity .2s ease, bottom .2s ease;
-      z-index: 99;
-      width: min(520px, calc(100% - 24px));
+      z-index: 9999;
+      width: min(560px, calc(100% - 24px));
       text-align: center;
-      font-weight: 800;
+      font-weight: 900;
+      line-height: 1.35;
     }
 
     .toast.show {
@@ -374,43 +706,102 @@
       bottom: 28px;
     }
 
-    .hidden {
-      display: none !important;
-    }
-
-    .version {
-      text-align: center;
-      color: rgba(200,230,255,.55);
-      font-size: 11px;
-      margin-top: 14px;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 720px) {
+    @media (max-width: 780px) {
       .app {
-        padding: 10px 8px 18px;
+        padding: 10px 8px 20px;
       }
 
-      .hero h1 {
-        font-size: 22px;
+      .login {
+        margin-top: 24px;
+        padding: 18px;
       }
 
-      .logo {
-        width: 50px;
-        height: 50px;
+      .login-visual {
+        width: 124px;
+        height: 124px;
+        border-radius: 32px;
       }
 
-      .pill {
-        font-size: 11px;
-        padding: 8px 10px;
+      .login-visual img {
+        width: 104px;
+        height: 104px;
+      }
+
+      .login-badges {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .side-actions {
+        grid-template-columns: 1fr 1fr;
+        min-width: 0;
+      }
+
+      .hero {
+        min-height: auto;
+        grid-template-columns: 68px 1fr;
+        padding: 13px;
+        border-radius: 24px;
+      }
+
+      .hero-logo {
+        width: 62px;
+        height: 62px;
+        border-radius: 20px;
+      }
+
+      .hero-logo img {
+        width: 58px;
+        height: 58px;
+      }
+
+      .hero p {
+        font-size: 12px;
       }
 
       .grid {
         grid-template-columns: repeat(2, 1fr);
       }
 
+      .stat {
+        min-height: 90px;
+        padding: 12px;
+      }
+
+      .tap-area {
+        min-height: 255px;
+      }
+
+      .tap-core {
+        width: 156px;
+        height: 156px;
+      }
+
+      .tap-core img {
+        width: 148px;
+        height: 148px;
+      }
+
+      .tap-ring {
+        width: 202px;
+        height: 202px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
       .item {
-        grid-template-columns: 48px 1fr;
+        grid-template-columns: 64px 1fr;
+      }
+
+      .thumb {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
       }
 
       .item button {
@@ -418,18 +809,22 @@
         width: 100%;
       }
 
-      .actions {
-        grid-template-columns: 1fr;
+      .section-title h3 {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .grid {
+        gap: 8px;
       }
 
-      .tap-core {
-        width: 150px;
-        height: 150px;
-        font-size: 46px;
+      .stat strong {
+        font-size: 19px;
       }
 
-      .login {
-        margin-top: 32px;
+      .hero h1 {
+        font-size: 25px;
       }
     }
   </style>
@@ -438,8 +833,21 @@
 <body>
   <div class="app">
     <div id="loginCard" class="card login">
+      <div class="login-visual">
+        <img src="./public/assets/currency/chip_bm_blue_black.png" alt="Marino Empire" onerror="this.remove()" />
+      </div>
+
       <h2>Marino Empire</h2>
-      <p>Casino imparatorluğunu büyüt, coin kas, binaları geliştir ve ödül mağazasından Free Spin / Freebet talebi oluştur.</p>
+
+      <p class="tagline">
+        Casino imparatorluğunu büyüt, coin kas, binaları geliştir ve ödül mağazasından Free Spin / Freebet talebi oluştur.
+      </p>
+
+      <div class="login-badges">
+        <div class="login-badge">⚡ Hızlı Oyun</div>
+        <div class="login-badge">🏆 Liderlik</div>
+        <div class="login-badge">🎁 Admin Onaylı Ödül</div>
+      </div>
 
       <input id="siteUsernameInput" placeholder="Site kullanıcı adını yaz" autocomplete="off" />
 
@@ -450,34 +858,81 @@
       </button>
 
       <div class="version">
-        Supabase hızlı sistem v2.1<br>
+        Supabase hızlı sistem v2.2<br>
         Tarayıcı testinde farklı hesap için test hesabını sıfırla.
       </div>
     </div>
 
     <div id="game" class="hidden">
-      <div class="hero">
-        <div class="logo">M</div>
-        <div>
-          <h1>Marino Empire</h1>
-          <p id="userLine">Oyuncu yükleniyor...</p>
+      <div class="topbar">
+        <div class="hero">
+          <div class="hero-logo">
+            <img src="./public/assets/currency/chip_bm_blue_black.png" alt="Marino Empire" onerror="this.remove()" />
+          </div>
+
+          <div>
+            <h1>Marino Empire</h1>
+            <p id="userLine">Oyuncu yükleniyor...</p>
+
+            <div class="hero-meta">
+              <span class="mini-badge">💠 Supabase Aktif</span>
+              <span class="mini-badge">🎮 Telegram Mini App</span>
+              <span class="mini-badge">🛡️ Admin Onaylı</span>
+            </div>
+          </div>
         </div>
-        <div id="syncPill" class="pill">Hazır</div>
+
+        <div class="side-actions">
+          <div id="syncPill" class="pill">Hazır</div>
+          <button id="soundBtn" class="sound-btn" type="button">Ses: Açık</button>
+        </div>
       </div>
 
       <div class="grid">
-        <div class="stat"><small>MARINO COIN</small><strong id="coinStat">0</strong></div>
-        <div class="stat"><small>ENERJİ</small><strong id="energyStat">0/0</strong></div>
-        <div class="stat"><small>SAATLİK GELİR</small><strong id="incomeStat">0</strong></div>
-        <div class="stat"><small>ÖDÜL TOKEN</small><strong id="tokenStat">0</strong></div>
+        <div class="stat">
+          <img src="./public/assets/currency/coin_bm_gold.png" alt="" onerror="this.remove()" />
+          <small>MARINO COIN</small>
+          <strong id="coinStat">0</strong>
+        </div>
+
+        <div class="stat">
+          <img src="./public/assets/currency/chip_spade_black_gold.png" alt="" onerror="this.remove()" />
+          <small>ENERJİ</small>
+          <strong id="energyStat">0/0</strong>
+        </div>
+
+        <div class="stat">
+          <img src="./public/assets/currency/coin_crown_gold.png" alt="" onerror="this.remove()" />
+          <small>SAATLİK GELİR</small>
+          <strong id="incomeStat">0</strong>
+        </div>
+
+        <div class="stat">
+          <img src="./public/assets/game/ticket_sports_reward.png" alt="" onerror="this.remove()" />
+          <small>ÖDÜL TOKEN</small>
+          <strong id="tokenStat">0</strong>
+        </div>
       </div>
 
-      <div class="card tap-area">
+      <div id="tapArea" class="card tap-area">
         <div>
-          <div id="tapBtn" class="tap-core">₼</div>
+          <div class="tap-stage">
+            <div class="tap-ring"></div>
+
+            <div id="tapBtn" class="tap-core">
+              <img
+                src="./public/assets/currency/coin_bm_gold.png"
+                alt="Marino Coin"
+                onerror="this.remove(); document.querySelector('.tap-symbol').style.display='block';"
+              />
+              <span class="tap-symbol">₼</span>
+            </div>
+          </div>
+
           <div class="tap-label">CASINOYA TIKLA</div>
-          <p style="color:#9fc3e6;margin:8px 0 0;font-size:13px;">
-            Her tık coin kazandırır. Enerji bitince beklemen gerekir.
+
+          <p class="tap-help">
+            Her tık coin kazandırır. Enerji bitince kasa ve bina gelirlerini kullanarak tekrar güçlen.
           </p>
         </div>
       </div>
@@ -495,21 +950,24 @@
         <h3>Binalar</h3>
         <span id="buildingInfo">Yükleniyor</span>
       </div>
+
       <div id="buildingsList" class="list"></div>
 
       <div class="section-title">
         <h3>Ödül Mağazası</h3>
         <span>Admin onaylı talepler</span>
       </div>
+
       <div id="storeList" class="list"></div>
 
       <div class="section-title">
         <h3>Liderlik</h3>
         <span>Sezon sıralaması</span>
       </div>
+
       <div id="leaderboardList" class="list"></div>
 
-      <div class="version">GitHub Pages + Supabase RPC v2.1</div>
+      <div class="version">GitHub Pages + Supabase RPC v2.2</div>
     </div>
   </div>
 
@@ -528,6 +986,21 @@
       tg.expand();
     }
 
+    const ASSETS = {
+      logo: "./public/assets/currency/chip_bm_blue_black.png",
+      coinGold: "./public/assets/currency/coin_bm_gold.png",
+      coinCrown: "./public/assets/currency/coin_crown_gold.png",
+      chipSpade: "./public/assets/currency/chip_spade_black_gold.png",
+      ticket: "./public/assets/game/ticket_sports_reward.png",
+      wheel: "./public/assets/game/wheel_daily_spin.png",
+      roomAdmin: "./public/assets/rooms/room_admin_control.png",
+      roomCasino: "./public/assets/rooms/room_casino_lobby.png",
+      roomRewards: "./public/assets/rooms/room_rewards_office.png",
+      roomSlot: "./public/assets/rooms/room_slot_area.png",
+      roomSports: "./public/assets/rooms/room_sportsbook_area.png",
+      roomVip: "./public/assets/rooms/room_vip_casino.png"
+    };
+
     const el = {
       loginCard: document.getElementById("loginCard"),
       game: document.getElementById("game"),
@@ -535,9 +1008,11 @@
       startBtn: document.getElementById("startBtn"),
       resetTestBtn: document.getElementById("resetTestBtn"),
       logoutBtn: document.getElementById("logoutBtn"),
+      tapArea: document.getElementById("tapArea"),
       tapBtn: document.getElementById("tapBtn"),
       collectBtn: document.getElementById("collectBtn"),
       refreshBtn: document.getElementById("refreshBtn"),
+      soundBtn: document.getElementById("soundBtn"),
       syncPill: document.getElementById("syncPill"),
       userLine: document.getElementById("userLine"),
       coinStat: document.getElementById("coinStat"),
@@ -561,14 +1036,19 @@
       busy: false,
       pendingTaps: 0,
       tapTimer: null,
-      autoLoginRunning: false
+      autoLoginRunning: false,
+      soundEnabled: localStorage.getItem("marino_sound") !== "off"
     };
+
+    let audioCtx = null;
 
     const savedSiteUsername = localStorage.getItem("marino_site_username");
 
     if (savedSiteUsername) {
       el.siteUsernameInput.value = savedSiteUsername;
     }
+
+    updateSoundButton();
 
     function getTelegramIdentity() {
       const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
@@ -715,7 +1195,7 @@
       }
     }
 
-    function tapCasino() {
+    function tapCasino(evt) {
       if (!state.player) return;
 
       if (Number(state.player.energy || 0) <= 0) {
@@ -731,9 +1211,72 @@
       state.pendingTaps += 1;
 
       renderStats();
+      tapEffect(evt, gain);
+      playTapSound();
 
       clearTimeout(state.tapTimer);
       state.tapTimer = setTimeout(flushTaps, 320);
+    }
+
+    function tapEffect(evt, gain) {
+      const span = document.createElement("span");
+      span.className = "float-coin";
+      span.textContent = "+" + fmt(gain);
+
+      let x = window.innerWidth / 2;
+      let y = window.innerHeight / 2;
+
+      if (evt && evt.clientX && evt.clientY) {
+        x = evt.clientX;
+        y = evt.clientY;
+      } else {
+        const rect = el.tapBtn.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top + rect.height / 2;
+      }
+
+      span.style.left = x + "px";
+      span.style.top = y + "px";
+
+      document.body.appendChild(span);
+
+      setTimeout(() => {
+        span.remove();
+      }, 900);
+    }
+
+    function playTapSound() {
+      if (!state.soundEnabled) return;
+
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+        if (!AudioContext) return;
+
+        if (!audioCtx) {
+          audioCtx = new AudioContext();
+        }
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(620, now);
+        osc.frequency.exponentialRampToValueAtTime(980, now + 0.055);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.09, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } catch (err) {
+        console.warn("Sound disabled:", err);
+      }
     }
 
     async function flushTaps() {
@@ -770,6 +1313,7 @@
 
         applyGameData(data);
         toast("Kasa toplandı.");
+        playTapSound();
       } catch (err) {
         toast(err.message);
       }
@@ -787,6 +1331,7 @@
 
         applyGameData(data);
         toast("Bina yükseltildi.");
+        playTapSound();
       } catch (err) {
         toast(err.message);
       }
@@ -832,6 +1377,17 @@
       toast("Giriş ekranına döndün. Hesap silinmedi.");
     }
 
+    function toggleSound() {
+      state.soundEnabled = !state.soundEnabled;
+      localStorage.setItem("marino_sound", state.soundEnabled ? "on" : "off");
+      updateSoundButton();
+      toast(state.soundEnabled ? "Ses açıldı." : "Ses kapatıldı.");
+    }
+
+    function updateSoundButton() {
+      el.soundBtn.textContent = state.soundEnabled ? "Ses: Açık" : "Ses: Kapalı";
+    }
+
     function renderAll() {
       renderStats();
       renderBuildings();
@@ -871,10 +1427,14 @@
 
       el.buildingsList.innerHTML = list.map(b => {
         const canBuy = Number(state.player.marino_coin || 0) >= Number(b.next_cost_coin || 0);
+        const image = getBuildingImage(b);
 
         return `
           <div class="item">
-            <div class="icon">${b.emoji || "🏢"}</div>
+            <div class="thumb">
+              <img src="${image}" alt="${escapeHtml(b.building_name || "Bina")}" onerror="this.remove()">
+            </div>
+
             <div>
               <h4>${escapeHtml(b.building_name)} · Lv. ${fmt(b.level)}</h4>
               <p>
@@ -882,6 +1442,7 @@
                 Sonraki maliyet: ${fmt(b.next_cost_coin)} coin
               </p>
             </div>
+
             <button
               class="small-btn ${canBuy ? "green" : ""}"
               ${canBuy ? "" : "disabled"}
@@ -905,10 +1466,14 @@
         const hasCoin = Number(state.player.marino_coin || 0) >= Number(item.cost_coin || 0);
         const hasToken = Number(state.player.reward_token || 0) >= Number(item.cost_token || 0);
         const canBuy = hasCoin && hasToken;
+        const image = getStoreImage(item);
 
         return `
           <div class="item">
-            <div class="icon">🎁</div>
+            <div class="thumb contain">
+              <img src="${image}" alt="${escapeHtml(item.item_name || "Ödül")}" onerror="this.remove()">
+            </div>
+
             <div>
               <h4>${escapeHtml(item.item_name)}</h4>
               <p>
@@ -916,6 +1481,7 @@
                 <br>${escapeHtml(item.description || "Admin onaylı ödül.")}
               </p>
             </div>
+
             <button
               class="small-btn gold"
               ${canBuy ? "" : "disabled"}
@@ -936,29 +1502,69 @@
       }
 
       el.leaderboardList.innerHTML = list.map((l, i) => {
+        const medal = i === 0 ? "🏆" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
+
         return `
           <div class="leader-row">
-            <div class="rank">${i + 1}</div>
+            <div class="rank">${medal}</div>
+
             <div>
               <strong>${escapeHtml(l.display_name || l.site_username || "Oyuncu")}</strong>
               <p style="margin:4px 0 0;color:#9fc3e6;font-size:12px;">
                 Level ${fmt(l.casino_level)} · İtibar ${fmt(l.reputation)}
               </p>
             </div>
+
             <strong>${fmt(l.season_points)}</strong>
           </div>
         `;
       }).join("");
     }
 
+    function getBuildingImage(b) {
+      const key = String(b.building_key || "").toLowerCase();
+      const name = String(b.building_name || "").toLowerCase();
+      const text = key + " " + name;
+
+      if (text.includes("slot")) return ASSETS.roomSlot;
+      if (text.includes("sport") || text.includes("spor")) return ASSETS.roomSports;
+      if (text.includes("vip")) return ASSETS.roomVip;
+      if (text.includes("reward") || text.includes("ödül") || text.includes("odul")) return ASSETS.roomRewards;
+      if (text.includes("admin") || text.includes("control") || text.includes("kontrol")) return ASSETS.roomAdmin;
+      if (text.includes("casino") || text.includes("lobby")) return ASSETS.roomCasino;
+
+      return ASSETS.roomCasino;
+    }
+
+    function getStoreImage(item) {
+      const code = String(item.item_code || "").toLowerCase();
+      const name = String(item.item_name || "").toLowerCase();
+      const desc = String(item.description || "").toLowerCase();
+      const text = code + " " + name + " " + desc;
+
+      if (text.includes("freebet") || text.includes("free bet") || text.includes("spor")) {
+        return ASSETS.ticket;
+      }
+
+      if (text.includes("spin") || text.includes("fs") || text.includes("freespin")) {
+        return ASSETS.wheel;
+      }
+
+      return ASSETS.coinCrown;
+    }
+
     function emptyItem(title, desc) {
       return `
         <div class="item">
-          <div class="icon">ℹ️</div>
+          <div class="thumb contain">
+            <img src="${ASSETS.coinCrown}" alt="" onerror="this.remove()">
+          </div>
+
           <div>
             <h4>${escapeHtml(title)}</h4>
             <p>${escapeHtml(desc)}</p>
           </div>
+
           <button class="small-btn" disabled>Bekle</button>
         </div>
       `;
@@ -975,6 +1581,8 @@
 
     function escapeAttr(value) {
       return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll('"', "&quot;")
         .replaceAll("\\", "\\\\")
         .replaceAll("'", "\\'");
     }
@@ -984,6 +1592,7 @@
     el.logoutBtn.addEventListener("click", logoutToLogin);
     el.collectBtn.addEventListener("click", collectIncome);
     el.refreshBtn.addEventListener("click", loadState);
+    el.soundBtn.addEventListener("click", toggleSound);
     el.tapBtn.addEventListener("click", tapCasino);
 
     window.addEventListener("load", () => {
@@ -996,6 +1605,12 @@
         setTimeout(() => {
           startGame({ silent: true });
         }, 300);
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && state.player) {
+        loadState();
       }
     });
 
