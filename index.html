@@ -3,30 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
+
   <title>Marino Empire</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
-      --bg: #050915;
-      --bg2: #071a2d;
-      --card: rgba(12, 30, 52, 0.82);
-      --card2: rgba(15, 48, 78, 0.72);
-      --line: rgba(108, 197, 255, 0.24);
-      --text: #eaf7ff;
-      --muted: #89a9bd;
-      --blue: #34b7ff;
-      --blue2: #087bff;
-      --green: #49d67a;
-      --gold: #ffd46b;
-      --red: #ff4d6d;
-      --purple: #b15cff;
-      --shadow: 0 24px 80px rgba(0,0,0,.42);
-      --radius: 24px;
+      --bg: #06111f;
+      --panel: rgba(8, 20, 38, .94);
+      --panel2: rgba(15, 33, 58, .95);
+      --line: rgba(114, 206, 255, .35);
+      --blue: #62cfff;
+      --blue2: #3b8cff;
+      --gold: #ffe08a;
+      --green: #52ffad;
+      --red: #ff5d7a;
+      --text: #f4fbff;
+      --muted: #9fc3e6;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
     }
 
     * {
@@ -34,200 +33,143 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    body {
       margin: 0;
-      width: 100%;
-      min-height: 100%;
-      background: radial-gradient(circle at top, #12345f 0%, var(--bg) 44%, #02050c 100%);
-      color: var(--text);
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      overflow-x: hidden;
-      touch-action: manipulation;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
+      min-height: 100vh;
       background:
-        radial-gradient(circle at 15% 15%, rgba(52,183,255,.18), transparent 28%),
-        radial-gradient(circle at 85% 25%, rgba(177,92,255,.14), transparent 28%),
-        radial-gradient(circle at 50% 100%, rgba(73,214,122,.10), transparent 35%);
-      pointer-events: none;
-      z-index: 0;
+        radial-gradient(circle at top, rgba(50,130,255,.25), transparent 35%),
+        linear-gradient(180deg, #102d5a 0%, #04101d 45%, #020711 100%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      overflow-x: hidden;
     }
 
     .app {
-      position: relative;
-      z-index: 1;
-      width: min(1180px, 100%);
+      width: min(980px, 100%);
       margin: 0 auto;
-      padding: 18px 14px 90px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(145deg, #0e87ff, #46e0ff);
-      box-shadow: 0 0 32px rgba(52,183,255,.38);
-      font-size: 24px;
-      font-weight: 900;
-      color: white;
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: .2px;
-      line-height: 1.05;
-    }
-
-    .brand small {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    .pill {
-      border: 1px solid var(--line);
-      background: rgba(8, 27, 48, .72);
-      color: var(--text);
-      padding: 9px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      white-space: nowrap;
-      box-shadow: inset 0 0 18px rgba(52,183,255,.08);
+      padding: 18px 12px 28px;
     }
 
     .hero {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      background:
-        linear-gradient(140deg, rgba(12, 37, 66, .92), rgba(6, 15, 31, .84)),
-        radial-gradient(circle at 20% 20%, rgba(52,183,255,.2), transparent 28%);
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
       margin-bottom: 14px;
     }
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      width: 240px;
-      height: 240px;
-      right: -70px;
-      top: -80px;
-      background: radial-gradient(circle, rgba(52,183,255,.22), transparent 68%);
-      animation: pulse 3s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: .75; }
-      50% { transform: scale(1.14); opacity: 1; }
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
+    .logo {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
       display: grid;
-      grid-template-columns: 1.3fr .7fr;
-      gap: 14px;
-      align-items: center;
+      place-items: center;
+      font-size: 30px;
+      font-weight: 900;
+      color: #04101d;
+      background: linear-gradient(135deg, #67d6ff, #aaf3ff);
+      box-shadow: 0 0 32px rgba(98,207,255,.45);
     }
 
-    .hero h2 {
-      margin: 0 0 8px;
-      font-size: clamp(26px, 5vw, 48px);
-      line-height: .98;
-      letter-spacing: -.8px;
+    .hero h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.05;
+      text-shadow: 0 0 20px rgba(98,207,255,.35);
     }
 
     .hero p {
-      margin: 0;
-      color: #b6d5e8;
+      margin: 5px 0 0;
+      color: var(--muted);
       font-size: 14px;
+    }
+
+    .pill {
+      margin-left: auto;
+      border: 1px solid var(--line);
+      background: rgba(12, 38, 70, .75);
+      color: #c8f3ff;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .login {
+      max-width: 560px;
+      margin: 70px auto 0;
+      text-align: center;
+      padding: 26px;
+    }
+
+    .login h2 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      color: #6be3ff;
+      text-shadow: 0 0 24px rgba(107,227,255,.45);
+    }
+
+    .login p {
+      color: #c7dcf7;
       line-height: 1.5;
-      max-width: 640px;
+      margin: 0 0 18px;
     }
 
-    .casino-visual {
-      min-height: 160px;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.1);
-      background:
-        linear-gradient(180deg, rgba(52,183,255,.12), rgba(73,214,122,.06)),
-        rgba(1, 8, 18, .42);
-      display: grid;
-      place-items: center;
-      position: relative;
-      overflow: hidden;
+    input {
+      width: 100%;
+      border: 1px solid rgba(150,210,255,.35);
+      background: rgba(255,255,255,.06);
+      color: white;
+      border-radius: 16px;
+      padding: 15px 16px;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 12px;
     }
 
-    .casino-visual .tower {
-      width: 46px;
-      height: 110px;
-      border-radius: 18px 18px 8px 8px;
-      background: linear-gradient(180deg, #37bcff, #0d4080);
-      box-shadow: 0 0 35px rgba(52,183,255,.35);
-      position: relative;
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(98,207,255,.12);
     }
 
-    .casino-visual .tower::before,
-    .casino-visual .tower::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      width: 42px;
-      height: 76px;
-      border-radius: 14px 14px 8px 8px;
-      background: linear-gradient(180deg, #194b8d, #071b37);
-      border: 1px solid rgba(255,255,255,.08);
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 16px;
+      font-weight: 900;
+      color: #03101e;
+      background: linear-gradient(135deg, #5db2ff, #91ecff);
+      box-shadow: 0 10px 26px rgba(68,172,255,.25);
+      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+      user-select: none;
     }
 
-    .casino-visual .tower::before { left: -54px; }
-    .casino-visual .tower::after { right: -54px; }
-
-    .spark {
-      position: absolute;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 16px var(--gold);
-      animation: floatSpark 3.6s linear infinite;
+    button:active {
+      transform: scale(.97);
     }
 
-    .spark:nth-child(2) { left: 20%; top: 70%; animation-delay: .2s; }
-    .spark:nth-child(3) { left: 72%; top: 68%; animation-delay: 1s; }
-    .spark:nth-child(4) { left: 42%; top: 82%; animation-delay: 1.8s; }
-
-    @keyframes floatSpark {
-      from { transform: translateY(30px); opacity: 0; }
-      30% { opacity: 1; }
-      to { transform: translateY(-150px); opacity: 0; }
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      filter: grayscale(.35);
     }
 
-    .stats {
+    .main-btn {
+      width: 100%;
+      padding: 15px 18px;
+      font-size: 17px;
+    }
+
+    .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
@@ -235,852 +177,597 @@
     }
 
     .stat {
-      border: 1px solid var(--line);
-      background: var(--card);
+      background: var(--panel2);
+      border: 1px solid rgba(142,204,255,.22);
       border-radius: 18px;
-      padding: 13px;
+      padding: 14px;
       min-height: 82px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.2);
     }
 
-    .stat label {
-      color: var(--muted);
-      font-size: 12px;
+    .stat small {
       display: block;
+      color: #9fd7ff;
+      font-weight: 900;
+      font-size: 11px;
       margin-bottom: 8px;
     }
 
     .stat strong {
-      font-size: 21px;
       display: block;
+      font-size: 22px;
       line-height: 1.1;
     }
 
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 14px;
-    }
-
-    .panel {
-      border: 1px solid var(--line);
-      background: rgba(7, 23, 42, .76);
-      border-radius: var(--radius);
-      padding: 14px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-
-    .panel-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .panel-title h3 {
-      margin: 0;
-      font-size: 18px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .tab {
-      border: 1px solid var(--line);
-      background: rgba(8, 27, 48, .72);
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .tab.active {
-      border-color: rgba(52,183,255,.75);
-      background: linear-gradient(135deg, rgba(52,183,255,.3), rgba(8,123,255,.22));
-      box-shadow: 0 0 20px rgba(52,183,255,.18);
-    }
-
-    .tap-zone {
-      user-select: none;
-      min-height: 260px;
-      border-radius: 24px;
-      border: 1px solid rgba(52,183,255,.25);
-      background:
-        radial-gradient(circle at 50% 35%, rgba(52,183,255,.22), transparent 34%),
-        linear-gradient(180deg, rgba(9, 41, 72, .8), rgba(5, 12, 25, .82));
+    .tap-area {
+      position: relative;
+      overflow: hidden;
+      min-height: 230px;
       display: grid;
       place-items: center;
       text-align: center;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      margin-bottom: 12px;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(98,207,255,.16), transparent 36%),
+        linear-gradient(180deg, rgba(8,22,40,.95), rgba(2,8,15,.95));
     }
 
-    .tap-button {
-      width: 175px;
-      height: 175px;
+    .tap-core {
+      width: 180px;
+      height: 180px;
       border-radius: 50%;
-      border: 2px solid rgba(255,255,255,.16);
-      background:
-        radial-gradient(circle at 35% 25%, #79e5ff, #087bff 42%, #052f66 72%);
       display: grid;
       place-items: center;
+      background:
+        radial-gradient(circle at 35% 30%, #eaf9ff, #62cfff 30%, #1764c7 72%, #08264a 100%);
       box-shadow:
-        0 0 50px rgba(52,183,255,.42),
-        inset 0 -18px 34px rgba(0,0,0,.36);
-      transform: translateZ(0);
-      transition: transform .08s ease;
-    }
-
-    .tap-zone:active .tap-button {
-      transform: scale(.96);
-    }
-
-    .tap-button span {
-      font-size: 42px;
+        0 0 0 12px rgba(98,207,255,.08),
+        0 0 55px rgba(98,207,255,.5),
+        inset 0 -18px 35px rgba(0,0,0,.35);
+      color: #021021;
+      font-size: 54px;
       font-weight: 1000;
-      text-shadow: 0 4px 16px rgba(0,0,0,.45);
+      touch-action: manipulation;
     }
 
-    .tap-help {
-      position: absolute;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      color: #a6c5d8;
-      font-size: 12px;
-    }
-
-    .floating-plus {
-      position: absolute;
-      color: var(--gold);
-      font-weight: 1000;
-      pointer-events: none;
-      animation: plusUp .8s ease forwards;
-      text-shadow: 0 0 18px rgba(255,212,107,.55);
-    }
-
-    @keyframes plusUp {
-      from { transform: translateY(0) scale(.9); opacity: 1; }
-      to { transform: translateY(-60px) scale(1.2); opacity: 0; }
+    .tap-label {
+      margin-top: 12px;
+      color: #d9f7ff;
+      font-weight: 900;
+      letter-spacing: .5px;
     }
 
     .actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-top: 12px;
     }
 
-    button {
-      border: 0;
-      color: white;
-      font-weight: 900;
-      border-radius: 16px;
-      padding: 13px 14px;
-      background: linear-gradient(135deg, var(--blue), var(--blue2));
-      box-shadow: 0 12px 28px rgba(8,123,255,.25);
-      cursor: pointer;
-      font-size: 14px;
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 18px 0 10px;
+      gap: 8px;
     }
 
-    button.secondary {
-      background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: none;
+    .section-title h3 {
+      margin: 0;
+      font-size: 20px;
     }
 
-    button.gold {
-      background: linear-gradient(135deg, #ffd46b, #ff8a00);
-      color: #241500;
+    .section-title span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
     }
 
-    button.green {
-      background: linear-gradient(135deg, #49d67a, #08a85a);
-      color: #04140b;
-    }
-
-    button.red {
-      background: linear-gradient(135deg, #ff4d6d, #b31133);
-    }
-
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-      filter: grayscale(.4);
-    }
-
-    .building-list,
-    .store-list,
-    .leader-list {
+    .list {
       display: grid;
       gap: 10px;
     }
 
-    .building,
-    .store-item,
-    .leader {
+    .item {
       display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
+      grid-template-columns: 58px 1fr auto;
       gap: 12px;
-      border: 1px solid rgba(255,255,255,.1);
-      background: rgba(255,255,255,.045);
+      align-items: center;
+      background: rgba(15,33,58,.76);
+      border: 1px solid rgba(142,204,255,.22);
       border-radius: 18px;
       padding: 12px;
     }
 
-    .building-icon {
-      width: 48px;
-      height: 48px;
+    .icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
       display: grid;
       place-items: center;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(52,183,255,.26), rgba(177,92,255,.18));
-      border: 1px solid rgba(255,255,255,.1);
-      font-size: 24px;
+      background: rgba(98,207,255,.12);
+      border: 1px solid rgba(98,207,255,.25);
+      font-size: 26px;
     }
 
-    .building h4,
-    .store-item h4,
-    .leader h4 {
-      margin: 0 0 4px;
-      font-size: 15px;
+    .item h4 {
+      margin: 0 0 5px;
+      font-size: 16px;
     }
 
-    .building p,
-    .store-item p,
-    .leader p {
+    .item p {
       margin: 0;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       line-height: 1.35;
     }
 
     .small-btn {
+      min-width: 118px;
+      padding: 12px 13px;
+      font-size: 13px;
+    }
+
+    .gold {
+      background: linear-gradient(135deg, #ffda69, #fff0a8);
+    }
+
+    .green {
+      background: linear-gradient(135deg, #45ff9c, #b9ffd8);
+    }
+
+    .danger {
+      background: linear-gradient(135deg, #ff6a86, #ffc1cc);
+    }
+
+    .leader-row {
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: rgba(15,33,58,.62);
+      border: 1px solid rgba(142,204,255,.18);
+      border-radius: 16px;
       padding: 10px 12px;
-      border-radius: 14px;
-      font-size: 12px;
-      min-width: 92px;
     }
 
-    .hidden {
-      display: none !important;
-    }
-
-    .login {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      background: rgba(1, 5, 12, .82);
-      backdrop-filter: blur(16px);
+    .rank {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
       display: grid;
       place-items: center;
-      padding: 16px;
-    }
-
-    .login-card {
-      width: min(460px, 100%);
-      border: 1px solid rgba(52,183,255,.28);
-      background: linear-gradient(145deg, rgba(10,32,58,.96), rgba(4,12,26,.96));
-      border-radius: 28px;
-      padding: 20px;
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
-
-    .login-card h2 {
-      margin: 0 0 8px;
-      font-size: 32px;
-    }
-
-    .login-card p {
-      margin: 0 0 16px;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    input {
-      width: 100%;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: white;
-      padding: 14px 15px;
-      border-radius: 16px;
-      outline: none;
-      font-size: 16px;
-      margin-bottom: 10px;
+      background: rgba(255,224,138,.16);
+      color: var(--gold);
+      font-weight: 1000;
     }
 
     .toast {
       position: fixed;
       left: 50%;
       bottom: 18px;
-      transform: translateX(-50%) translateY(20px);
-      z-index: 99;
-      background: rgba(5, 17, 30, .94);
-      border: 1px solid rgba(52,183,255,.28);
-      color: white;
-      padding: 12px 14px;
+      transform: translateX(-50%);
+      background: rgba(2, 8, 15, .94);
+      color: #e9fbff;
+      border: 1px solid rgba(98,207,255,.35);
+      padding: 12px 16px;
       border-radius: 16px;
-      min-width: min(420px, calc(100% - 28px));
-      text-align: center;
+      box-shadow: 0 16px 48px rgba(0,0,0,.45);
       opacity: 0;
       pointer-events: none;
-      transition: .22s ease;
-      box-shadow: 0 18px 60px rgba(0,0,0,.4);
+      transition: opacity .2s ease, bottom .2s ease;
+      z-index: 99;
+      width: min(520px, calc(100% - 24px));
+      text-align: center;
+      font-weight: 800;
     }
 
     .toast.show {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      bottom: 28px;
     }
 
-    .loading {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: none;
-      place-items: center;
-      background: rgba(0,0,0,.38);
-      backdrop-filter: blur(5px);
-    }
-
-    .loading.show {
-      display: grid;
-    }
-
-    .loader {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      border: 4px solid rgba(255,255,255,.14);
-      border-top-color: var(--blue);
-      animation: spin .8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .hidden {
+      display: none !important;
     }
 
     .version {
       text-align: center;
-      color: rgba(255,255,255,.35);
+      color: rgba(200,230,255,.55);
       font-size: 11px;
-      margin-top: 16px;
+      margin-top: 14px;
     }
 
-    @media (max-width: 880px) {
-      .hero-content,
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .casino-visual {
-        min-height: 130px;
-      }
-    }
-
-    @media (max-width: 520px) {
+    @media (max-width: 720px) {
       .app {
-        padding: 14px 10px 80px;
+        padding: 10px 8px 18px;
       }
 
-      .brand h1 {
-        font-size: 18px;
+      .hero h1 {
+        font-size: 22px;
+      }
+
+      .logo {
+        width: 50px;
+        height: 50px;
       }
 
       .pill {
-        display: none;
+        font-size: 11px;
+        padding: 8px 10px;
       }
 
-      .hero {
-        padding: 14px;
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
       }
 
-      .stats {
-        gap: 8px;
+      .item {
+        grid-template-columns: 48px 1fr;
       }
 
-      .stat {
-        padding: 11px;
-        min-height: 76px;
-      }
-
-      .stat strong {
-        font-size: 18px;
+      .item button {
+        grid-column: 1 / -1;
+        width: 100%;
       }
 
       .actions {
         grid-template-columns: 1fr;
       }
 
-      .building,
-      .store-item,
-      .leader {
-        grid-template-columns: auto 1fr;
+      .tap-core {
+        width: 150px;
+        height: 150px;
+        font-size: 46px;
       }
 
-      .building button,
-      .store-item button {
-        grid-column: 1 / -1;
-        width: 100%;
+      .login {
+        margin-top: 32px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="login" id="login">
-    <div class="login-card">
-      <div class="logo" style="margin:0 auto 12px;">M</div>
+  <div class="app">
+    <div id="loginCard" class="card login">
       <h2>Marino Empire</h2>
-      <p>Casino imparatorluğunu büyüt, coin kas, binaları geliştir ve ödül mağazasına yaklaş.</p>
-      <input id="siteUsername" placeholder="Betmarino kullanıcı adın" autocomplete="off" />
-      <button id="startBtn" class="green">Oyuna Başla</button>
-      <p style="font-size:12px;margin-top:12px;">Test modunda tarayıcıdan çalışır. Telegram’a bağlayınca gerçek kullanıcı bilgisi otomatik alınacak.</p>
+      <p>Casino imparatorluğunu büyüt, coin kas, binaları geliştir ve ödül mağazasından Free Spin / Freebet talebi oluştur.</p>
+      <input id="siteUsernameInput" placeholder="Site kullanıcı adını yaz" autocomplete="off" />
+      <button id="startBtn" class="main-btn">OYUNA BAŞLA</button>
+      <div class="version">Supabase hızlı sistem v2.0</div>
     </div>
-  </div>
 
-  <div class="loading" id="loading">
-    <div class="loader"></div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <main class="app">
-    <div class="topbar">
-      <div class="brand">
+    <div id="game" class="hidden">
+      <div class="hero">
         <div class="logo">M</div>
         <div>
           <h1>Marino Empire</h1>
-          <small id="playerName">Oyuncu yükleniyor...</small>
+          <p id="userLine">Oyuncu yükleniyor...</p>
         </div>
+        <div id="syncPill" class="pill">Hazır</div>
       </div>
-      <div class="pill" id="apiStatus">API bekleniyor</div>
-    </div>
 
-    <section class="hero">
-      <div class="hero-content">
+      <div class="grid">
+        <div class="stat"><small>MARINO COIN</small><strong id="coinStat">0</strong></div>
+        <div class="stat"><small>ENERJİ</small><strong id="energyStat">0/0</strong></div>
+        <div class="stat"><small>SAATLİK GELİR</small><strong id="incomeStat">0</strong></div>
+        <div class="stat"><small>ÖDÜL TOKEN</small><strong id="tokenStat">0</strong></div>
+      </div>
+
+      <div class="card tap-area">
         <div>
-          <h2>Casino Tycoon Başladı</h2>
-          <p>
-            Dokunarak başlangıç coinlerini kas. Sonra Slot Salonu, Spor Bar, VIP Lounge ve diğer işletmeleri yükselt.
-            Pasif gelir arttıkça ödül mağazasına daha hızlı yaklaşırsın.
+          <div id="tapBtn" class="tap-core">₼</div>
+          <div class="tap-label">CASINOYA TIKLA</div>
+          <p style="color:#9fc3e6;margin:8px 0 0;font-size:13px;">
+            Her tık coin kazandırır. Enerji bitince beklemen gerekir.
           </p>
         </div>
-
-        <div class="casino-visual">
-          <div class="tower"></div>
-          <div class="spark"></div>
-          <div class="spark"></div>
-          <div class="spark"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="stats">
-      <div class="stat">
-        <label>Marino Coin</label>
-        <strong id="coin">0</strong>
-      </div>
-      <div class="stat">
-        <label>Reward Token</label>
-        <strong id="token">0</strong>
-      </div>
-      <div class="stat">
-        <label>Enerji</label>
-        <strong id="energy">0 / 0</strong>
-      </div>
-      <div class="stat">
-        <label>Saatlik Gelir</label>
-        <strong id="income">0</strong>
-      </div>
-    </section>
-
-    <section class="main-grid">
-      <div class="panel">
-        <div class="tabs">
-          <button class="tab active" data-tab="empire">İmparatorluk</button>
-          <button class="tab" data-tab="store">Ödül Mağazası</button>
-          <button class="tab" data-tab="leaderboard">Sıralama</button>
-        </div>
-
-        <div id="empireTab">
-          <div class="tap-zone" id="tapZone">
-            <div class="tap-button">
-              <span>₺</span>
-            </div>
-            <div class="tap-help">Basılı tut: sürekli coin kasar. Enerji biterse durur.</div>
-          </div>
-
-          <div class="actions">
-            <button id="collectBtn" class="gold">Kasayı Topla</button>
-            <button id="refreshBtn" class="secondary">Yenile</button>
-          </div>
-
-          <div class="panel-title">
-            <h3>Binalar</h3>
-            <span class="pill" id="levelPill">Level 1</span>
-          </div>
-
-          <div class="building-list" id="buildings"></div>
-        </div>
-
-        <div id="storeTab" class="hidden">
-          <div class="panel-title">
-            <h3>Ödül Mağazası</h3>
-            <span class="pill">Admin onaylı</span>
-          </div>
-          <div class="store-list" id="store"></div>
-        </div>
-
-        <div id="leaderboardTab" class="hidden">
-          <div class="panel-title">
-            <h3>Liderlik Tablosu</h3>
-            <span class="pill">Sezon S001</span>
-          </div>
-          <div class="leader-list" id="leaderboard"></div>
-        </div>
       </div>
 
-      <aside class="panel">
-        <div class="panel-title">
-          <h3>Durum</h3>
-          <span class="pill" id="syncPill">Hazır</span>
-        </div>
+      <div class="actions">
+        <button id="collectBtn" class="main-btn gold">KASAYI TOPLA</button>
+        <button id="refreshBtn" class="main-btn">YENİLE</button>
+      </div>
 
-        <div class="stat" style="margin-bottom:10px;">
-          <label>Toplanabilir Gelir</label>
-          <strong id="claimable">0</strong>
-        </div>
+      <div class="section-title">
+        <h3>Binalar</h3>
+        <span id="buildingInfo">Yükleniyor</span>
+      </div>
+      <div id="buildingsList" class="list"></div>
 
-        <div class="stat" style="margin-bottom:10px;">
-          <label>İtibar</label>
-          <strong id="reputation">0</strong>
-        </div>
+      <div class="section-title">
+        <h3>Ödül Mağazası</h3>
+        <span>Admin onaylı talepler</span>
+      </div>
+      <div id="storeList" class="list"></div>
 
-        <div class="stat" style="margin-bottom:10px;">
-          <label>Kasa Kapasitesi</label>
-          <strong id="safe">0 saat</strong>
-        </div>
+      <div class="section-title">
+        <h3>Liderlik</h3>
+        <span>Sezon sıralaması</span>
+      </div>
+      <div id="leaderboardList" class="list"></div>
 
-        <button id="soundBtn" class="secondary" style="width:100%;">Ses: Aç / Kapat</button>
+      <div class="version">GitHub Pages + Supabase RPC v2.0</div>
+    </div>
+  </div>
 
-        <div class="version" id="versionText"></div>
-      </aside>
-    </section>
-  </main>
+  <div id="toast" class="toast"></div>
 
   <script>
-    /********************************************************
-     * AYAR
-     ********************************************************/
-    const API_URL = "https://script.google.com/macros/s/AKfycbzPaR7ZpWrDTSm35syzlOQROXK_7XBNAQR88IUif9wtUdvkPJ5C131RpxZ0DnbmMsnmbA/exec";
-    const APP_VERSION = "2026.04.25.002";
+    const SUPABASE_URL = "https://vxfjprvahjtfhvtuvsoy.supabase.co/rest/v1/";
+    const SUPABASE_KEY = "sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU";
 
-    /********************************************************
-     * TELEGRAM / TEST USER
-     ********************************************************/
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
     if (tg) {
       tg.ready();
       tg.expand();
-      document.body.style.backgroundColor = "#050915";
     }
 
+    const el = {
+      loginCard: document.getElementById("loginCard"),
+      game: document.getElementById("game"),
+      siteUsernameInput: document.getElementById("siteUsernameInput"),
+      startBtn: document.getElementById("startBtn"),
+      tapBtn: document.getElementById("tapBtn"),
+      collectBtn: document.getElementById("collectBtn"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      syncPill: document.getElementById("syncPill"),
+      userLine: document.getElementById("userLine"),
+      coinStat: document.getElementById("coinStat"),
+      energyStat: document.getElementById("energyStat"),
+      incomeStat: document.getElementById("incomeStat"),
+      tokenStat: document.getElementById("tokenStat"),
+      buildingInfo: document.getElementById("buildingInfo"),
+      buildingsList: document.getElementById("buildingsList"),
+      storeList: document.getElementById("storeList"),
+      leaderboardList: document.getElementById("leaderboardList"),
+      toast: document.getElementById("toast")
+    };
+
     const state = {
+      telegram: getTelegramIdentity(),
       user: null,
       player: null,
       upgrades: [],
       store: [],
       leaderboard: [],
-      activeTab: "empire",
-      sound: true,
+      busy: false,
       pendingTaps: 0,
-      tapping: false,
-      tapTimer: null,
-      flushTimer: null,
-      requestBusy: false
+      tapTimer: null
     };
 
-    /********************************************************
-     * ELEMENTS
-     ********************************************************/
-    const el = {
-      login: document.getElementById("login"),
-      loading: document.getElementById("loading"),
-      toast: document.getElementById("toast"),
-      siteUsername: document.getElementById("siteUsername"),
-      startBtn: document.getElementById("startBtn"),
-      playerName: document.getElementById("playerName"),
-      apiStatus: document.getElementById("apiStatus"),
-      coin: document.getElementById("coin"),
-      token: document.getElementById("token"),
-      energy: document.getElementById("energy"),
-      income: document.getElementById("income"),
-      claimable: document.getElementById("claimable"),
-      reputation: document.getElementById("reputation"),
-      safe: document.getElementById("safe"),
-      levelPill: document.getElementById("levelPill"),
-      syncPill: document.getElementById("syncPill"),
-      tapZone: document.getElementById("tapZone"),
-      collectBtn: document.getElementById("collectBtn"),
-      refreshBtn: document.getElementById("refreshBtn"),
-      soundBtn: document.getElementById("soundBtn"),
-      buildings: document.getElementById("buildings"),
-      store: document.getElementById("store"),
-      leaderboard: document.getElementById("leaderboard"),
-      versionText: document.getElementById("versionText"),
-      empireTab: document.getElementById("empireTab"),
-      storeTab: document.getElementById("storeTab"),
-      leaderboardTab: document.getElementById("leaderboardTab")
-    };
-
-    el.versionText.textContent = "v" + APP_VERSION;
-
-    /********************************************************
-     * AUDIO
-     ********************************************************/
-    let audioCtx = null;
-
-    function unlockAudio() {
-      if (!state.sound) return;
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === "suspended") audioCtx.resume();
+    const savedSiteUsername = localStorage.getItem("marino_site_username");
+    if (savedSiteUsername) {
+      el.siteUsernameInput.value = savedSiteUsername;
     }
 
-    function beep(type = "tap") {
-      if (!state.sound || !audioCtx) return;
+    function getTelegramIdentity() {
+      const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
 
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      let freq = 520;
-      let duration = 0.06;
-
-      if (type === "coin") {
-        freq = 820;
-        duration = 0.09;
-      }
-
-      if (type === "upgrade") {
-        freq = 440;
-        duration = 0.16;
-      }
-
-      if (type === "error") {
-        freq = 160;
-        duration = 0.18;
-      }
-
-      osc.type = type === "error" ? "sawtooth" : "square";
-      osc.frequency.setValueAtTime(freq, now);
-
-      if (type === "upgrade") {
-        osc.frequency.exponentialRampToValueAtTime(980, now + duration);
-      }
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + duration + 0.02);
-    }
-
-    /********************************************************
-     * API - JSONP
-     ********************************************************/
-    function api(action, data = {}) {
-      return new Promise((resolve, reject) => {
-        if (!API_URL || API_URL.includes("BURAYA_")) {
-          reject(new Error("API_URL boş. index.html içinde API linkini yapıştırman lazım."));
-          return;
-        }
-
-        const callbackName = "__marino_cb_" + Date.now() + "_" + Math.floor(Math.random() * 999999);
-
-        const payload = {
-          action,
-          callback: callbackName,
-          _v: APP_VERSION,
-          _ts: Date.now(),
-          ...basePayload(),
-          ...data
-        };
-
-        const qs = new URLSearchParams(payload).toString();
-        const url = API_URL + (API_URL.includes("?") ? "&" : "?") + qs;
-
-        const script = document.createElement("script");
-        let done = false;
-
-        const cleanup = () => {
-          try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
-          if (script.parentNode) script.parentNode.removeChild(script);
-        };
-
-        window[callbackName] = (response) => {
-          if (done) return;
-          done = true;
-          cleanup();
-          resolve(response);
-        };
-
-        script.onerror = () => {
-          if (done) return;
-          done = true;
-          cleanup();
-          reject(new Error("API bağlantısı başarısız."));
-        };
-
-        setTimeout(() => {
-          if (done) return;
-          done = true;
-          cleanup();
-          reject(new Error("API zaman aşımına uğradı."));
-        }, 20000);
-
-        script.src = url;
-        document.head.appendChild(script);
-      });
-    }
-
-    function basePayload() {
-      const siteUsername = localStorage.getItem("marino_site_username") || el.siteUsername.value.trim() || "testsite";
-
-      if (tg && tg.initData) {
+      if (u && u.id) {
         return {
-          initData: tg.initData,
-          site_username: siteUsername
+          id: String(u.id),
+          username: u.username || "",
+          first_name: u.first_name || "",
+          last_name: u.last_name || "",
+          language_code: u.language_code || "tr"
         };
+      }
+
+      let demoId = localStorage.getItem("marino_demo_telegram_id");
+      if (!demoId) {
+        demoId = "WEB_" + Math.floor(Date.now() + Math.random() * 999999);
+        localStorage.setItem("marino_demo_telegram_id", demoId);
       }
 
       return {
-        telegram_id: localStorage.getItem("marino_test_telegram_id") || "100001",
-        telegram_username: "test_user",
-        first_name: "Test",
-        last_name: "User",
-        language_code: "tr",
-        site_username: siteUsername
+        id: demoId,
+        username: "web_test",
+        first_name: "Web",
+        last_name: "Test",
+        language_code: "tr"
       };
     }
 
-    /********************************************************
-     * INIT
-     ********************************************************/
-    el.startBtn.addEventListener("click", startGame);
-    el.collectBtn.addEventListener("click", collectIncome);
-    el.refreshBtn.addEventListener("click", loadState);
-    el.soundBtn.addEventListener("click", () => {
-      state.sound = !state.sound;
-      el.soundBtn.textContent = state.sound ? "Ses: Açık" : "Ses: Kapalı";
-      if (state.sound) {
-        unlockAudio();
-        beep("coin");
+    function fmt(n) {
+      n = Number(n || 0);
+      return n.toLocaleString("tr-TR");
+    }
+
+    function requestId(prefix) {
+      return prefix + "-" + Date.now() + "-" + Math.floor(Math.random() * 999999);
+    }
+
+    function toast(msg) {
+      el.toast.textContent = msg;
+      el.toast.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        el.toast.classList.remove("show");
+      }, 2600);
+    }
+
+    function setBusy(isBusy, text) {
+      state.busy = isBusy;
+      el.syncPill.textContent = text || (isBusy ? "İşleniyor..." : "Güncel");
+    }
+
+    async function rpc(name, params) {
+      setBusy(true, "İşleniyor...");
+
+      const { data, error } = await db.rpc(name, params);
+
+      if (error) {
+        console.error(error);
+        setBusy(false, "Hata");
+        throw new Error(error.message || "Supabase hatası");
       }
-    });
 
-    document.querySelectorAll(".tab").forEach(btn => {
-      btn.addEventListener("click", () => setTab(btn.dataset.tab));
-    });
+      if (!data || data.ok === false) {
+        setBusy(false, "Uyarı");
+        throw new Error((data && data.error) ? data.error : "İşlem başarısız");
+      }
 
-    el.tapZone.addEventListener("pointerdown", startTapping);
-    window.addEventListener("pointerup", stopTapping);
-    window.addEventListener("pointercancel", stopTapping);
-    window.addEventListener("blur", stopTapping);
+      setBusy(false, "Güncel");
+      return data;
+    }
 
-    const savedUsername = localStorage.getItem("marino_site_username");
-    if (savedUsername) el.siteUsername.value = savedUsername;
+    function applyGameData(data) {
+      state.user = data.user || state.user;
+      state.player = data.state || state.player;
+      state.upgrades = data.upgrades || [];
+      state.store = data.store || [];
+      state.leaderboard = data.leaderboard || [];
 
-    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-      const u = tg.initDataUnsafe.user;
-      el.siteUsername.placeholder = "Betmarino kullanıcı adın";
-      el.playerName.textContent = "Telegram: " + (u.username ? "@" + u.username : u.first_name || u.id);
+      renderAll();
+
+      if (data.reward_request_status === "pending") {
+        toast("Ödül talebin oluşturuldu. Admin onayı bekliyor.");
+      }
     }
 
     async function startGame() {
+      const siteUsername = el.siteUsernameInput.value.trim();
+
+      if (!siteUsername) {
+        toast("Site kullanıcı adını yazmadan başlatma.");
+        return;
+      }
+
+      localStorage.setItem("marino_site_username", siteUsername);
+
+      el.startBtn.disabled = true;
+      el.startBtn.textContent = "GİRİŞ YAPILIYOR...";
+
       try {
-        unlockAudio();
+        const data = await rpc("register_player", {
+          p_telegram_id: state.telegram.id,
+          p_site_username: siteUsername,
+          p_telegram_username: state.telegram.username,
+          p_first_name: state.telegram.first_name,
+          p_last_name: state.telegram.last_name,
+          p_language_code: state.telegram.language_code,
+          p_referred_by: ""
+        });
 
-        const username = el.siteUsername.value.trim();
-        if (!username) {
-          toast("Kullanıcı adı yazmadan başlatma. Sonra ödül eşleşmesi çöp olur.");
-          beep("error");
-          return;
-        }
+        el.loginCard.classList.add("hidden");
+        el.game.classList.remove("hidden");
 
-        localStorage.setItem("marino_site_username", username);
-
-        showLoading(true);
-        el.apiStatus.textContent = "Bağlanıyor...";
-
-        const res = await api("register", { site_username: username });
-
-        if (!res.ok) throw new Error(res.error || "Register başarısız.");
-
-        state.user = res.user;
-        state.player = res.state;
-
-        el.login.classList.add("hidden");
-
-        await loadState();
-
-        beep("upgrade");
-        toast("Marino Empire açıldı.");
+        applyGameData(data);
+        toast("Giriş başarılı. Sistem Supabase üzerinden çalışıyor.");
       } catch (err) {
-        console.error(err);
         toast(err.message);
-        beep("error");
       } finally {
-        showLoading(false);
+        el.startBtn.disabled = false;
+        el.startBtn.textContent = "OYUNA BAŞLA";
       }
     }
 
-    /********************************************************
-     * LOAD / RENDER
-     ********************************************************/
     async function loadState() {
+      if (!state.player) return;
+
       try {
-        el.syncPill.textContent = "Senkron...";
-        const res = await api("state");
+        const data = await rpc("get_game_state", {
+          p_telegram_id: state.telegram.id
+        });
 
-        if (!res.ok) throw new Error(res.error || "State alınamadı.");
-
-        state.player = res.state;
-        state.upgrades = res.upgrades || [];
-        state.store = res.store || [];
-        state.leaderboard = res.leaderboard || [];
-
-        renderAll();
-
-        el.apiStatus.textContent = "API aktif";
-        el.syncPill.textContent = "Güncel";
+        applyGameData(data);
       } catch (err) {
-        console.error(err);
         toast(err.message);
-        el.apiStatus.textContent = "API hata";
-        el.syncPill.textContent = "Hata";
-        beep("error");
+      }
+    }
+
+    function tapCasino() {
+      if (!state.player) return;
+
+      if (Number(state.player.energy || 0) <= 0) {
+        toast("Enerji yetersiz.");
+        return;
+      }
+
+      const gain = Number(state.player.tap_power || 1);
+
+      state.player.marino_coin = Number(state.player.marino_coin || 0) + gain;
+      state.player.energy = Number(state.player.energy || 0) - 1;
+
+      state.pendingTaps += 1;
+
+      renderStats();
+
+      clearTimeout(state.tapTimer);
+      state.tapTimer = setTimeout(flushTaps, 320);
+    }
+
+    async function flushTaps() {
+      if (!state.pendingTaps || !state.player) return;
+
+      const taps = Math.min(state.pendingTaps, 50);
+      state.pendingTaps -= taps;
+
+      try {
+        const data = await rpc("tap_coin", {
+          p_telegram_id: state.telegram.id,
+          p_taps: taps
+        });
+
+        applyGameData(data);
+
+        if (state.pendingTaps > 0) {
+          state.tapTimer = setTimeout(flushTaps, 150);
+        }
+      } catch (err) {
+        toast(err.message);
+        loadState();
+      }
+    }
+
+    async function collectIncome() {
+      if (!state.player || state.busy) return;
+
+      try {
+        const data = await rpc("collect_income", {
+          p_telegram_id: state.telegram.id,
+          p_request_id: requestId("COLLECT")
+        });
+
+        applyGameData(data);
+        toast("Kasa toplandı.");
+      } catch (err) {
+        toast(err.message);
+      }
+    }
+
+    async function upgradeBuilding(buildingKey) {
+      if (!state.player || state.busy) return;
+
+      try {
+        const data = await rpc("upgrade_building", {
+          p_telegram_id: state.telegram.id,
+          p_building_key: buildingKey,
+          p_request_id: requestId("UPGRADE")
+        });
+
+        applyGameData(data);
+        toast("Bina yükseltildi.");
+      } catch (err) {
+        toast(err.message);
+      }
+    }
+
+    async function requestReward(itemCode) {
+      if (!state.player || state.busy) return;
+
+      try {
+        const data = await rpc("request_reward", {
+          p_telegram_id: state.telegram.id,
+          p_item_code: itemCode,
+          p_request_id: requestId("REWARD")
+        });
+
+        applyGameData(data);
+      } catch (err) {
+        toast(err.message);
       }
     }
 
@@ -1094,440 +781,153 @@
     function renderStats() {
       const p = state.player || {};
 
-      el.coin.textContent = fmt(p.marino_coin || 0);
-      el.token.textContent = fmt(p.reward_token || 0);
-      el.energy.textContent = fmt(p.energy || 0) + " / " + fmt(p.max_energy || 0);
-      el.income.textContent = fmt(p.passive_income_per_hour || 0) + " /saat";
-      el.claimable.textContent = fmt(p.claimable_coin || 0);
-      el.reputation.textContent = fmt(p.reputation || 0);
-      el.safe.textContent = fmt(p.safe_capacity_hours || 0) + " saat";
-      el.levelPill.textContent = "Level " + (p.casino_level || 1);
+      el.coinStat.textContent = fmt(p.marino_coin);
+      el.energyStat.textContent = fmt(p.energy) + "/" + fmt(p.max_energy);
+      el.incomeStat.textContent = fmt(p.passive_income_per_hour) + "/saat";
+      el.tokenStat.textContent = fmt(p.reward_token);
 
-      const displayName = state.user
-        ? (state.user.telegram_username || state.user.first_name || state.user.site_username || "Oyuncu")
-        : "Oyuncu";
+      const username =
+        (state.user && (state.user.telegram_username || state.user.first_name)) ||
+        state.telegram.username ||
+        "Oyuncu";
 
-      el.playerName.textContent = displayName + " • " + (p.site_username || "");
+      el.userLine.textContent =
+        username + " · " +
+        (p.site_username || "-") +
+        " · Level " + fmt(p.casino_level || 1) +
+        " · Toplanabilir: " + fmt(p.claimable_coin || 0) + " coin";
     }
 
     function renderBuildings() {
-      const icons = {
-        slot_hall: "🎰",
-        sports_bar: "⚽",
-        vip_lounge: "💎",
-        cashier_safe: "🏦",
-        marketing_office: "📣",
-        security_center: "🛡️",
-        bonus_office: "🎁",
-        live_casino_floor: "🎥"
-      };
+      const list = state.upgrades || [];
 
-      el.buildings.innerHTML = "";
+      el.buildingInfo.textContent = list.length + " bina";
 
-      state.upgrades.forEach(item => {
-        const coin = Number(state.player?.marino_coin || 0);
-        const cost = Number(item.next_cost_coin || 0);
-        const canBuy = coin >= cost;
+      if (!list.length) {
+        el.buildingsList.innerHTML = emptyItem("Binalar yüklenemedi", "Supabase bağlantısını kontrol et.");
+        return;
+      }
 
-        const card = document.createElement("div");
-        card.className = "building";
+      el.buildingsList.innerHTML = list.map(b => {
+        const canBuy = Number(state.player.marino_coin || 0) >= Number(b.next_cost_coin || 0);
 
-        card.innerHTML = `
-          <div class="building-icon">${icons[item.building_key] || "🏢"}</div>
-          <div>
-            <h4>${escapeHtml(item.building_name)} <span style="color:var(--gold)">Lv.${item.level}</span></h4>
-            <p>Gelir: ${fmt(item.current_income_per_hour || 0)} /saat · Sonraki maliyet: ${fmt(cost)} coin</p>
+        return `
+          <div class="item">
+            <div class="icon">${b.emoji || "🏢"}</div>
+            <div>
+              <h4>${escapeHtml(b.building_name)} · Lv. ${fmt(b.level)}</h4>
+              <p>
+                Gelir: ${fmt(b.current_income_per_hour)}/saat ·
+                Sonraki maliyet: ${fmt(b.next_cost_coin)} coin
+              </p>
+            </div>
+            <button
+              class="small-btn ${canBuy ? "green" : ""}"
+              ${canBuy ? "" : "disabled"}
+              onclick="upgradeBuilding('${escapeAttr(b.building_key)}')">
+              YÜKSELT
+            </button>
           </div>
-          <button class="small-btn ${canBuy ? "green" : "secondary"}" ${canBuy ? "" : "disabled"}>
-            Yükselt
-          </button>
         `;
-
-        card.querySelector("button").addEventListener("click", () => upgradeBuilding(item.building_key));
-        el.buildings.appendChild(card);
-      });
+      }).join("");
     }
 
     function renderStore() {
-      el.store.innerHTML = "";
+      const list = (state.store || []).filter(x => x.category === "reward");
 
-      state.store.forEach(item => {
-        const coin = Number(state.player?.marino_coin || 0);
-        const token = Number(state.player?.reward_token || 0);
-        const costCoin = Number(item.cost_coin || 0);
-        const costToken = Number(item.cost_token || 0);
-        const canBuy = coin >= costCoin && token >= costToken && item.category === "reward";
+      if (!list.length) {
+        el.storeList.innerHTML = emptyItem("Ödül bulunamadı", "Mağaza ürünleri yüklenemedi.");
+        return;
+      }
 
-        const card = document.createElement("div");
-        card.className = "store-item";
+      el.storeList.innerHTML = list.map(item => {
+        const hasCoin = Number(state.player.marino_coin || 0) >= Number(item.cost_coin || 0);
+        const hasToken = Number(state.player.reward_token || 0) >= Number(item.cost_token || 0);
+        const canBuy = hasCoin && hasToken;
 
-        const icon = item.item_code.includes("FS") ? "🎰" : item.item_code.includes("FB") ? "🎫" : "⚡";
-
-        card.innerHTML = `
-          <div class="building-icon">${icon}</div>
-          <div>
-            <h4>${escapeHtml(item.item_name)}</h4>
-            <p>${fmt(costCoin)} coin + ${fmt(costToken)} token · Günlük limit: ${item.user_daily_limit}</p>
+        return `
+          <div class="item">
+            <div class="icon">🎁</div>
+            <div>
+              <h4>${escapeHtml(item.item_name)}</h4>
+              <p>
+                Coin: ${fmt(item.cost_coin)} · Token: ${fmt(item.cost_token)}
+                <br>${escapeHtml(item.description || "Admin onaylı ödül.")}
+              </p>
+            </div>
+            <button
+              class="small-btn gold"
+              ${canBuy ? "" : "disabled"}
+              onclick="requestReward('${escapeAttr(item.item_code)}')">
+              TALEP ET
+            </button>
           </div>
-          <button class="small-btn ${canBuy ? "gold" : "secondary"}" ${canBuy ? "" : "disabled"}>
-            Talep Et
-          </button>
         `;
-
-        card.querySelector("button").addEventListener("click", () => requestReward(item.item_code));
-        el.store.appendChild(card);
-      });
+      }).join("");
     }
 
     function renderLeaderboard() {
-      el.leaderboard.innerHTML = "";
+      const list = state.leaderboard || [];
 
-      if (!state.leaderboard.length) {
-        el.leaderboard.innerHTML = `<p style="color:var(--muted)">Henüz sıralama yok.</p>`;
+      if (!list.length) {
+        el.leaderboardList.innerHTML = emptyItem("Sıralama boş", "İlk oyuncu sen ol.");
         return;
       }
 
-      state.leaderboard.forEach(row => {
-        const card = document.createElement("div");
-        card.className = "leader";
-
-        card.innerHTML = `
-          <div class="building-icon">${Number(row.rank) === 1 ? "👑" : "#" + row.rank}</div>
-          <div>
-            <h4>${escapeHtml(row.display_name || row.site_username || row.telegram_id)}</h4>
-            <p>Level ${row.casino_level} · İtibar ${fmt(row.reputation || 0)} · Puan ${fmt(row.season_points || 0)}</p>
+      el.leaderboardList.innerHTML = list.map((l, i) => {
+        return `
+          <div class="leader-row">
+            <div class="rank">${i + 1}</div>
+            <div>
+              <strong>${escapeHtml(l.display_name || l.site_username || "Oyuncu")}</strong>
+              <p style="margin:4px 0 0;color:#9fc3e6;font-size:12px;">
+                Level ${fmt(l.casino_level)} · İtibar ${fmt(l.reputation)}
+              </p>
+            </div>
+            <strong>${fmt(l.season_points)}</strong>
           </div>
-          <div></div>
         `;
-
-        el.leaderboard.appendChild(card);
-      });
+      }).join("");
     }
 
-    /********************************************************
-     * ACTIONS
-     ********************************************************/
-    async function collectIncome() {
-  const oldPlayer = structuredClone(state.player || {});
-  const claimable = Number(state.player?.claimable_coin || 0);
-
-  if (claimable <= 0) {
-    toast("Toplanacak gelir yok.");
-    beep("error");
-    return;
-  }
-
-  // Ekranı anında güncelle
-  state.player.marino_coin = Number(state.player.marino_coin || 0) + claimable;
-  state.player.claimable_coin = 0;
-  renderStats();
-
-  el.syncPill.textContent = "Kaydediliyor...";
-  toast("Kasadan +" + fmt(claimable) + " coin toplandı.");
-  beep("coin");
-
-  try {
-    const res = await api("collect", { request_id: makeReqId() });
-
-    if (!res.ok) throw new Error(res.error || "Gelir toplanamadı.");
-
-    if (res.state) {
-      state.player = res.state;
-      renderStats();
+    function emptyItem(title, desc) {
+      return `
+        <div class="item">
+          <div class="icon">ℹ️</div>
+          <div>
+            <h4>${escapeHtml(title)}</h4>
+            <p>${escapeHtml(desc)}</p>
+          </div>
+          <button class="small-btn" disabled>Bekle</button>
+        </div>
+      `;
     }
 
-    el.syncPill.textContent = "Güncel";
-  } catch (err) {
-    state.player = oldPlayer;
-    renderStats();
-
-    toast("Kayıt başarısız, işlem geri alındı: " + err.message);
-    el.syncPill.textContent = "Hata";
-    beep("error");
-  }
-}
-
-async function upgradeBuilding(buildingKey) {
-  const building = state.upgrades.find(x => x.building_key === buildingKey);
-
-  if (!building) {
-    toast("Bina bulunamadı.");
-    beep("error");
-    return;
-  }
-
-  const cost = Number(building.next_cost_coin || 0);
-  const coin = Number(state.player?.marino_coin || 0);
-
-  if (coin < cost) {
-    toast("Coin yetmiyor. Önce biraz daha kas.");
-    beep("error");
-    return;
-  }
-
-  const oldPlayer = structuredClone(state.player || {});
-  const oldUpgrades = structuredClone(state.upgrades || []);
-
-  // Ekranı anında güncelle
-  state.player.marino_coin = coin - cost;
-
-  building.level = Number(building.level || 0) + 1;
-
-  if (building.base_income_per_hour > 0) {
-    building.current_income_per_hour = Number(building.base_income_per_hour || 0) * Number(building.level || 0);
-  }
-
-  building.next_cost_coin = Math.ceil(cost * 1.65);
-
-  state.player.passive_income_per_hour = state.upgrades.reduce((sum, item) => {
-    return sum + Number(item.current_income_per_hour || 0);
-  }, 0);
-
-  renderAll();
-
-  el.syncPill.textContent = "Kaydediliyor...";
-  toast(building.building_name + " yükseltildi.");
-  beep("upgrade");
-
-  try {
-    const res = await api("upgrade", {
-      building_key: buildingKey,
-      request_id: makeReqId()
-    });
-
-    if (!res.ok) throw new Error(res.error || "Yükseltme başarısız.");
-
-    if (res.state) state.player = res.state;
-    if (res.upgrades) state.upgrades = res.upgrades;
-
-    renderAll();
-    el.syncPill.textContent = "Güncel";
-  } catch (err) {
-    // Hata olursa eski hale dön
-    state.player = oldPlayer;
-    state.upgrades = oldUpgrades;
-    renderAll();
-
-    toast("Kayıt başarısız, işlem geri alındı: " + err.message);
-    el.syncPill.textContent = "Hata";
-    beep("error");
-  }
-}
-
-async function requestReward(itemCode) {
-  const item = state.store.find(x => x.item_code === itemCode);
-
-  if (!item) {
-    toast("Ödül bulunamadı.");
-    beep("error");
-    return;
-  }
-
-  if (item.category !== "reward") {
-    toast("Bu ürün ödül talebi için uygun değil.");
-    beep("error");
-    return;
-  }
-
-  const costCoin = Number(item.cost_coin || 0);
-  const costToken = Number(item.cost_token || 0);
-  const playerCoin = Number(state.player?.marino_coin || 0);
-  const playerToken = Number(state.player?.reward_token || 0);
-
-  if (playerCoin < costCoin || playerToken < costToken) {
-    toast("Bu ödül için coin veya token yetmiyor.");
-    beep("error");
-    return;
-  }
-
-  const oldPlayer = structuredClone(state.player || {});
-
-  // Ekranı anında güncelle
-  state.player.marino_coin = playerCoin - costCoin;
-  state.player.reward_token = playerToken - costToken;
-
-  renderAll();
-
-  el.syncPill.textContent = "Kaydediliyor...";
-  toast("Ödül talebi alındı. Admin onayı bekliyor.");
-  beep("upgrade");
-
-  try {
-    const res = await api("requestReward", {
-      item_code: itemCode,
-      request_id: makeReqId()
-    });
-
-    if (!res.ok) throw new Error(res.error || "Ödül talebi başarısız.");
-
-    if (res.state) {
-      state.player = res.state;
-      renderAll();
-    }
-
-    el.syncPill.textContent = "Güncel";
-  } catch (err) {
-    state.player = oldPlayer;
-    renderAll();
-
-    toast("Kayıt başarısız, işlem geri alındı: " + err.message);
-    el.syncPill.textContent = "Hata";
-    beep("error");
-  }
-}
-
-    /********************************************************
-     * TAP SYSTEM
-     ********************************************************/
-    function startTapping(e) {
-      e.preventDefault();
-      unlockAudio();
-
-      if (state.tapping) return;
-      state.tapping = true;
-
-      addTapVisual(e.clientX, e.clientY);
-      queueTap();
-
-      state.tapTimer = setInterval(() => {
-        queueTap();
-      }, 130);
-
-      state.flushTimer = setInterval(() => {
-        flushTaps();
-      }, 700);
-    }
-
-    function stopTapping() {
-      state.tapping = false;
-
-      if (state.tapTimer) {
-        clearInterval(state.tapTimer);
-        state.tapTimer = null;
-      }
-
-      if (state.flushTimer) {
-        clearInterval(state.flushTimer);
-        state.flushTimer = null;
-      }
-
-      flushTaps();
-    }
-
-    function queueTap() {
-      const p = state.player;
-      if (!p) return;
-
-      if (Number(p.energy || 0) <= 0) {
-        toast("Enerji bitti. Biraz bekle veya sonra tekrar dene.");
-        stopTapping();
-        return;
-      }
-
-      state.pendingTaps += 1;
-
-      p.energy = Math.max(0, Number(p.energy || 0) - 1);
-      p.marino_coin = Number(p.marino_coin || 0) + Number(p.tap_power || 1);
-
-      renderStats();
-      beep("tap");
-    }
-
-    async function flushTaps() {
-      if (state.requestBusy) return;
-      if (state.pendingTaps <= 0) return;
-
-      const taps = Math.min(state.pendingTaps, 50);
-      state.pendingTaps -= taps;
-      state.requestBusy = true;
-
-      try {
-        el.syncPill.textContent = "Tap yazılıyor...";
-        const res = await api("tap", {
-          taps,
-          request_id: makeReqId()
-        });
-
-        if (!res.ok) throw new Error(res.error || "Tap kaydı başarısız.");
-
-        state.player = res.state;
-        renderStats();
-        el.syncPill.textContent = "Güncel";
-      } catch (err) {
-        toast(err.message);
-        await loadState();
-        beep("error");
-      } finally {
-        state.requestBusy = false;
-      }
-    }
-
-    function addTapVisual(x, y) {
-      const rect = el.tapZone.getBoundingClientRect();
-      const plus = document.createElement("div");
-      plus.className = "floating-plus";
-      plus.textContent = "+" + fmt(state.player?.tap_power || 1);
-      plus.style.left = ((x || rect.left + rect.width / 2) - rect.left) + "px";
-      plus.style.top = ((y || rect.top + rect.height / 2) - rect.top) + "px";
-      el.tapZone.appendChild(plus);
-
-      setTimeout(() => plus.remove(), 850);
-    }
-
-    /********************************************************
-     * TAB
-     ********************************************************/
-    function setTab(tab) {
-      state.activeTab = tab;
-
-      document.querySelectorAll(".tab").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.tab === tab);
-      });
-
-      el.empireTab.classList.toggle("hidden", tab !== "empire");
-      el.storeTab.classList.toggle("hidden", tab !== "store");
-      el.leaderboardTab.classList.toggle("hidden", tab !== "leaderboard");
-    }
-
-    /********************************************************
-     * HELPERS
-     ********************************************************/
-    function fmt(num) {
-      num = Number(num || 0);
-
-      if (num >= 1000000000) return (num / 1000000000).toFixed(2) + "B";
-      if (num >= 1000000) return (num / 1000000).toFixed(2) + "M";
-      if (num >= 1000) return Math.floor(num).toLocaleString("tr-TR");
-
-      return Math.floor(num).toLocaleString("tr-TR");
-    }
-
-    function toast(message) {
-      el.toast.textContent = message;
-      el.toast.classList.add("show");
-
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => {
-        el.toast.classList.remove("show");
-      }, 3200);
-    }
-
-    function showLoading(show) {
-      el.loading.classList.toggle("show", !!show);
-    }
-
-    function makeReqId() {
-      return "REQ-" + Date.now() + "-" + Math.floor(Math.random() * 999999);
-    }
-
-    function escapeHtml(str) {
-      return String(str || "")
+    function escapeHtml(value) {
+      return String(value ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
+
+    function escapeAttr(value) {
+      return String(value ?? "")
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'");
+    }
+
+    el.startBtn.addEventListener("click", startGame);
+    el.collectBtn.addEventListener("click", collectIncome);
+    el.refreshBtn.addEventListener("click", loadState);
+    el.tapBtn.addEventListener("click", tapCasino);
+
+    setInterval(() => {
+      if (state.player) {
+        loadState();
+      }
+    }, 30000);
   </script>
 </body>
 </html>
