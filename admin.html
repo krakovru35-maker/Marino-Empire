@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <title>Marino Empire Admin</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #06111f;
+      --panel: rgba(8, 20, 38, .94);
+      --panel2: rgba(15, 33, 58, .95);
+      --line: rgba(114, 206, 255, .35);
+      --blue: #62cfff;
+      --gold: #ffe08a;
+      --green: #52ffad;
+      --red: #ff5d7a;
+      --text: #f4fbff;
+      --muted: #9fc3e6;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(50,130,255,.25), transparent 35%),
+        linear-gradient(180deg, #102d5a 0%, #04101d 45%, #020711 100%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .app {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 16px 10px 30px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .logo {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 1000;
+      color: #04101d;
+      background: linear-gradient(135deg, #67d6ff, #aaf3ff);
+      box-shadow: 0 0 32px rgba(98,207,255,.45);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.05;
+      text-shadow: 0 0 20px rgba(98,207,255,.35);
+    }
+
+    .hero p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pill {
+      margin-left: auto;
+      border: 1px solid var(--line);
+      background: rgba(12, 38, 70, .75);
+      color: #c8f3ff;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .login {
+      max-width: 620px;
+      margin: 65px auto 0;
+      text-align: center;
+      padding: 26px;
+    }
+
+    .login h2 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      color: #6be3ff;
+      text-shadow: 0 0 24px rgba(107,227,255,.45);
+    }
+
+    .login p {
+      color: #c7dcf7;
+      line-height: 1.5;
+      margin: 0 0 16px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid rgba(150,210,255,.35);
+      background: rgba(255,255,255,.06);
+      color: white;
+      border-radius: 16px;
+      padding: 14px 15px;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    select option {
+      background: #071426;
+      color: white;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(98,207,255,.12);
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 15px;
+      font-weight: 900;
+      color: #03101e;
+      background: linear-gradient(135deg, #5db2ff, #91ecff);
+      box-shadow: 0 10px 26px rgba(68,172,255,.25);
+      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+      user-select: none;
+    }
+
+    button:active {
+      transform: scale(.97);
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      filter: grayscale(.35);
+    }
+
+    .main-btn {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 16px;
+    }
+
+    .green {
+      background: linear-gradient(135deg, #45ff9c, #b9ffd8);
+    }
+
+    .danger {
+      background: linear-gradient(135deg, #ff6a86, #ffc1cc);
+    }
+
+    .gold {
+      background: linear-gradient(135deg, #ffda69, #fff0a8);
+    }
+
+    .ghost {
+      background: rgba(255,255,255,.08);
+      color: #d7f4ff;
+      border: 1px solid rgba(142,204,255,.22);
+      box-shadow: none;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 160px 160px;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      background: var(--panel2);
+      border: 1px solid rgba(142,204,255,.22);
+      border-radius: 18px;
+      padding: 14px;
+      min-height: 82px;
+    }
+
+    .stat small {
+      display: block;
+      color: #9fd7ff;
+      font-weight: 900;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .request-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .request {
+      background: rgba(15,33,58,.76);
+      border: 1px solid rgba(142,204,255,.22);
+      border-radius: 20px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .request h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: #eafaff;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 8px 0;
+    }
+
+    .tag {
+      border: 1px solid rgba(142,204,255,.22);
+      background: rgba(255,255,255,.06);
+      color: #cceeff;
+      border-radius: 999px;
+      padding: 7px 9px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .tag.pending {
+      color: #fff2b7;
+      border-color: rgba(255,224,138,.45);
+      background: rgba(255,224,138,.12);
+    }
+
+    .tag.approved {
+      color: #baffd9;
+      border-color: rgba(82,255,173,.45);
+      background: rgba(82,255,173,.12);
+    }
+
+    .tag.rejected {
+      color: #ffd0d8;
+      border-color: rgba(255,93,122,.45);
+      background: rgba(255,93,122,.12);
+    }
+
+    .request p {
+      margin: 6px 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: grid;
+      gap: 8px;
+      min-width: 145px;
+    }
+
+    .actions button {
+      padding: 11px 12px;
+      font-size: 13px;
+    }
+
+    .raw {
+      margin-top: 10px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      padding: 10px;
+      color: #b9d6f5;
+      font-family: Consolas, monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      display: none;
+    }
+
+    .raw.show {
+      display: block;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px 14px;
+      color: var(--muted);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(2, 8, 15, .94);
+      color: #e9fbff;
+      border: 1px solid rgba(98,207,255,.35);
+      padding: 12px 16px;
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, bottom .2s ease;
+      z-index: 99;
+      width: min(560px, calc(100% - 24px));
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .toast.show {
+      opacity: 1;
+      bottom: 28px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .version {
+      text-align: center;
+      color: rgba(200,230,255,.55);
+      font-size: 11px;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        padding: 10px 8px 22px;
+      }
+
+      .hero h1 {
+        font-size: 21px;
+      }
+
+      .logo {
+        width: 48px;
+        height: 48px;
+        font-size: 23px;
+      }
+
+      .pill {
+        font-size: 10px;
+        padding: 8px 9px;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .request {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        grid-template-columns: 1fr 1fr;
+        min-width: 0;
+      }
+
+      .actions .full {
+        grid-column: 1 / -1;
+      }
+
+      .login {
+        margin-top: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div id="loginCard" class="card login">
+      <h2>Marino Empire Admin</h2>
+      <p>
+        Ödül taleplerini görüntülemek, onaylamak veya reddetmek için admin girişi yap.
+      </p>
+
+      <input id="adminTelegramIdInput" placeholder="Admin Telegram ID" autocomplete="off" />
+      <button id="adminLoginBtn" class="main-btn">ADMİN PANELE GİR</button>
+
+      <button id="clearAdminBtn" class="main-btn ghost" style="margin-top:10px;">
+        KAYITLI ADMİN ID TEMİZLE
+      </button>
+
+      <div class="version">
+        Not: Telegram içinden açarsan ID otomatik gelir. Tarayıcı testinde ID’yi elle yazabilirsin.
+      </div>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+      <div class="hero">
+        <div class="logo">A</div>
+        <div>
+          <h1>Ödül Admin Paneli</h1>
+          <p id="adminLine">Admin kontrol ediliyor...</p>
+        </div>
+        <div id="syncPill" class="pill">Hazır</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><small>TOPLAM TALEP</small><strong id="totalStat">0</strong></div>
+        <div class="stat"><small>BEKLEYEN</small><strong id="pendingStat">0</strong></div>
+        <div class="stat"><small>ONAYLI</small><strong id="approvedStat">0</strong></div>
+        <div class="stat"><small>REDDEDİLEN</small><strong id="rejectedStat">0</strong></div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <input id="searchInput" placeholder="Kullanıcı adı, Telegram ID, ödül ara..." />
+          <select id="statusFilter">
+            <option value="pending">Bekleyenler</option>
+            <option value="all">Tümü</option>
+            <option value="approved">Onaylananlar</option>
+            <option value="rejected">Reddedilenler</option>
+          </select>
+          <button id="refreshBtn" class="main-btn">YENİLE</button>
+        </div>
+
+        <textarea id="adminNoteInput" placeholder="Admin notu: Örn. Free Spin manuel eklendi / kullanıcı şartı sağlamadı."></textarea>
+
+        <div id="requestList" class="request-list"></div>
+      </div>
+
+      <button id="logoutBtn" class="main-btn ghost">ADMİN ÇIKIŞ</button>
+
+      <div class="version">
+        GitHub Pages + Supabase Admin Panel v1.0
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const SUPABASE_URL = "https://vxfjprvahjtfhvtuvsoy.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU";
+
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    const el = {
+      loginCard: document.getElementById("loginCard"),
+      adminPanel: document.getElementById("adminPanel"),
+      adminTelegramIdInput: document.getElementById("adminTelegramIdInput"),
+      adminLoginBtn: document.getElementById("adminLoginBtn"),
+      clearAdminBtn: document.getElementById("clearAdminBtn"),
+      logoutBtn: document.getElementById("logoutBtn"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      searchInput: document.getElementById("searchInput"),
+      statusFilter: document.getElementById("statusFilter"),
+      adminNoteInput: document.getElementById("adminNoteInput"),
+      requestList: document.getElementById("requestList"),
+      adminLine: document.getElementById("adminLine"),
+      syncPill: document.getElementById("syncPill"),
+      totalStat: document.getElementById("totalStat"),
+      pendingStat: document.getElementById("pendingStat"),
+      approvedStat: document.getElementById("approvedStat"),
+      rejectedStat: document.getElementById("rejectedStat"),
+      toast: document.getElementById("toast")
+    };
+
+    const state = {
+      admin: null,
+      requests: [],
+      usersMap: {},
+      busy: false
+    };
+
+    const tgUser = getTelegramUser();
+
+    if (tgUser && tgUser.id) {
+      el.adminTelegramIdInput.value = String(tgUser.id);
+    } else {
+      const savedAdminId = localStorage.getItem("marino_admin_telegram_id");
+      if (savedAdminId) {
+        el.adminTelegramIdInput.value = savedAdminId;
+      }
+    }
+
+    function getTelegramUser() {
+      const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+
+      if (!u || !u.id) return null;
+
+      return {
+        id: String(u.id),
+        username: u.username || "",
+        first_name: u.first_name || "",
+        last_name: u.last_name || ""
+      };
+    }
+
+    function fmt(n) {
+      return Number(n || 0).toLocaleString("tr-TR");
+    }
+
+    function toast(msg) {
+      el.toast.textContent = msg;
+      el.toast.classList.add("show");
+
+      clearTimeout(window.__toastTimer);
+
+      window.__toastTimer = setTimeout(() => {
+        el.toast.classList.remove("show");
+      }, 2600);
+    }
+
+    function setBusy(isBusy, text) {
+      state.busy = isBusy;
+      el.syncPill.textContent = text || (isBusy ? "İşleniyor..." : "Güncel");
+    }
+
+    async function adminLogin() {
+      const adminId = el.adminTelegramIdInput.value.trim();
+
+      if (!adminId) {
+        toast("Admin Telegram ID boş olamaz.");
+        return;
+      }
+
+      el.adminLoginBtn.disabled = true;
+      el.adminLoginBtn.textContent = "KONTROL EDİLİYOR...";
+
+      try {
+        const { data, error } = await db
+          .from("users")
+          .select("*")
+          .eq("telegram_id", adminId)
+          .eq("is_admin", true)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+          throw new Error("Bu Telegram ID admin değil. Supabase users tablosunda is_admin=true olmalı.");
+        }
+
+        state.admin = data;
+        localStorage.setItem("marino_admin_telegram_id", adminId);
+
+        el.loginCard.classList.add("hidden");
+        el.adminPanel.classList.remove("hidden");
+
+        el.adminLine.textContent =
+          "Admin: " +
+          (data.telegram_username || data.first_name || data.site_username || data.telegram_id);
+
+        toast("Admin girişi başarılı.");
+        await loadRequests();
+
+      } catch (err) {
+        console.error(err);
+        toast(err.message || "Admin girişi başarısız.");
+      } finally {
+        el.adminLoginBtn.disabled = false;
+        el.adminLoginBtn.textContent = "ADMİN PANELE GİR";
+      }
+    }
+
+    async function loadRequests() {
+      if (!state.admin || state.busy) return;
+
+      setBusy(true, "Yükleniyor...");
+
+      try {
+        const { data, error } = await db
+          .from("reward_requests")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(200);
+
+        if (error) throw error;
+
+        state.requests = Array.isArray(data) ? data : [];
+
+        await loadUsersForRequests();
+
+        renderStats();
+        renderRequests();
+
+        setBusy(false, "Güncel");
+      } catch (err) {
+        console.error(err);
+        setBusy(false, "Hata");
+        toast(err.message || "Talepler yüklenemedi.");
+      }
+    }
+
+    async function loadUsersForRequests() {
+      const ids = [...new Set(
+        state.requests
+          .map(r => String(r.telegram_id || ""))
+          .filter(Boolean)
+      )];
+
+      state.usersMap = {};
+
+      if (!ids.length) return;
+
+      const { data, error } = await db
+        .from("users")
+        .select("telegram_id, telegram_username, first_name, last_name, site_username, is_admin")
+        .in("telegram_id", ids);
+
+      if (error) {
+        console.warn("Kullanıcı bilgileri alınamadı:", error);
+        return;
+      }
+
+      (data || []).forEach(u => {
+        state.usersMap[String(u.telegram_id)] = u;
+      });
+    }
+
+    function renderStats() {
+      const total = state.requests.length;
+      const pending = state.requests.filter(r => normalizeStatus(r.status) === "pending").length;
+      const approved = state.requests.filter(r => normalizeStatus(r.status) === "approved").length;
+      const rejected = state.requests.filter(r => normalizeStatus(r.status) === "rejected").length;
+
+      el.totalStat.textContent = fmt(total);
+      el.pendingStat.textContent = fmt(pending);
+      el.approvedStat.textContent = fmt(approved);
+      el.rejectedStat.textContent = fmt(rejected);
+    }
+
+    function renderRequests() {
+      const filter = el.statusFilter.value;
+      const q = el.searchInput.value.trim().toLowerCase();
+
+      let list = [...state.requests];
+
+      if (filter !== "all") {
+        list = list.filter(r => normalizeStatus(r.status) === filter);
+      }
+
+      if (q) {
+        list = list.filter(r => {
+          const u = state.usersMap[String(r.telegram_id || "")] || {};
+          const text = [
+            r.telegram_id,
+            r.site_username,
+            r.item_code,
+            r.item_name,
+            r.status,
+            r.request_id,
+            r.id,
+            u.telegram_username,
+            u.site_username,
+            u.first_name,
+            u.last_name
+          ].join(" ").toLowerCase();
+
+          return text.includes(q);
+        });
+      }
+
+      if (!list.length) {
+        el.requestList.innerHTML = `
+          <div class="empty">
+            Kayıt bulunamadı. Bekleyen talep yoksa sistem doğru çalışıyor olabilir.
+          </div>
+        `;
+        return;
+      }
+
+      el.requestList.innerHTML = list.map((r, index) => renderRequestCard(r, index)).join("");
+    }
+
+    function renderRequestCard(r, index) {
+      const user = state.usersMap[String(r.telegram_id || "")] || {};
+      const status = normalizeStatus(r.status);
+      const requestKey = getRequestKey(r);
+
+      const siteUsername =
+        r.site_username ||
+        user.site_username ||
+        "-";
+
+      const telegramUsername =
+        user.telegram_username ||
+        r.telegram_username ||
+        "-";
+
+      const itemName =
+        r.item_name ||
+        r.item_code ||
+        r.reward_name ||
+        "Ödül Talebi";
+
+      const costCoin =
+        r.cost_coin ??
+        r.coin_cost ??
+        r.spent_coin ??
+        "-";
+
+      const costToken =
+        r.cost_token ??
+        r.token_cost ??
+        r.spent_token ??
+        "-";
+
+      const createdAt =
+        r.created_at ||
+        r.requested_at ||
+        "-";
+
+      const note =
+        r.admin_note ||
+        r.note ||
+        "";
+
+      return `
+        <div class="request">
+          <div>
+            <h3>${escapeHtml(itemName)}</h3>
+
+            <div class="meta">
+              <span class="tag ${status}">${statusText(status)}</span>
+              <span class="tag">Site: ${escapeHtml(siteUsername)}</span>
+              <span class="tag">TG: ${escapeHtml(String(r.telegram_id || "-"))}</span>
+              <span class="tag">@${escapeHtml(telegramUsername)}</span>
+            </div>
+
+            <p><strong>Talep zamanı:</strong> ${escapeHtml(formatDate(createdAt))}</p>
+            <p><strong>Item code:</strong> ${escapeHtml(String(r.item_code || "-"))}</p>
+            <p><strong>Maliyet:</strong> ${escapeHtml(String(costCoin))} coin / ${escapeHtml(String(costToken))} token</p>
+
+            ${note ? `<p><strong>Admin notu:</strong> ${escapeHtml(note)}</p>` : ""}
+
+            <button class="ghost" style="padding:8px 10px;font-size:12px;margin-top:8px;" onclick="toggleRaw(${index})">
+              Ham veriyi göster/gizle
+            </button>
+
+            <div id="raw_${index}" class="raw">${escapeHtml(JSON.stringify(r, null, 2))}</div>
+          </div>
+
+          <div class="actions">
+            <button class="green" ${status === "approved" ? "disabled" : ""} onclick="updateRequestStatus('${escapeAttr(requestKey.field)}', '${escapeAttr(requestKey.value)}', 'approved')">
+              ONAYLA
+            </button>
+
+            <button class="danger" ${status === "rejected" ? "disabled" : ""} onclick="updateRequestStatus('${escapeAttr(requestKey.field)}', '${escapeAttr(requestKey.value)}', 'rejected')">
+              REDDET
+            </button>
+
+            <button class="gold full" onclick="copyRequestText(${index})">
+              KOPYALA
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function updateRequestStatus(field, value, newStatus) {
+      if (!state.admin || state.busy) return;
+
+      const row = state.requests.find(r => String(r[field]) === String(value));
+
+      if (!row) {
+        toast("Talep kaydı bulunamadı.");
+        return;
+      }
+
+      const adminNote = el.adminNoteInput.value.trim();
+
+      const payload = {
+        status: newStatus
+      };
+
+      if ("admin_note" in row) payload.admin_note = adminNote;
+      if ("reviewed_at" in row) payload.reviewed_at = new Date().toISOString();
+      if ("reviewed_by" in row) payload.reviewed_by = state.admin.telegram_id;
+      if ("approved_by" in row && newStatus === "approved") payload.approved_by = state.admin.telegram_id;
+      if ("rejected_by" in row && newStatus === "rejected") payload.rejected_by = state.admin.telegram_id;
+      if ("approved_at" in row && newStatus === "approved") payload.approved_at = new Date().toISOString();
+      if ("rejected_at" in row && newStatus === "rejected") payload.rejected_at = new Date().toISOString();
+      if ("updated_at" in row) payload.updated_at = new Date().toISOString();
+
+      setBusy(true, newStatus === "approved" ? "Onaylanıyor..." : "Reddediliyor...");
+
+      try {
+        let { data, error } = await db
+          .from("reward_requests")
+          .update(payload)
+          .eq(field, value)
+          .select();
+
+        if (error) {
+          const fallbackPayload = { status: newStatus };
+
+          const fallback = await db
+            .from("reward_requests")
+            .update(fallbackPayload)
+            .eq(field, value)
+            .select();
+
+          if (fallback.error) throw fallback.error;
+
+          data = fallback.data;
+        }
+
+        toast(newStatus === "approved" ? "Talep onaylandı." : "Talep reddedildi.");
+
+        await loadRequests();
+      } catch (err) {
+        console.error(err);
+        setBusy(false, "Hata");
+        toast(err.message || "İşlem başarısız. RLS/policy veya kolon adı eksik olabilir.");
+      }
+    }
+
+    function copyRequestText(index) {
+      const r = getFilteredListForIndex(index);
+      if (!r) {
+        toast("Kopyalanacak talep bulunamadı.");
+        return;
+      }
+
+      const u = state.usersMap[String(r.telegram_id || "")] || {};
+
+      const text =
+`Marino Empire Ödül Talebi
+Durum: ${statusText(normalizeStatus(r.status))}
+Telegram ID: ${r.telegram_id || "-"}
+Telegram Username: ${u.telegram_username || r.telegram_username || "-"}
+Site Kullanıcı Adı: ${r.site_username || u.site_username || "-"}
+Ödül: ${r.item_name || r.item_code || r.reward_name || "-"}
+Item Code: ${r.item_code || "-"}
+Coin: ${r.cost_coin ?? r.coin_cost ?? r.spent_coin ?? "-"}
+Token: ${r.cost_token ?? r.token_cost ?? r.spent_token ?? "-"}
+Talep Zamanı: ${formatDate(r.created_at || r.requested_at || "-")}
+Admin Notu: ${el.adminNoteInput.value.trim() || r.admin_note || "-"}`;
+
+      navigator.clipboard.writeText(text)
+        .then(() => toast("Talep metni kopyalandı."))
+        .catch(() => toast("Kopyalama başarısız."));
+    }
+
+    function getFilteredListForIndex(index) {
+      const filter = el.statusFilter.value;
+      const q = el.searchInput.value.trim().toLowerCase();
+
+      let list = [...state.requests];
+
+      if (filter !== "all") {
+        list = list.filter(r => normalizeStatus(r.status) === filter);
+      }
+
+      if (q) {
+        list = list.filter(r => {
+          const u = state.usersMap[String(r.telegram_id || "")] || {};
+          const text = [
+            r.telegram_id,
+            r.site_username,
+            r.item_code,
+            r.item_name,
+            r.status,
+            r.request_id,
+            r.id,
+            u.telegram_username,
+            u.site_username,
+            u.first_name,
+            u.last_name
+          ].join(" ").toLowerCase();
+
+          return text.includes(q);
+        });
+      }
+
+      return list[index];
+    }
+
+    function getRequestKey(row) {
+      const possible = ["id", "request_id", "reward_request_id"];
+
+      for (const key of possible) {
+        if (row[key] !== undefined && row[key] !== null && row[key] !== "") {
+          return {
+            field: key,
+            value: String(row[key])
+          };
+        }
+      }
+
+      return {
+        field: "created_at",
+        value: String(row.created_at || "")
+      };
+    }
+
+    function normalizeStatus(status) {
+      const s = String(status || "pending").toLowerCase();
+
+      if (["approved", "approve", "onay", "onaylandi", "onaylandı"].includes(s)) return "approved";
+      if (["rejected", "reject", "red", "reddedildi"].includes(s)) return "rejected";
+      return "pending";
+    }
+
+    function statusText(status) {
+      if (status === "approved") return "ONAYLANDI";
+      if (status === "rejected") return "REDDEDİLDİ";
+      return "BEKLEMEDE";
+    }
+
+    function formatDate(value) {
+      if (!value || value === "-") return "-";
+
+      const d = new Date(value);
+
+      if (Number.isNaN(d.getTime())) return String(value);
+
+      return d.toLocaleString("tr-TR");
+    }
+
+    function toggleRaw(index) {
+      const box = document.getElementById("raw_" + index);
+      if (box) box.classList.toggle("show");
+    }
+
+    function clearAdmin() {
+      localStorage.removeItem("marino_admin_telegram_id");
+      el.adminTelegramIdInput.value = "";
+      toast("Kayıtlı admin ID temizlendi.");
+    }
+
+    function logout() {
+      state.admin = null;
+      state.requests = [];
+      state.usersMap = {};
+
+      el.adminPanel.classList.add("hidden");
+      el.loginCard.classList.remove("hidden");
+
+      toast("Admin çıkış yapıldı.");
+    }
+
+    el.adminLoginBtn.addEventListener("click", adminLogin);
+    el.clearAdminBtn.addEventListener("click", clearAdmin);
+    el.logoutBtn.addEventListener("click", logout);
+    el.refreshBtn.addEventListener("click", loadRequests);
+    el.searchInput.addEventListener("input", renderRequests);
+    el.statusFilter.addEventListener("change", renderRequests);
+
+    window.addEventListener("load", () => {
+      const savedAdminId = localStorage.getItem("marino_admin_telegram_id");
+
+      if (savedAdminId && !tgUser) {
+        el.adminTelegramIdInput.value = savedAdminId;
+      }
+    });
+  </script>
+</body>
+</html>
