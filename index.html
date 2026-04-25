@@ -542,6 +542,18 @@
       el.siteUsernameInput.value = savedSiteUsername;
     }
 
+    window.addEventListener("load", () => {
+  const savedUsername = localStorage.getItem("marino_site_username");
+
+  if (savedUsername) {
+    el.siteUsernameInput.value = savedUsername;
+
+    setTimeout(() => {
+      startGame();
+    }, 300);
+  }
+});
+
     function getTelegramIdentity() {
       const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
 
