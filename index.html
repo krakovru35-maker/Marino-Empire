@@ -416,6 +416,8 @@ function loadSet(){try{return Object.assign({countryCode:'TR',countryName:'Türk
 function saveSet(){localStorage.marino_settings=JSON.stringify(S.settings);applySet()}
 function loadClaimed(){try{return JSON.parse(localStorage.marino_claimed_tasks||'{}')}catch(e){return{}}}
 function saveClaimed(){localStorage.marino_claimed_tasks=JSON.stringify(S.claimed)}
+const APP_VERSION='v15-stable';
+function clearBrokenLocalCache(){try{if(localStorage.marino_app_version!==APP_VERSION){localStorage.removeItem('marino_local_game');localStorage.removeItem('marino_claimed_tasks');localStorage.marino_app_version=APP_VERSION;S.claimed={};}}catch(e){}}
 function toast(m){let e=q('#toast');if(!e)return;e.textContent=m;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2600)}
 
 const audio={
@@ -471,7 +473,7 @@ function tgUser(){
 function defaultGame(){
   const u=S.user||tgUser();
   let saved=null;try{saved=JSON.parse(localStorage.marino_local_game||'null')}catch(e){}
-  if(saved&&saved.state)return saved;
+  if(saved&&saved.state&&Number(saved.state.casino_level||1)<=100&&Number(saved.state.reward_token||0)<=500000)return saved;
   return{
     user:u,
     state:{marino_coin:1000,reward_token:25,energy:500,max_energy:500,tap_power:1,passive_income_per_hour:0,casino_level:1,reputation:0,claimable_coin:0},
@@ -509,9 +511,9 @@ async function loadGame(){
   render();
   try{
     let site=S.user.site_username||S.user.telegram_username||S.user.first_name||('user_'+S.user.telegram_id);
-    let data=await rpc('start_game',{p_telegram_id:S.user.telegram_id,p_site_username:site,p_telegram_username:S.user.telegram_username||'',p_first_name:S.user.first_name||'',p_last_name:S.user.last_name||'',p_language_code:S.user.language_code||'tr',p_referred_by:''});
+    let data=await rpc('start_game',{p_telegram_id:S.user.telegram_id,p_site_username:site,p_display_name:S.user.first_name||S.user.telegram_username||site||'Oyuncu',p_country_code:S.settings.countryCode||'TR',p_country_name:S.settings.countryName||'Türkiye',p_telegram_username:S.user.telegram_username||'',p_first_name:S.user.first_name||'',p_last_name:S.user.last_name||'',p_language_code:S.user.language_code||'tr',p_referred_by:''});
     if(data&&typeof data==='object'){S.game=normalizeGame(data);S.remoteReady=true;await saveRemote(false);render()}
-  }catch(e){S.remoteReady=false;console.warn('Yerel mod:',e&&e.message?e.message:e);toast('Oyun yerel modda açıldı. SQL bağlantısı gelirse otomatik kullanır.');render()}
+  }catch(e){S.remoteReady=false;console.warn('SQL/RPC hata:',e&&e.message?e.message:e);S.game=defaultGame();saveLocalGame();toast('SQL bağlantısı açılmadı: '+((e&&e.message)?e.message:'RPC/bağlantı hatası'));render()}
 }
 function normalizeGame(data){
   let g=defaultGame();
@@ -609,7 +611,7 @@ function tapCost(){let s=st();return Math.round(500+Math.pow(Number(s.tap_power|
 function localTap(){let s=st();if(Number(s.energy)<=0)return false;s.energy=Math.max(0,Number(s.energy)-1);s.marino_coin=Number(s.marino_coin||0)+Number(s.tap_power||1);s.reputation=Number(s.reputation||0)+1;recalcLevel();saveLocalGame();return true}
 async function tap(){
   if(S.busy)return;let s=st();if(Number(s.energy)<=0){toast('Enerji bitti. Biraz bekle.');audio.bad();return}S.busy=true;
-  try{if(S.remoteReady){let d=await rpc('tap_coin',{p_telegram_id:S.user.telegram_id,p_taps:1});applyResult(d)}else localTap();plus('+'+fmt(st().tap_power||1));audio.tap();render()}
+  try{if(S.remoteReady){let d=await rpc('tap_coin',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});applyResult(d)}else localTap();plus('+'+fmt(st().tap_power||1));audio.tap();render()}
   catch(e){localTap();plus('+'+fmt(st().tap_power||1));audio.tap();render()}finally{S.busy=false}
 }
 function plus(t){let e=document.createElement('div');e.className='plus';e.textContent=t;q('.tapArea').appendChild(e);setTimeout(()=>e.remove(),850)}
@@ -631,8 +633,8 @@ async function handle(a){
     if(act==='building'){if(S.remoteReady){d=await rpc('upgrade_building',{p_telegram_id:S.user.telegram_id,p_building_key:a.dataset.key,p_request_id:uid()});applyResult(d)}else localUpgradeBuilding(a.dataset.key);msg='Bina yükseltildi.';audio.win()}
     if(act==='tapUp'){if(S.remoteReady){d=await rpc('marino_upgrade_tap',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});applyResult(d)}else localTapUp();msg='Dokunma gücü yükseltildi.';audio.win()}
     if(act==='reward'){if(S.remoteReady){d=await rpc('request_reward',{p_telegram_id:S.user.telegram_id,p_item_code:a.dataset.code,p_request_id:uid()});applyResult(d)}else localReward(a.dataset.code);msg='Ödül talebi admin paneline gönderildi.';audio.win()}
-    if(act==='task'){let reward=0;if(S.remoteReady){try{d=await rpc('marino_claim_task',{p_telegram_id:S.user.telegram_id,p_task_id:a.dataset.task,p_level_no:Number(a.dataset.level)});applyResult(d)}catch(e){reward=localTask(a.dataset.task,a.dataset.type)}}else reward=localTask(a.dataset.task,a.dataset.type);msg=reward?'Görev ödülü alındı: +'+fmt(reward)+' coin':'Görev ödülü alındı.';audio.win()}
-    if(act==='mini'){let win=0;if(S.remoteReady){try{d=await rpc('marino_play_mini_game',{p_telegram_id:S.user.telegram_id,p_game_key:a.dataset.game,p_request_id:uid()});applyResult(d);win=d&&d.reward_coin?Number(d.reward_coin):0}catch(e){win=localMini(a.dataset.game)}}else win=localMini(a.dataset.game);msg=win>0?'Mini oyun kazancı: +'+fmt(win)+' coin':'Mini oyun boş döndü.';win>0?audio.win():audio.bad()}
+    if(act==='task'){let reward=0;if(S.remoteReady){try{d=await rpc('marino_claim_task',{p_telegram_id:S.user.telegram_id,p_task_id:a.dataset.task,p_task_level:Number(a.dataset.level),p_request_id:uid()});applyResult(d)}catch(e){reward=localTask(a.dataset.task,a.dataset.type)}}else reward=localTask(a.dataset.task,a.dataset.type);msg=reward?'Görev ödülü alındı: +'+fmt(reward)+' coin':'Görev ödülü alındı.';audio.win()}
+    if(act==='mini'){let win=0;if(S.remoteReady){try{d=await rpc('marino_play_mini_game',{p_telegram_id:S.user.telegram_id,p_game:a.dataset.game,p_request_id:uid()});applyResult(d);win=d&&d.reward_coin?Number(d.reward_coin):0}catch(e){win=localMini(a.dataset.game)}}else win=localMini(a.dataset.game);msg=win>0?'Mini oyun kazancı: +'+fmt(win)+' coin':'Mini oyun boş döndü.';win>0?audio.win():audio.bad()}
     if(act==='ad'){await watchAd();S.busy=false;return}
     toast(msg);render();
   }catch(e){console.error(e);toast((e&&e.message)||'İşlem tamamlanamadı.');audio.bad();render()}finally{S.busy=false}
@@ -646,11 +648,11 @@ async function watchAd(){
   try{if(S.remoteReady){let d=await rpc('marino_claim_ad_reward',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});applyResult(d)}else{let s=st();s.marino_coin+=250;s.reputation+=20;recalcLevel();saveLocalGame()}toast('Reklam ödülü eklendi: +250 coin');audio.win();render()}catch(e){let s=st();s.marino_coin+=250;saveLocalGame();toast('Reklam ödülü yerel eklendi: +250 coin');render()}
 }
 async function saveRemote(show){
-  try{await rpc('marino_save_settings',{p_telegram_id:S.user.telegram_id,p_country_code:S.settings.countryCode,p_country_name:S.settings.countryName,p_sound_enabled:!!S.settings.sfx,p_music_enabled:!!S.settings.music});if(show)toast('Ayarlar kaydedildi.')}
+  try{await rpc('marino_save_settings',{p_telegram_id:S.user.telegram_id,p_country_code:S.settings.countryCode,p_country_name:S.settings.countryName,p_sfx_enabled:!!S.settings.sfx,p_music_enabled:!!S.settings.music,p_music_path:S.settings.musicUrl||DEFAULT_MUSIC_SRC});if(show)toast('Ayarlar kaydedildi.')}
   catch(e){if(show)toast('Ayarlar kaydedildi. SQL ayar fonksiyonu yoksa yerel çalışır.')}
 }
 function start(){
-  bootTelegram();bind();applySet();S.user=tgUser();S.game=defaultGame();render();loadGame().finally(()=>setTimeout(()=>{let sp=q('#splash');if(sp)sp.classList.add('hide')},300));
+  bootTelegram();clearBrokenLocalCache();bind();applySet();S.user=tgUser();S.game=defaultGame();render();loadGame().finally(()=>setTimeout(()=>{let sp=q('#splash');if(sp)sp.classList.add('hide')},300));
 }
 start();
 })();
