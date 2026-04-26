@@ -343,8 +343,16 @@ async function toggleBan(id) {
 }
 
 async function resolveReq(id, action) {
+    const note = prompt("Oyuncuya iletilecek not (İsteğe bağlı):", action === 'approved' ? 'Tebrikler! Ödülünüz eklendi.' : 'Maalesef talebiniz reddedildi.');
+    if(note === null) return; // Cancel if prompt cancelled
+
     try {
-        await rpc('marino_admin_resolve_request', { p_admin_id: '0', p_req_id: id, p_action: action });
+        await rpc('marino_admin_resolve_request', { 
+            p_admin_id: '0', 
+            p_req_id: id, 
+            p_action: action,
+            p_note: note
+        });
         refreshData();
     } catch(e) {}
 }
