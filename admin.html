@@ -2,11 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Marino Empire Admin</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -14,47 +10,36 @@
 
   <style>
     :root {
-      --bg0: #030812;
-      --bg1: #07182b;
-      --panel: rgba(7, 19, 34, .92);
-      --panel2: rgba(12, 33, 57, .82);
-      --panel3: rgba(255,255,255,.055);
-      --line: rgba(112, 211, 255, .28);
-      --line2: rgba(255,255,255,.09);
-      --blue: #62d7ff;
-      --blue2: #2c92ff;
-      --cyan: #8df4ff;
-      --gold: #ffe18a;
-      --green: #55ffad;
-      --red: #ff5c7d;
-      --pink: #ff8fb4;
-      --text: #f4fbff;
-      --muted: #a9c9e9;
-      --muted2: #7195ba;
-      --shadow: 0 22px 70px rgba(0,0,0,.48);
+      --bg: #030914;
+      --panel: rgba(9, 24, 43, 0.92);
+      --panel2: rgba(13, 35, 60, 0.86);
+      --line: rgba(94, 204, 255, 0.28);
+      --line2: rgba(255, 255, 255, 0.08);
+      --text: #eef8ff;
+      --muted: #a9c6df;
+      --cyan: #55dcff;
+      --blue: #2b8cff;
+      --green: #40e596;
+      --red: #ff5f7e;
+      --gold: #ffcf5a;
+      --pink: #ff8db0;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+      --radius: 26px;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; }
 
-    html {
+    html, body {
+      width: 100%;
       min-height: 100%;
-      background: var(--bg0);
-    }
-
-    body {
       margin: 0;
-      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      overflow-x: hidden;
       background:
-        radial-gradient(circle at 18% 0%, rgba(79, 198, 255, .26), transparent 34%),
-        radial-gradient(circle at 88% 16%, rgba(65, 110, 255, .20), transparent 32%),
-        radial-gradient(circle at 50% 120%, rgba(255, 214, 120, .10), transparent 34%),
-        linear-gradient(180deg, #102b4d 0%, #061525 42%, #020711 100%);
+        radial-gradient(circle at 20% -10%, rgba(77, 198, 255, 0.25), transparent 34%),
+        radial-gradient(circle at 100% 10%, rgba(47, 116, 255, 0.2), transparent 30%),
+        linear-gradient(180deg, #071a2d 0%, #020711 72%);
+      overflow-x: hidden;
     }
 
     body::before {
@@ -62,625 +47,561 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: .5;
-      background-image:
-        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
       background-size: 34px 34px;
-      mask-image: linear-gradient(to bottom, black, transparent 78%);
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent 86%);
     }
 
-    .app {
-      position: relative;
-      z-index: 1;
-      width: min(1180px, 100%);
-      margin: 0 auto;
-      padding: 16px 12px 32px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .card {
-      background: linear-gradient(180deg, rgba(14, 36, 62, .92), rgba(4, 13, 24, .92));
-      border: 1px solid var(--line);
-      border-radius: 26px;
-      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.08);
-      overflow: hidden;
-    }
-
-    .glass {
-      background: rgba(4, 14, 26, .72);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: 0 18px 50px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.06);
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .logo {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(112,211,255,.30);
-      box-shadow: 0 0 34px rgba(98,215,255,.25);
-      flex: 0 0 auto;
-    }
-
-    .logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .titlebox {
-      min-width: 0;
-    }
-
-    .titlebox h1 {
-      margin: 0;
-      font-size: 26px;
-      line-height: 1.08;
-      letter-spacing: -.5px;
-      text-shadow: 0 0 22px rgba(98,215,255,.28);
-    }
-
-    .titlebox p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .status-pill {
-      margin-left: auto;
-      padding: 10px 13px;
-      border: 1px solid rgba(112,211,255,.28);
-      border-radius: 999px;
-      background: rgba(7, 24, 43, .75);
-      color: #d6f7ff;
-      font-size: 12px;
-      font-weight: 900;
-      white-space: nowrap;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
-    }
-
-    .status-pill.good {
-      color: #bfffe0;
-      border-color: rgba(85,255,173,.32);
-      background: rgba(85,255,173,.08);
-    }
-
-    .status-pill.bad {
-      color: #ffd0dc;
-      border-color: rgba(255,92,125,.34);
-      background: rgba(255,92,125,.08);
-    }
-
-    .login-card {
-      max-width: 620px;
-      margin: 58px auto 0;
-      padding: 26px;
-      text-align: center;
-    }
-
-    .login-logo {
-      width: 96px;
-      height: 96px;
-      margin: 0 auto 16px;
-      border-radius: 28px;
-      display: grid;
-      place-items: center;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(112,211,255,.30);
-      box-shadow: 0 0 42px rgba(98,215,255,.22);
-      overflow: hidden;
-    }
-
-    .login-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .login-card h2 {
-      margin: 0 0 10px;
-      font-size: 31px;
-      line-height: 1.1;
-      letter-spacing: -.7px;
-    }
-
-    .login-card p {
-      margin: 0 0 18px;
-      color: var(--muted);
-      line-height: 1.5;
-      font-size: 15px;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      border: 1px solid rgba(150,218,255,.28);
-      background: rgba(1, 8, 15, .48);
-      color: white;
-      border-radius: 17px;
-      padding: 14px 15px;
-      font-size: 15px;
-      outline: none;
-      margin: 0;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-    }
-
-    textarea {
-      min-height: 78px;
-      resize: vertical;
-      line-height: 1.45;
-    }
-
-    select option {
-      background: #071426;
-      color: #fff;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: rgba(190,220,245,.62);
-    }
-
-    input:focus, textarea:focus, select:focus {
-      border-color: rgba(98,215,255,.75);
-      box-shadow: 0 0 0 4px rgba(98,215,255,.11), inset 0 1px 0 rgba(255,255,255,.06);
+    button, input, select, textarea {
+      font: inherit;
     }
 
     button {
       border: 0;
       cursor: pointer;
-      border-radius: 16px;
-      font-weight: 950;
-      color: #03101e;
-      background: linear-gradient(135deg, #5edcff, #2e91ff);
-      box-shadow: 0 12px 28px rgba(46,145,255,.28), inset 0 1px 0 rgba(255,255,255,.33);
-      transition: transform .12s ease, filter .12s ease, opacity .12s ease, box-shadow .12s ease;
-      user-select: none;
-    }
-
-    button:hover {
-      filter: brightness(1.06);
-      box-shadow: 0 16px 34px rgba(46,145,255,.33), inset 0 1px 0 rgba(255,255,255,.38);
-    }
-
-    button:active {
-      transform: scale(.965) translateY(1px);
-      filter: brightness(.96);
+      -webkit-tap-highlight-color: transparent;
     }
 
     button:disabled {
-      opacity: .52;
+      opacity: 0.46;
       cursor: not-allowed;
-      filter: grayscale(.35);
-      transform: none;
+      filter: grayscale(0.15);
     }
 
-    .main-btn {
-      width: 100%;
-      padding: 14px 18px;
-      font-size: 15px;
-      letter-spacing: .2px;
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: calc(18px + env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom));
     }
 
-    .green {
-      background: linear-gradient(135deg, #40ff9e, #aaffcf);
-      color: #052314;
-      box-shadow: 0 12px 28px rgba(64,255,158,.18), inset 0 1px 0 rgba(255,255,255,.35);
+    .hidden { display: none !important; }
+
+    .shell {
+      position: relative;
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(13, 35, 62, 0.94), rgba(3, 10, 18, 0.96));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+      overflow: hidden;
     }
 
-    .danger {
-      background: linear-gradient(135deg, #ff5679, #ffc1d0);
-      color: #26020b;
-      box-shadow: 0 12px 28px rgba(255,86,121,.18), inset 0 1px 0 rgba(255,255,255,.35);
+    .shell::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      pointer-events: none;
+      background: linear-gradient(120deg, transparent, rgba(83, 220, 255, 0.11), transparent 62%);
     }
 
-    .gold {
-      background: linear-gradient(135deg, #ffda65, #fff0a9);
-      color: #2a1b00;
-      box-shadow: 0 12px 28px rgba(255,218,101,.18), inset 0 1px 0 rgba(255,255,255,.42);
+    .login {
+      width: min(430px, 100%);
+      margin: 0 auto;
+      padding: 28px 12px;
     }
 
-    .ghost {
-      background: rgba(255,255,255,.065);
-      color: #dcf5ff;
-      border: 1px solid rgba(142,204,255,.22);
-      box-shadow: none;
+    .login .shell {
+      padding: 26px 14px 16px;
+      text-align: center;
     }
 
-    .ghost:hover {
-      box-shadow: none;
-      background: rgba(255,255,255,.09);
+    .logoBox {
+      width: 104px;
+      height: 104px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      border-radius: 28px;
+      background: radial-gradient(circle at 45% 25%, rgba(88, 226, 255, 0.25), rgba(3, 9, 18, 0.98) 58%);
+      border: 1px solid rgba(96, 215, 255, 0.32);
+      box-shadow: 0 0 38px rgba(77, 203, 255, 0.22);
+      overflow: hidden;
     }
 
-    .login-actions {
+    .logoBox img {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 18px rgba(70, 200, 255, 0.55));
+    }
+
+    .fallbackLogo {
+      display: none;
+      font-size: 38px;
+      font-weight: 950;
+      letter-spacing: -2px;
+      color: var(--cyan);
+      text-shadow: 0 0 22px rgba(85, 220, 255, 0.58);
+    }
+
+    .logoBox img.broken { display: none; }
+    .logoBox img.broken + .fallbackLogo { display: block; }
+
+    h1, h2, h3, p { margin: 0; }
+
+    .title {
+      font-size: clamp(25px, 6vw, 36px);
+      line-height: 1.05;
+      font-weight: 950;
+      letter-spacing: -1.25px;
+    }
+
+    .subtitle {
+      max-width: 520px;
+      margin: 10px auto 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      font-weight: 650;
+    }
+
+    .form {
+      margin-top: 20px;
       display: grid;
       gap: 10px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 16px;
+      border: 1px solid rgba(92, 206, 255, 0.25);
+      background: rgba(1, 9, 18, 0.72);
+      color: var(--text);
+      outline: none;
+      padding: 0 15px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+      padding: 13px 15px;
+      line-height: 1.45;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(85, 220, 255, 0.68);
+      box-shadow: 0 0 0 4px rgba(85, 220, 255, 0.11);
+    }
+
+    .btn {
+      min-height: 48px;
+      border-radius: 17px;
+      padding: 0 16px;
+      color: #03111f;
+      font-weight: 950;
+      letter-spacing: 0.25px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      box-shadow: 0 14px 30px rgba(43, 140, 255, 0.28), inset 0 1px 0 rgba(255,255,255,0.42);
+      transition: transform .14s ease, filter .14s ease;
+    }
+
+    .btn:active { transform: translateY(1px) scale(0.985); }
+    .btn:hover { filter: brightness(1.05); }
+
+    .btn.ghost {
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: none;
+    }
+
+    .btn.green {
+      color: #031611;
+      background: linear-gradient(135deg, #54f2b0, #24ca7a);
+      box-shadow: 0 14px 30px rgba(36, 202, 122, 0.20), inset 0 1px 0 rgba(255,255,255,0.42);
+    }
+
+    .btn.red {
+      color: #22030a;
+      background: linear-gradient(135deg, #ff88a3, #ff4e72);
+      box-shadow: 0 14px 30px rgba(255, 78, 114, 0.22), inset 0 1px 0 rgba(255,255,255,0.42);
+    }
+
+    .btn.gold {
+      color: #231705;
+      background: linear-gradient(135deg, #ffe28a, #ffbd3e);
+      box-shadow: 0 14px 30px rgba(255, 189, 62, 0.18), inset 0 1px 0 rgba(255,255,255,0.42);
+    }
+
+    .hint {
       margin-top: 12px;
+      color: rgba(221, 241, 255, 0.65);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .version {
+      margin-top: 14px;
+      color: rgba(221, 241, 255, 0.54);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .panel {
+      display: grid;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .miniLogo {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: rgba(2, 12, 23, 0.78);
+      border: 1px solid rgba(96, 215, 255, 0.28);
+      overflow: hidden;
+      box-shadow: 0 0 26px rgba(85, 220, 255, 0.16);
+    }
+
+    .miniLogo img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #95dbff;
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 14px var(--green);
+    }
+
+    .panelTitle {
+      margin-top: 3px;
+      font-size: clamp(24px, 5vw, 34px);
+      line-height: 1.05;
+      font-weight: 950;
+      letter-spacing: -1px;
+    }
+
+    .adminLine {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .pill {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      color: #c8f2ff;
+      background: rgba(85, 220, 255, 0.09);
+      border: 1px solid rgba(85, 220, 255, 0.22);
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
     }
 
     .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
-      margin-bottom: 14px;
+      padding: 0 18px 18px;
     }
 
     .stat {
-      position: relative;
-      overflow: hidden;
-      padding: 15px;
-      min-height: 88px;
+      min-height: 92px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(1, 10, 18, 0.55);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
-    .stat::after {
-      content: "";
-      position: absolute;
-      width: 90px;
-      height: 90px;
-      right: -28px;
-      top: -26px;
-      border-radius: 999px;
-      background: rgba(98,215,255,.10);
-      filter: blur(1px);
-    }
-
-    .stat small {
-      position: relative;
-      z-index: 1;
-      display: block;
-      color: #a8ddff;
-      font-weight: 950;
-      font-size: 11px;
-      letter-spacing: .7px;
-      margin-bottom: 9px;
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
     }
 
     .stat strong {
-      position: relative;
-      z-index: 1;
       display: block;
-      font-size: 25px;
-      line-height: 1.05;
-      letter-spacing: -.5px;
-    }
-
-    .panel-card {
-      padding: 14px;
+      margin-top: 7px;
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: -1px;
     }
 
     .toolbar {
       display: grid;
-      grid-template-columns: 1fr 160px 150px;
+      grid-template-columns: 1.1fr 0.6fr auto;
       gap: 10px;
-      margin-bottom: 10px;
+      padding: 0 18px 18px;
     }
 
-    .subbar {
-      display: grid;
-      grid-template-columns: 1fr 150px;
-      gap: 10px;
-      margin-bottom: 14px;
+    .noteRow {
+      padding: 0 18px 18px;
     }
 
-    .request-list {
+    .list {
       display: grid;
       gap: 12px;
+      padding: 0 18px 18px;
     }
 
     .request {
-      position: relative;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 100% 0%, rgba(98,215,255,.12), transparent 34%),
-        rgba(11, 31, 54, .76);
-      border: 1px solid rgba(142,204,255,.22);
-      border-radius: 22px;
-      padding: 14px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) 158px;
       gap: 12px;
-      align-items: start;
-      box-shadow: 0 12px 34px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.055);
+      padding: 15px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(10, 30, 52, 0.84), rgba(2, 9, 17, 0.92));
+      border: 1px solid rgba(92, 206, 255, 0.20);
+      box-shadow: 0 12px 34px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
     .request h3 {
-      margin: 0 0 8px;
       font-size: 18px;
       line-height: 1.2;
-      color: #eefcff;
+      font-weight: 950;
+      letter-spacing: -0.35px;
+      margin-bottom: 9px;
     }
 
     .meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
-      margin: 8px 0;
+      gap: 6px;
+      margin-bottom: 11px;
     }
 
     .tag {
-      border: 1px solid rgba(142,204,255,.20);
-      background: rgba(255,255,255,.055);
-      color: #d5f2ff;
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 9px;
       border-radius: 999px;
-      padding: 7px 9px;
-      font-size: 12px;
-      font-weight: 900;
+      color: #d9efff;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px;
+      font-weight: 950;
       max-width: 100%;
-      overflow-wrap: anywhere;
     }
 
-    .tag.pending {
-      color: #fff1b4;
-      border-color: rgba(255,224,138,.42);
-      background: rgba(255,224,138,.105);
-    }
+    .tag.pending { color: #ffe6a6; background: rgba(255, 207, 90, 0.13); border-color: rgba(255, 207, 90, 0.24); }
+    .tag.approved { color: #b9ffd8; background: rgba(64, 229, 150, 0.13); border-color: rgba(64, 229, 150, 0.24); }
+    .tag.rejected { color: #ffc1ce; background: rgba(255, 95, 126, 0.13); border-color: rgba(255, 95, 126, 0.24); }
 
-    .tag.approved {
-      color: #bdffd9;
-      border-color: rgba(82,255,173,.44);
-      background: rgba(82,255,173,.105);
-    }
-
-    .tag.rejected {
-      color: #ffd1da;
-      border-color: rgba(255,93,122,.44);
-      background: rgba(255,93,122,.105);
-    }
-
-    .request p {
-      margin: 6px 0;
-      color: var(--muted);
+    .kv {
+      display: grid;
+      grid-template-columns: 135px minmax(0, 1fr);
+      gap: 6px 10px;
+      color: #d4ebff;
       font-size: 13px;
-      line-height: 1.45;
-      overflow-wrap: anywhere;
+      line-height: 1.35;
     }
 
-    .request p strong {
-      color: #e7f8ff;
-    }
+    .kv b { color: #8ecfff; }
+    .kv div { min-width: 0; overflow-wrap: anywhere; }
 
     .actions {
       display: grid;
       gap: 8px;
-      min-width: 148px;
+      align-content: start;
     }
 
-    .actions button {
-      padding: 11px 12px;
-      font-size: 13px;
-      white-space: nowrap;
+    .actions .btn {
+      min-height: 42px;
+      border-radius: 14px;
+      font-size: 12px;
+    }
+
+    .rawBtn {
+      display: inline-flex;
+      margin-top: 12px;
+      min-height: 34px;
+      padding: 0 10px;
+      align-items: center;
+      border-radius: 12px;
+      color: #ccefff;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      font-weight: 900;
     }
 
     .raw {
-      margin-top: 10px;
-      background: rgba(0,0,0,.24);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 14px;
-      padding: 10px;
-      color: #bbd8f5;
-      font-family: Consolas, monospace;
-      font-size: 11px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
       display: none;
-      max-height: 260px;
+      margin-top: 10px;
+      padding: 12px;
+      max-height: 210px;
       overflow: auto;
+      white-space: pre-wrap;
+      border-radius: 16px;
+      color: #bfe9ff;
+      background: rgba(0,0,0,0.32);
+      border: 1px solid rgba(255,255,255,0.08);
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     }
 
-    .raw.show {
-      display: block;
-    }
+    .raw.show { display: block; }
 
     .empty {
+      min-height: 110px;
+      display: grid;
+      place-items: center;
       text-align: center;
-      padding: 34px 14px;
+      padding: 20px;
+      border-radius: 22px;
       color: var(--muted);
+      background: rgba(1, 10, 18, 0.55);
+      border: 1px dashed rgba(92, 206, 255, 0.26);
+      font-weight: 850;
       line-height: 1.45;
-    }
-
-    .empty strong {
-      color: #e8f9ff;
-      display: block;
-      font-size: 18px;
-      margin-bottom: 7px;
     }
 
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      background: rgba(1, 8, 15, .96);
-      color: #e9fbff;
-      border: 1px solid rgba(98,207,255,.35);
-      padding: 12px 16px;
-      border-radius: 16px;
-      box-shadow: 0 16px 48px rgba(0,0,0,.46);
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      transform: translate(-50%, 16px);
+      width: min(430px, calc(100% - 24px));
+      min-height: 50px;
+      padding: 14px 16px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border-radius: 18px;
+      color: #f1fbff;
+      background: rgba(3, 12, 22, 0.96);
+      border: 1px solid rgba(85, 220, 255, 0.34);
+      box-shadow: 0 20px 55px rgba(0,0,0,0.45);
       opacity: 0;
       pointer-events: none;
-      transition: opacity .2s ease, bottom .2s ease;
-      z-index: 99;
-      width: min(580px, calc(100% - 24px));
-      text-align: center;
+      transition: .22s ease;
+      z-index: 50;
       font-weight: 900;
       line-height: 1.35;
     }
 
     .toast.show {
       opacity: 1;
-      bottom: 28px;
+      transform: translate(-50%, 0);
     }
 
-    .version {
-      text-align: center;
-      color: rgba(200,230,255,.56);
-      font-size: 11px;
-      margin-top: 14px;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 760px) {
-      .app {
-        padding: 10px 8px 24px;
-      }
-
-      .login-card {
-        margin-top: 22px;
-        padding: 20px 14px;
-      }
-
-      .login-card h2 {
-        font-size: 26px;
-      }
-
-      .topbar {
-        gap: 10px;
-      }
-
-      .logo {
-        width: 50px;
-        height: 50px;
-        border-radius: 16px;
-      }
-
-      .titlebox h1 {
-        font-size: 20px;
-      }
-
-      .titlebox p {
-        font-size: 12px;
-      }
-
-      .status-pill {
-        padding: 8px 9px;
-        font-size: 10px;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .toolbar,
-      .subbar {
-        grid-template-columns: 1fr;
-      }
-
-      .request {
-        grid-template-columns: 1fr;
-      }
-
-      .actions {
-        min-width: 0;
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .actions .full {
-        grid-column: 1 / -1;
-      }
+    @media (max-width: 720px) {
+      .app { padding-left: 8px; padding-right: 8px; }
+      .hero { grid-template-columns: auto 1fr; }
+      .hero .pill { grid-column: 1 / -1; justify-self: stretch; }
+      .stats { grid-template-columns: repeat(2, 1fr); padding-left: 12px; padding-right: 12px; }
+      .toolbar { grid-template-columns: 1fr; padding-left: 12px; padding-right: 12px; }
+      .noteRow, .list { padding-left: 12px; padding-right: 12px; }
+      .request { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: repeat(3, 1fr); }
+      .kv { grid-template-columns: 112px minmax(0, 1fr); font-size: 12px; }
+      .topbar { padding: 14px; }
     }
   </style>
 </head>
-
 <body>
-  <div class="app">
+  <main class="app">
+    <section id="loginCard" class="login">
+      <div class="shell">
+        <div class="logoBox">
+          <img src="./assets/app_icon_marino_m.png" alt="Marino Empire" onerror="this.classList.add('broken')" />
+          <div class="fallbackLogo">M</div>
+        </div>
 
-    <div id="loginCard" class="card login-card">
-      <div class="login-logo">
-        <img src="./public/assets/brand/app_icon_marino_m.png?v=20260426" alt="Marino Empire" onerror="this.style.display='none'; this.parentElement.textContent='BM';" />
+        <h1 class="title">Marino Empire Admin</h1>
+        <p class="subtitle">Ödül taleplerini kontrol etmek, onaylamak ve reddetmek için admin girişi yap.</p>
+
+        <div class="form">
+          <input id="adminTelegramIdInput" inputmode="numeric" autocomplete="off" placeholder="Admin Telegram ID" />
+          <button id="adminLoginBtn" class="btn">ADMİN PANELE GİR</button>
+          <button id="clearAdminBtn" class="btn ghost">KAYITLI ADMİN ID TEMİZLE</button>
+        </div>
+
+        <div class="hint">
+          Telegram içinden açarsan ID otomatik gelir. Tarayıcı testinde elle yazabilirsin. Admin yetkisi <b>marino_players</b> tablosundaki <b>is_admin=true</b> alanından kontrol edilir.
+        </div>
+
+        <div class="version">Marino Empire Admin Panel v2.0</div>
       </div>
+    </section>
 
-      <h2>Marino Empire Admin</h2>
-      <p>
-        Ödül taleplerini kontrol etmek, onaylamak ve reddetmek için admin girişi yap.
-      </p>
-
-      <input id="adminTelegramIdInput" placeholder="Admin Telegram ID" autocomplete="off" inputmode="numeric" />
-
-      <div class="login-actions">
-        <button id="adminLoginBtn" class="main-btn">ADMİN PANELE GİR</button>
-        <button id="clearAdminBtn" class="main-btn ghost">KAYITLI ADMİN ID TEMİZLE</button>
-      </div>
-
-      <div class="version">
-        Telegram içinden açarsan ID otomatik gelir. Tarayıcı testinde elle yazabilirsin.
-      </div>
-    </div>
-
-    <div id="adminPanel" class="hidden">
-      <div class="topbar">
-        <div class="logo">
-          <img src="./public/assets/brand/app_icon_marino_m.png?v=20260426" alt="Marino Empire" onerror="this.style.display='none'; this.parentElement.textContent='BM';" />
+    <section id="adminPanel" class="panel hidden">
+      <div class="shell">
+        <div class="topbar">
+          <div class="hero">
+            <div class="miniLogo">
+              <img src="./assets/app_icon_marino_m.png" alt="M" />
+            </div>
+            <div>
+              <div class="eyebrow"><span class="dot"></span> Canlı ödül operasyon paneli</div>
+              <h2 class="panelTitle">Marino Empire Admin</h2>
+              <div id="adminLine" class="adminLine">Admin hazırlanıyor...</div>
+            </div>
+            <div id="syncPill" class="pill">Güncel</div>
+          </div>
         </div>
 
-        <div class="titlebox">
-          <h1>Ödül Admin Paneli</h1>
-          <p id="adminLine">Admin kontrol ediliyor...</p>
+        <div class="stats">
+          <div class="stat"><span>Toplam Talep</span><strong id="totalStat">0</strong></div>
+          <div class="stat"><span>Bekleyen</span><strong id="pendingStat">0</strong></div>
+          <div class="stat"><span>Onaylanan</span><strong id="approvedStat">0</strong></div>
+          <div class="stat"><span>Reddedilen</span><strong id="rejectedStat">0</strong></div>
         </div>
 
-        <div id="syncPill" class="status-pill">Hazır</div>
-      </div>
-
-      <div class="stats">
-        <div class="glass stat">
-          <small>TOPLAM TALEP</small>
-          <strong id="totalStat">0</strong>
-        </div>
-        <div class="glass stat">
-          <small>BEKLEYEN</small>
-          <strong id="pendingStat">0</strong>
-        </div>
-        <div class="glass stat">
-          <small>ONAYLI</small>
-          <strong id="approvedStat">0</strong>
-        </div>
-        <div class="glass stat">
-          <small>REDDEDİLEN</small>
-          <strong id="rejectedStat">0</strong>
-        </div>
-      </div>
-
-      <div class="card panel-card">
         <div class="toolbar">
-          <input id="searchInput" placeholder="Kullanıcı adı, Telegram ID, ödül ara..." />
+          <input id="searchInput" placeholder="Kullanıcı, Telegram ID, ödül veya request ID ara..." />
           <select id="statusFilter">
-            <option value="pending">Bekleyenler</option>
-            <option value="all">Tümü</option>
-            <option value="approved">Onaylananlar</option>
-            <option value="rejected">Reddedilenler</option>
+            <option value="all">Tüm talepler</option>
+            <option value="pending">Bekleyen</option>
+            <option value="approved">Onaylanan</option>
+            <option value="rejected">Reddedilen</option>
           </select>
-          <button id="refreshBtn" class="main-btn">YENİLE</button>
+          <button id="refreshBtn" class="btn">YENİLE</button>
         </div>
 
-        <div class="subbar">
-          <textarea id="adminNoteInput" placeholder="Admin notu: Örn. Free Spin manuel eklendi / kullanıcı şartı sağlamadı."></textarea>
-          <button id="copyVisibleBtn" class="main-btn ghost">GÖRÜNENLERİ KOPYALA</button>
+        <div class="noteRow">
+          <textarea id="adminNoteInput" placeholder="İşlem notu yazabilirsin. Kolon varsa admin_note/review alanlarına işlenir."></textarea>
         </div>
 
-        <div id="requestList" class="request-list"></div>
-      </div>
+        <div id="requestList" class="list">
+          <div class="empty">Talepler yükleniyor...</div>
+        </div>
 
-      <button id="logoutBtn" class="main-btn ghost" style="margin-top:12px;">ADMİN ÇIKIŞ</button>
-
-      <div class="version">
-        Marino Empire Admin Panel v2.0 — marino_players + marino_reward_requests
+        <div class="toolbar" style="grid-template-columns:1fr;">
+          <button id="logoutBtn" class="btn ghost">ADMİN ÇIKIŞ</button>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <div id="toast" class="toast"></div>
 
@@ -688,16 +609,19 @@
     const SUPABASE_URL = "https://vxfjprvahjtfhvtuvsoy.supabase.co";
     const SUPABASE_KEY = "sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU";
 
-    const PLAYER_TABLE = "marino_players";
-    const REQUEST_TABLE = "marino_reward_requests";
+    const PLAYERS_TABLE = "marino_players";
+    const REQUEST_TABLE_CANDIDATES = ["marino_reward_requests", "reward_requests"];
 
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
     if (tg) {
       tg.ready();
       tg.expand();
+      try {
+        tg.setHeaderColor("#071a2d");
+        tg.setBottomBarColor("#030914");
+      } catch (_) {}
     }
 
     const el = {
@@ -708,7 +632,6 @@
       clearAdminBtn: document.getElementById("clearAdminBtn"),
       logoutBtn: document.getElementById("logoutBtn"),
       refreshBtn: document.getElementById("refreshBtn"),
-      copyVisibleBtn: document.getElementById("copyVisibleBtn"),
       searchInput: document.getElementById("searchInput"),
       statusFilter: document.getElementById("statusFilter"),
       adminNoteInput: document.getElementById("adminNoteInput"),
@@ -725,19 +648,34 @@
     const state = {
       admin: null,
       requests: [],
-      playersMap: {},
+      usersMap: {},
       busy: false,
       currentRenderedList: [],
-      autoTimer: null
+      requestTable: null
     };
 
-    const tgUser = getTelegramUser();
+    boot();
 
-    if (tgUser && tgUser.id) {
-      el.adminTelegramIdInput.value = String(tgUser.id);
-    } else {
-      const savedAdminId = localStorage.getItem("marino_admin_telegram_id");
-      if (savedAdminId) el.adminTelegramIdInput.value = savedAdminId;
+    function boot() {
+      const tgUser = getTelegramUser();
+
+      if (tgUser && tgUser.id) {
+        el.adminTelegramIdInput.value = String(tgUser.id);
+      } else {
+        const savedAdminId = localStorage.getItem("marino_admin_telegram_id");
+        if (savedAdminId) el.adminTelegramIdInput.value = savedAdminId;
+      }
+
+      el.adminLoginBtn.addEventListener("click", adminLogin);
+      el.clearAdminBtn.addEventListener("click", clearAdmin);
+      el.logoutBtn.addEventListener("click", logout);
+      el.refreshBtn.addEventListener("click", loadRequests);
+      el.searchInput.addEventListener("input", renderRequests);
+      el.statusFilter.addEventListener("change", renderRequests);
+
+      el.adminTelegramIdInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") adminLogin();
+      });
     }
 
     function getTelegramUser() {
@@ -748,8 +686,7 @@
         id: String(u.id),
         username: u.username || "",
         first_name: u.first_name || "",
-        last_name: u.last_name || "",
-        language_code: u.language_code || ""
+        last_name: u.last_name || ""
       };
     }
 
@@ -763,7 +700,7 @@
     }
 
     function escapeAttr(value) {
-      return escapeHtml(value);
+      return escapeHtml(value).replaceAll("`", "&#096;");
     }
 
     function fmt(n) {
@@ -773,19 +710,14 @@
     function toast(msg) {
       el.toast.textContent = msg;
       el.toast.classList.add("show");
-
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => {
-        el.toast.classList.remove("show");
-      }, 3000);
+      window.__toastTimer = setTimeout(() => el.toast.classList.remove("show"), 3200);
     }
 
-    function setBusy(isBusy, text, type) {
+    function setBusy(isBusy, text) {
       state.busy = isBusy;
       el.syncPill.textContent = text || (isBusy ? "İşleniyor..." : "Güncel");
-
-      el.syncPill.classList.remove("good", "bad");
-      if (type) el.syncPill.classList.add(type);
+      el.refreshBtn.disabled = isBusy;
     }
 
     async function adminLogin() {
@@ -801,7 +733,7 @@
 
       try {
         const { data, error } = await db
-          .from(PLAYER_TABLE)
+          .from(PLAYERS_TABLE)
           .select("*")
           .eq("telegram_id", adminId)
           .maybeSingle();
@@ -809,11 +741,11 @@
         if (error) throw error;
 
         if (!data) {
-          throw new Error("Bu Telegram ID marino_players tablosunda bulunamadı.");
+          throw new Error("Bu Telegram ID marino_players tablosunda bulunamadı. Admin SQL kodunu çalıştır ya da bu ID ile oyuna bir kez giriş yap.");
         }
 
         if (data.is_admin !== true) {
-          throw new Error("Bu kullanıcı admin değil. marino_players tablosunda is_admin=true olmalı.");
+          throw new Error("Bu Telegram ID bulundu ama admin değil. marino_players tablosunda is_admin=true yapmalısın.");
         }
 
         state.admin = data;
@@ -822,16 +754,11 @@
         el.loginCard.classList.add("hidden");
         el.adminPanel.classList.remove("hidden");
 
-        el.adminLine.textContent =
-          "Admin: " +
-          (data.telegram_username ? "@" + data.telegram_username : data.first_name || data.site_username || data.telegram_id);
+        const name = data.telegram_username || data.first_name || data.site_username || data.telegram_id;
+        el.adminLine.textContent = "Admin: " + name + " • Tablo: " + PLAYERS_TABLE;
 
         toast("Admin girişi başarılı.");
-
         await loadRequests();
-
-        startAutoRefresh();
-
       } catch (err) {
         console.error(err);
         toast(err.message || "Admin girişi başarısız.");
@@ -841,48 +768,63 @@
       }
     }
 
-    async function loadRequests(silent = false) {
+    async function loadRequests() {
       if (!state.admin || state.busy) return;
 
-      if (!silent) setBusy(true, "Yükleniyor...");
+      setBusy(true, "Yükleniyor...");
 
       try {
-        const { data, error } = await db
-          .from(REQUEST_TABLE)
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(300);
+        const result = await fetchRequestsFromBestTable();
+        state.requestTable = result.table;
+        state.requests = Array.isArray(result.data) ? result.data : [];
 
-        if (error) throw error;
-
-        state.requests = Array.isArray(data) ? data : [];
-
-        await loadPlayersForRequests();
+        await loadUsersForRequests();
 
         renderStats();
         renderRequests();
 
-        setBusy(false, "Güncel", "good");
+        el.adminLine.textContent = "Admin: " + getDisplayName(state.admin) + " • Talepler: " + state.requestTable;
+        setBusy(false, "Güncel");
       } catch (err) {
         console.error(err);
-        setBusy(false, "Hata", "bad");
-        toast(err.message || "Talepler yüklenemedi. RLS veya tablo adı hatası olabilir.");
+        state.requests = [];
+        renderStats();
+        renderRequests();
+        setBusy(false, "Hata");
+        toast(err.message || "Talepler yüklenemedi.");
       }
     }
 
-    async function loadPlayersForRequests() {
-      const ids = [...new Set(
-        state.requests
-          .map(r => String(r.telegram_id || ""))
-          .filter(Boolean)
-      )];
+    async function fetchRequestsFromBestTable() {
+      let lastError = null;
 
-      state.playersMap = {};
+      for (const table of REQUEST_TABLE_CANDIDATES) {
+        const res = await db
+          .from(table)
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(250);
 
+        if (!res.error) {
+          return { table, data: res.data || [] };
+        }
+
+        lastError = res.error;
+        const msg = String(res.error.message || "").toLowerCase();
+        const canTryNext = msg.includes("does not exist") || msg.includes("could not find") || msg.includes("schema cache");
+        if (!canTryNext) break;
+      }
+
+      throw lastError || new Error("Talep tablosu okunamadı.");
+    }
+
+    async function loadUsersForRequests() {
+      const ids = [...new Set(state.requests.map(r => String(r.telegram_id || "")).filter(Boolean))];
+      state.usersMap = {};
       if (!ids.length) return;
 
       const { data, error } = await db
-        .from(PLAYER_TABLE)
+        .from(PLAYERS_TABLE)
         .select("telegram_id, telegram_username, first_name, last_name, site_username, is_admin")
         .in("telegram_id", ids);
 
@@ -892,7 +834,7 @@
       }
 
       (data || []).forEach(u => {
-        state.playersMap[String(u.telegram_id)] = u;
+        state.usersMap[String(u.telegram_id)] = u;
       });
     }
 
@@ -910,8 +852,7 @@
 
     function getFilteredList() {
       const filter = el.statusFilter.value;
-      const q = String(el.searchInput.value || "").trim().toLowerCase();
-
+      const q = el.searchInput.value.trim().toLowerCase();
       let list = [...state.requests];
 
       if (filter !== "all") {
@@ -920,24 +861,12 @@
 
       if (q) {
         list = list.filter(r => {
-          const u = state.playersMap[String(r.telegram_id || "")] || {};
+          const u = state.usersMap[String(r.telegram_id || "")] || {};
           const text = [
-            r.id,
-            r.request_id,
-            r.telegram_id,
-            r.site_username,
-            r.telegram_username,
-            r.item_code,
-            r.item_name,
-            r.reward_name,
-            r.status,
-            r.admin_note,
-            u.telegram_username,
-            u.site_username,
-            u.first_name,
-            u.last_name
+            r.telegram_id, r.site_username, r.item_code, r.item_name, r.status,
+            r.request_id, r.id, r.reward_request_id,
+            u.telegram_username, u.site_username, u.first_name, u.last_name
           ].join(" ").toLowerCase();
-
           return text.includes(q);
         });
       }
@@ -946,60 +875,44 @@
     }
 
     function renderRequests() {
-      const list = getFilteredList();
-      state.currentRenderedList = list;
+      try {
+        const list = getFilteredList();
+        state.currentRenderedList = list;
 
-      if (!list.length) {
-        el.requestList.innerHTML = `
-          <div class="empty">
-            <strong>Kayıt bulunamadı</strong>
-            Seçili filtrede talep yok. Bekleyen talep yoksa sistem doğru çalışıyor olabilir.
-          </div>
-        `;
-        return;
+        if (!list.length) {
+          el.requestList.innerHTML = `
+            <div class="empty">
+              Kayıt bulunamadı. Bekleyen talep yoksa normal. Oyundan ödül talebi atınca burada görünmeli.<br>
+              Aktif talep tablosu: ${escapeHtml(state.requestTable || "henüz seçilmedi")}
+            </div>
+          `;
+          return;
+        }
+
+        el.requestList.innerHTML = list.map((r, index) => renderRequestCard(r, index)).join("");
+      } catch (err) {
+        console.error(err);
+        el.requestList.innerHTML = `<div class="empty">Liste çizilirken hata oluştu: ${escapeHtml(err.message)}</div>`;
+        toast(err.message || "Liste çizilemedi.");
       }
-
-      el.requestList.innerHTML = list.map((r, index) => renderRequestCard(r, index)).join("");
     }
 
     function renderRequestCard(r, index) {
-      const user = state.playersMap[String(r.telegram_id || "")] || {};
+      const user = state.usersMap[String(r.telegram_id || "")] || {};
       const status = normalizeStatus(r.status);
       const requestKey = getRequestKey(r);
-
+      const itemName = r.item_name || r.reward_name || r.item_code || "Ödül Talebi";
       const siteUsername = r.site_username || user.site_username || "-";
       const telegramUsername = user.telegram_username || r.telegram_username || "-";
-      const firstName = user.first_name || r.first_name || "-";
-      const lastName = user.last_name || r.last_name || "";
-
-      const itemName =
-        r.item_name ||
-        r.reward_name ||
-        r.item_code ||
-        "Ödül Talebi";
-
-      const itemCode = r.item_code || r.reward_code || "-";
-
-      const costCoin =
-        r.cost_coin ??
-        r.coin_cost ??
-        r.spent_coin ??
-        r.marino_coin ??
-        "-";
-
-      const costToken =
-        r.cost_token ??
-        r.token_cost ??
-        r.spent_token ??
-        r.reward_token ??
-        "-";
-
-      const createdAt = r.created_at || r.requested_at || "-";
-      const reviewedAt = r.reviewed_at || r.approved_at || r.rejected_at || "";
-      const note = r.admin_note || r.note || "";
+      const costCoin = r.cost_coin ?? r.coin_cost ?? r.spent_coin ?? r.required_coin ?? "-";
+      const costToken = r.cost_token ?? r.token_cost ?? r.spent_token ?? r.required_token ?? "-";
+      const createdAt = r.created_at || r.requested_at || r.inserted_at || "-";
+      const note = r.admin_note || r.note || r.reject_reason || "";
+      const keyField = escapeAttr(requestKey.field);
+      const keyValue = escapeAttr(requestKey.value);
 
       return `
-        <div class="request">
+        <article class="request">
           <div>
             <h3>${escapeHtml(itemName)}</h3>
 
@@ -1008,115 +921,107 @@
               <span class="tag">Site: ${escapeHtml(siteUsername)}</span>
               <span class="tag">TG ID: ${escapeHtml(String(r.telegram_id || "-"))}</span>
               <span class="tag">@${escapeHtml(telegramUsername)}</span>
-              <span class="tag">${escapeHtml(firstName + (lastName ? " " + lastName : ""))}</span>
             </div>
 
-            <p><strong>Talep zamanı:</strong> ${escapeHtml(formatDate(createdAt))}</p>
-            ${reviewedAt ? `<p><strong>İşlem zamanı:</strong> ${escapeHtml(formatDate(reviewedAt))}</p>` : ""}
-            <p><strong>Ödül kodu:</strong> ${escapeHtml(String(itemCode))}</p>
-            <p><strong>Maliyet:</strong> ${escapeHtml(String(costCoin))} coin / ${escapeHtml(String(costToken))} token</p>
-            ${note ? `<p><strong>Admin notu:</strong> ${escapeHtml(note)}</p>` : ""}
+            <div class="kv">
+              <b>Talep zamanı</b><div>${escapeHtml(formatDate(createdAt))}</div>
+              <b>Item code</b><div>${escapeHtml(String(r.item_code || "-"))}</div>
+              <b>Maliyet</b><div>${escapeHtml(String(costCoin))} coin / ${escapeHtml(String(costToken))} token</div>
+              <b>Request key</b><div>${escapeHtml(requestKey.field)} = ${escapeHtml(requestKey.value)}</div>
+              ${note ? `<b>Admin notu</b><div>${escapeHtml(note)}</div>` : ""}
+            </div>
 
-            <button class="ghost" style="padding:8px 10px;font-size:12px;margin-top:8px;" onclick="toggleRaw(${index})">
-              Ham veriyi göster/gizle
-            </button>
-
+            <button class="rawBtn" onclick="toggleRaw(${index})">Ham veriyi göster/gizle</button>
             <div id="raw_${index}" class="raw">${escapeHtml(JSON.stringify(r, null, 2))}</div>
           </div>
 
           <div class="actions">
-            <button class="green" ${status === "approved" ? "disabled" : ""} onclick="updateRequestStatus('${escapeAttr(requestKey.field)}', '${escapeAttr(requestKey.value)}', 'approved')">
-              ONAYLA
-            </button>
-
-            <button class="danger" ${status === "rejected" ? "disabled" : ""} onclick="updateRequestStatus('${escapeAttr(requestKey.field)}', '${escapeAttr(requestKey.value)}', 'rejected')">
-              REDDET
-            </button>
-
-            <button class="gold full" onclick="copyRequestText(${index})">
-              KOPYALA
-            </button>
+            <button class="btn green" ${status === "approved" ? "disabled" : ""} onclick="updateRequestStatus('${keyField}', '${keyValue}', 'approved')">ONAYLA</button>
+            <button class="btn red" ${status === "rejected" ? "disabled" : ""} onclick="updateRequestStatus('${keyField}', '${keyValue}', 'rejected')">REDDET</button>
+            <button class="btn gold" onclick="copyRequestText(${index})">KOPYALA</button>
           </div>
-        </div>
+        </article>
       `;
     }
 
     async function updateRequestStatus(field, value, newStatus) {
       if (!state.admin || state.busy) return;
+      if (!state.requestTable) {
+        toast("Talep tablosu seçilemedi.");
+        return;
+      }
 
-      const row =
-        state.currentRenderedList.find(r => String(r[field]) === String(value)) ||
-        state.requests.find(r => String(r[field]) === String(value));
+      const row = state.currentRenderedList.find(r => String(r[field]) === String(value)) ||
+                  state.requests.find(r => String(r[field]) === String(value));
 
       if (!row) {
         toast("Talep kaydı bulunamadı.");
         return;
       }
 
-      const adminNote = String(el.adminNoteInput.value || "").trim();
+      const adminNote = el.adminNoteInput.value.trim();
+      const now = new Date().toISOString();
 
-      const payload = {
-        status: newStatus
-      };
-
+      const payload = { status: newStatus };
       if ("admin_note" in row) payload.admin_note = adminNote;
-      if ("reviewed_at" in row) payload.reviewed_at = new Date().toISOString();
+      if ("review_note" in row) payload.review_note = adminNote;
+      if ("reviewed_at" in row) payload.reviewed_at = now;
       if ("reviewed_by" in row) payload.reviewed_by = String(state.admin.telegram_id);
-      if ("updated_at" in row) payload.updated_at = new Date().toISOString();
-
-      if (newStatus === "approved") {
-        if ("approved_at" in row) payload.approved_at = new Date().toISOString();
-        if ("approved_by" in row) payload.approved_by = String(state.admin.telegram_id);
-      }
-
-      if (newStatus === "rejected") {
-        if ("rejected_at" in row) payload.rejected_at = new Date().toISOString();
-        if ("rejected_by" in row) payload.rejected_by = String(state.admin.telegram_id);
-      }
+      if ("updated_at" in row) payload.updated_at = now;
+      if ("approved_by" in row && newStatus === "approved") payload.approved_by = String(state.admin.telegram_id);
+      if ("approved_at" in row && newStatus === "approved") payload.approved_at = now;
+      if ("rejected_by" in row && newStatus === "rejected") payload.rejected_by = String(state.admin.telegram_id);
+      if ("rejected_at" in row && newStatus === "rejected") payload.rejected_at = now;
 
       setBusy(true, newStatus === "approved" ? "Onaylanıyor..." : "Reddediliyor...");
 
       try {
-        const { error } = await db
-          .from(REQUEST_TABLE)
+        let result = await db
+          .from(state.requestTable)
           .update(payload)
-          .eq(field, value);
+          .eq(field, value)
+          .select();
 
-        if (error) throw error;
+        if (result.error) {
+          const fallback = await db
+            .from(state.requestTable)
+            .update({ status: newStatus })
+            .eq(field, value)
+            .select();
+
+          if (fallback.error) throw fallback.error;
+        }
 
         toast(newStatus === "approved" ? "Talep onaylandı." : "Talep reddedildi.");
-
         state.busy = false;
-        await loadRequests(true);
+        await loadRequests();
       } catch (err) {
         console.error(err);
-        setBusy(false, "Hata", "bad");
-        toast(err.message || "İşlem başarısız. RLS/policy veya kolon adı hatası olabilir.");
+        setBusy(false, "Hata");
+        toast(err.message || "İşlem başarısız. RLS/policy veya kolon adı kontrol edilmeli.");
       }
     }
 
     function copyRequestText(index) {
       const r = state.currentRenderedList[index];
-
       if (!r) {
         toast("Kopyalanacak talep bulunamadı.");
         return;
       }
 
-      const u = state.playersMap[String(r.telegram_id || "")] || {};
-
+      const u = state.usersMap[String(r.telegram_id || "")] || {};
       const text =
 `Marino Empire Ödül Talebi
 Durum: ${statusText(normalizeStatus(r.status))}
+Talep Tablosu: ${state.requestTable || "-"}
 Telegram ID: ${r.telegram_id || "-"}
 Telegram Username: ${u.telegram_username || r.telegram_username || "-"}
 Site Kullanıcı Adı: ${r.site_username || u.site_username || "-"}
-Ad Soyad: ${(u.first_name || r.first_name || "-") + " " + (u.last_name || r.last_name || "")}
 Ödül: ${r.item_name || r.reward_name || r.item_code || "-"}
-Ödül Kodu: ${r.item_code || r.reward_code || "-"}
-Coin: ${r.cost_coin ?? r.coin_cost ?? r.spent_coin ?? "-"}
-Token: ${r.cost_token ?? r.token_cost ?? r.spent_token ?? "-"}
-Talep Zamanı: ${formatDate(r.created_at || r.requested_at || "-")}
+Item Code: ${r.item_code || "-"}
+Coin: ${r.cost_coin ?? r.coin_cost ?? r.spent_coin ?? r.required_coin ?? "-"}
+Token: ${r.cost_token ?? r.token_cost ?? r.spent_token ?? r.required_token ?? "-"}
+Talep Zamanı: ${formatDate(r.created_at || r.requested_at || r.inserted_at || "-")}
 Admin Notu: ${el.adminNoteInput.value.trim() || r.admin_note || "-"}`;
 
       navigator.clipboard.writeText(text)
@@ -1124,52 +1029,23 @@ Admin Notu: ${el.adminNoteInput.value.trim() || r.admin_note || "-"}`;
         .catch(() => toast("Kopyalama başarısız."));
     }
 
-    function copyVisibleRequests() {
-      if (!state.currentRenderedList.length) {
-        toast("Kopyalanacak görünen talep yok.");
-        return;
-      }
-
-      const text = state.currentRenderedList.map((r, i) => {
-        const u = state.playersMap[String(r.telegram_id || "")] || {};
-
-        return `${i + 1}) ${r.item_name || r.reward_name || r.item_code || "Ödül Talebi"}
-Durum: ${statusText(normalizeStatus(r.status))}
-Site: ${r.site_username || u.site_username || "-"}
-Telegram: ${r.telegram_id || "-"} / @${u.telegram_username || r.telegram_username || "-"}
-Kod: ${r.item_code || r.reward_code || "-"}
-Zaman: ${formatDate(r.created_at || r.requested_at || "-")}`;
-      }).join("\n\n--------------------\n\n");
-
-      navigator.clipboard.writeText(text)
-        .then(() => toast("Görünen talepler kopyalandı."))
-        .catch(() => toast("Kopyalama başarısız."));
-    }
-
     function getRequestKey(row) {
-      const possible = ["request_id", "id", "reward_request_id"];
+      const possible = ["id", "request_id", "reward_request_id"];
 
       for (const key of possible) {
         if (row[key] !== undefined && row[key] !== null && row[key] !== "") {
-          return {
-            field: key,
-            value: String(row[key])
-          };
+          return { field: key, value: String(row[key]) };
         }
       }
 
-      return {
-        field: "created_at",
-        value: String(row.created_at || "")
-      };
+      if (row.created_at) return { field: "created_at", value: String(row.created_at) };
+      return { field: "telegram_id", value: String(row.telegram_id || "") };
     }
 
     function normalizeStatus(status) {
-      const s = String(status || "pending").toLowerCase().trim();
-
+      const s = String(status || "pending").toLowerCase();
       if (["approved", "approve", "onay", "onaylandi", "onaylandı"].includes(s)) return "approved";
-      if (["rejected", "reject", "red", "reddedildi"].includes(s)) return "rejected";
-
+      if (["rejected", "reject", "red", "reddedildi", "reddedildi"].includes(s)) return "rejected";
       return "pending";
     }
 
@@ -1181,11 +1057,13 @@ Zaman: ${formatDate(r.created_at || r.requested_at || "-")}`;
 
     function formatDate(value) {
       if (!value || value === "-") return "-";
-
       const d = new Date(value);
       if (Number.isNaN(d.getTime())) return String(value);
-
       return d.toLocaleString("tr-TR");
+    }
+
+    function getDisplayName(user) {
+      return user.telegram_username || user.first_name || user.site_username || user.telegram_id || "admin";
     }
 
     function toggleRaw(index) {
@@ -1200,41 +1078,16 @@ Zaman: ${formatDate(r.created_at || r.requested_at || "-")}`;
     }
 
     function logout() {
-      stopAutoRefresh();
-
       state.admin = null;
       state.requests = [];
-      state.playersMap = {};
+      state.usersMap = {};
       state.currentRenderedList = [];
+      state.requestTable = null;
 
       el.adminPanel.classList.add("hidden");
       el.loginCard.classList.remove("hidden");
-
       toast("Admin çıkış yapıldı.");
     }
-
-    function startAutoRefresh() {
-      stopAutoRefresh();
-
-      state.autoTimer = setInterval(() => {
-        if (state.admin && !state.busy) loadRequests(true);
-      }, 20000);
-    }
-
-    function stopAutoRefresh() {
-      if (state.autoTimer) {
-        clearInterval(state.autoTimer);
-        state.autoTimer = null;
-      }
-    }
-
-    el.adminLoginBtn.addEventListener("click", adminLogin);
-    el.clearAdminBtn.addEventListener("click", clearAdmin);
-    el.logoutBtn.addEventListener("click", logout);
-    el.refreshBtn.addEventListener("click", () => loadRequests(false));
-    el.copyVisibleBtn.addEventListener("click", copyVisibleRequests);
-    el.searchInput.addEventListener("input", renderRequests);
-    el.statusFilter.addEventListener("change", renderRequests);
 
     window.toggleRaw = toggleRaw;
     window.updateRequestStatus = updateRequestStatus;
