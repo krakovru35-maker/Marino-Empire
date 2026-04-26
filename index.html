@@ -77,10 +77,10 @@ button{border:0;cursor:pointer;touch-action:manipulation}
 .pill{height:38px;padding:0 13px;border-radius:15px;border:1px solid var(--line);background:rgba(7,25,42,.75);font-weight:1000;font-size:12px;white-space:nowrap}
 .chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;height:24px}
 .chip{border:1px solid var(--line);background:rgba(6,20,35,.72);border-radius:17px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:1000;white-space:nowrap;overflow:hidden;min-width:0}
-.stats{height:92px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{border:1px solid var(--line);background:linear-gradient(180deg,rgba(12,42,66,.78),rgba(2,11,21,.80));border-radius:21px;padding:10px 12px;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.20)}
-.stat small{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#a7c1d1;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stat b{display:block;margin-top:6px;font-size:24px;line-height:1;font-weight:1100;letter-spacing:-.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats{height:126px;min-height:126px;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr);gap:8px}
+.stat{border:1px solid var(--line);background:linear-gradient(180deg,rgba(12,42,66,.78),rgba(2,11,21,.80));border-radius:21px;padding:8px 12px;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.20);display:flex;flex-direction:column;justify-content:center;min-width:0;min-height:0}
+.stat small{display:block;font-size:10px;line-height:1.1;letter-spacing:1.2px;text-transform:uppercase;color:#a7c1d1;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat b{display:block;margin-top:4px;font-size:22px;line-height:1.05;font-weight:1100;letter-spacing:-.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat span{display:none;margin-top:4px;font-size:11px;color:#8eabba;font-weight:800;white-space:nowrap}
 main{min-height:0;overflow:hidden;border-radius:26px;position:relative}
 .view{display:none;height:100%;min-height:0;overflow:hidden}
@@ -154,15 +154,18 @@ main{min-height:0;overflow:hidden;border-radius:26px;position:relative}
 .switch i{display:block;width:22px;height:22px;border-radius:50%;background:#fff;transition:.18s}
 .switch.on{background:rgba(77,240,164,.34)}
 .switch.on i{transform:translateX(24px);background:#aaffd3}
-select{height:40px;border-radius:14px;background:#061625;border:1px solid var(--line);padding:0 10px;outline:0;max-width:190px}
+select,input[type="text"],input[type="url"]{height:40px;border-radius:14px;background:#061625;border:1px solid var(--line);padding:0 10px;outline:0;max-width:190px;color:#fff}
+input[type="text"],input[type="url"]{width:100%;max-width:none;margin-top:8px}
+.setRow.stack{display:block}
+.hint{margin:7px 0 0;color:#8fb0c3;font-size:11px;line-height:1.35;font-weight:800}
 .toast{position:absolute;left:18px;right:18px;bottom:calc(var(--navH) + 28px + var(--safeB));z-index:90;min-height:48px;border-radius:18px;border:1px solid rgba(85,221,255,.36);background:rgba(1,10,18,.96);display:grid;place-items:center;text-align:center;padding:12px;font-weight:1000;font-size:13px;opacity:0;transform:translateY(12px);transition:.18s;pointer-events:none;box-shadow:0 14px 50px rgba(0,0,0,.38)}
 .toast.show{opacity:1;transform:translateY(0)}
 .notice{border-color:rgba(247,191,76,.34);background:linear-gradient(135deg,rgba(118,78,12,.28),rgba(5,20,36,.82))}
 @media(max-height:780px){
-  #app{gap:7px;padding-top:8px}.profile{height:74px}.avatar{width:52px;height:52px}.stats{height:84px}.stat b{font-size:22px}.hero h2{font-size:24px}.hero p{display:none}.char{width:78px;height:92px}.coinBtn{width:min(35vw,145px);height:min(35vw,145px)}
+  #app{gap:7px;padding-top:8px}.profile{height:74px}.avatar{width:52px;height:52px}.stats{height:118px;min-height:118px}.stat{padding:7px 10px}.stat b{font-size:21px}.hero h2{font-size:24px}.hero p{display:none}.char{width:78px;height:92px}.coinBtn{width:min(35vw,145px);height:min(35vw,145px)}
 }
 @media(max-height:690px){
-  .chips{display:none}.profile{height:68px}.stats{height:78px}.nav{height:66px}.game{padding:12px}.hero{display:none}.stat small{font-size:9px}.stat b{font-size:20px}.quick .actBtn{height:42px;font-size:11px}.row{grid-template-columns:42px minmax(0,1fr) auto;padding:10px}.ico{width:42px;height:42px;border-radius:15px}.title h2{font-size:20px}
+  .chips{display:none}.profile{height:68px}.stats{height:108px;min-height:108px}.nav{height:66px}.game{padding:12px}.hero{display:none}.stat{border-radius:18px;padding:6px 10px}.stat small{font-size:9px}.stat b{font-size:19px}.quick .actBtn{height:42px;font-size:11px}.row{grid-template-columns:42px minmax(0,1fr) auto;padding:10px}.ico{width:42px;height:42px;border-radius:15px}.title h2{font-size:20px}
 }
 @media(max-width:365px){.profile{grid-template-columns:50px minmax(0,1fr)}.avatar{width:50px;height:50px}.profile .pill{display:none}.row{grid-template-columns:42px minmax(0,1fr)}.row .smallBtn{grid-column:1/-1;width:100%}.rank{grid-template-columns:36px minmax(0,1fr)}.rankScore{grid-column:1/-1;text-align:left}.nav{gap:2px;padding:7px}.nav button{font-size:10px}}
 </style>
@@ -293,6 +296,7 @@ select{height:40px;border-radius:14px;background:#061625;border:1px solid var(--
       <div class="setRow"><label>Ülke sıralaması</label><select id="country"><option value="TR|Türkiye">Türkiye</option><option value="CY|Kıbrıs">Kıbrıs</option><option value="KG|Kırgızistan">Kırgızistan</option><option value="AZ|Azerbaycan">Azerbaycan</option><option value="DE|Almanya">Almanya</option><option value="NL|Hollanda">Hollanda</option></select></div>
       <div class="setRow"><label>Ses Efektleri</label><button id="sfx" class="switch on" type="button"><i></i></button></div>
       <div class="setRow"><label>Fon Müziği</label><button id="music" class="switch" type="button"><i></i></button></div>
+      <div class="setRow stack"><label>Fon Müziği Dosyası</label><input id="musicUrl" type="text" placeholder="public/assets/audio/fon.mp3 veya https://...mp3"><p class="hint">Kendi MP3/OGG dosyanı GitHub deposuna yükleyip buraya yolunu yaz. Örnek: <strong>public/assets/audio/fon.mp3</strong></p><button id="testMusic" class="smallBtn ghost" style="width:100%;margin-top:10px" type="button">Müziği Test Et</button></div>
       <div class="setRow"><label>Performans modu</label><button id="perf" class="switch" type="button"><i></i></button></div>
       <button id="saveSettings" class="smallBtn gold" style="width:100%;margin-top:14px" type="button">Ayarları Kaydet</button>
       <button id="resetLocal" class="smallBtn red" style="width:100%;margin-top:10px" type="button">Yerel Test Verisini Sıfırla</button>
@@ -307,6 +311,7 @@ select{height:40px;border-radius:14px;background:#061625;border:1px solid var(--
 'use strict';
 const SUPABASE_URL='https://vxfjprvahjtfhvtuvsoy.supabase.co';
 const SUPABASE_KEY='sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU';
+const DEFAULT_MUSIC_SRC='public/assets/audio/fon.mp3';
 const tg=window.Telegram&&window.Telegram.WebApp?window.Telegram.WebApp:null;
 const db=window.supabase&&SUPABASE_URL&&SUPABASE_KEY?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 const q=s=>document.querySelector(s);
@@ -330,30 +335,53 @@ function bootTelegram(){
   window.addEventListener('resize',setViewport,{passive:true});
   window.addEventListener('orientationchange',()=>setTimeout(setViewport,250),{passive:true});
 }
-function loadSet(){try{return Object.assign({countryCode:'TR',countryName:'Türkiye',sfx:true,music:false,perf:false},JSON.parse(localStorage.marino_settings||'{}'))}catch(e){return{countryCode:'TR',countryName:'Türkiye',sfx:true,music:false,perf:false}}}
+function loadSet(){try{return Object.assign({countryCode:'TR',countryName:'Türkiye',sfx:true,music:false,perf:false,musicUrl:DEFAULT_MUSIC_SRC},JSON.parse(localStorage.marino_settings||'{}'))}catch(e){return{countryCode:'TR',countryName:'Türkiye',sfx:true,music:false,perf:false,musicUrl:DEFAULT_MUSIC_SRC}}}
 function saveSet(){localStorage.marino_settings=JSON.stringify(S.settings);applySet()}
 function loadClaimed(){try{return JSON.parse(localStorage.marino_claimed_tasks||'{}')}catch(e){return{}}}
 function saveClaimed(){localStorage.marino_claimed_tasks=JSON.stringify(S.claimed)}
 function toast(m){let e=q('#toast');if(!e)return;e.textContent=m;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2600)}
 
 const audio={
-  ctx:null,nodes:[],unlocked:false,
+  ctx:null,nodes:[],bg:null,unlocked:false,
   init(){try{if(!this.ctx){let A=window.AudioContext||window.webkitAudioContext;if(A)this.ctx=new A()}this.unlocked=true;if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume().catch(()=>{})}catch(e){}},
+  src(){return String((S.settings&&S.settings.musicUrl)||DEFAULT_MUSIC_SRC||'').trim()},
   tone(f=500,d=.07,type='sine',g=.035){if(!S.settings.sfx)return;this.init();if(!this.ctx)return;let o=this.ctx.createOscillator(),v=this.ctx.createGain();o.type=type;o.frequency.value=f;v.gain.value=g;o.connect(v);v.connect(this.ctx.destination);o.start();v.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+d);o.stop(this.ctx.currentTime+d+.03)},
   click(){this.tone(520,.05,'triangle',.025)},tap(){this.tone(760,.06);setTimeout(()=>this.tone(1040,.05),45)},win(){this.tone(620,.08,'triangle');setTimeout(()=>this.tone(900,.09,'triangle'),90);setTimeout(()=>this.tone(1180,.12,'triangle'),180)},bad(){this.tone(180,.12,'sawtooth',.025)},
-  start(){this.init();if(!this.ctx||this.nodes.length)return;let g=this.ctx.createGain();g.gain.value=.016;g.connect(this.ctx.destination);let a=this.ctx.createOscillator(),b=this.ctx.createOscillator();a.type='sine';b.type='triangle';a.frequency.value=110;b.frequency.value=220;a.connect(g);b.connect(g);a.start();b.start();this.nodes=[a,b,g]},
-  stop(){this.nodes.forEach(n=>{try{n.stop&&n.stop();n.disconnect&&n.disconnect()}catch(e){}});this.nodes=[]}
+  start(){
+    this.init();
+    this.stop();
+    let src=this.src();
+    if(src){
+      try{
+        this.bg=new Audio(src);
+        this.bg.loop=true;
+        this.bg.preload='auto';
+        this.bg.volume=.28;
+        let p=this.bg.play();
+        if(p&&p.catch)p.catch(()=>toast('Fon müziği için ekrana bir kez dokunman gerekebilir.'));
+        return;
+      }catch(e){console.warn('Music file could not start',e)}
+    }
+    if(!this.ctx)return;
+    let g=this.ctx.createGain();g.gain.value=.016;g.connect(this.ctx.destination);
+    let a=this.ctx.createOscillator(),b=this.ctx.createOscillator();a.type='sine';b.type='triangle';a.frequency.value=110;b.frequency.value=220;a.connect(g);b.connect(g);a.start();b.start();this.nodes=[a,b,g];
+  },
+  stop(){
+    if(this.bg){try{this.bg.pause();this.bg.currentTime=0}catch(e){}this.bg=null}
+    this.nodes.forEach(n=>{try{n.stop&&n.stop();n.disconnect&&n.disconnect()}catch(e){}});this.nodes=[];
+  }
 };
 function unlockAudio(){audio.init();if(S.settings.music)audio.start()}
 function applySet(){
-  let sfx=q('#sfx'),music=q('#music'),perf=q('#perf'),sound=q('#soundQuick'),country=q('#country'),app=q('#app');
+  let sfx=q('#sfx'),music=q('#music'),perf=q('#perf'),sound=q('#soundQuick'),country=q('#country'),musicUrl=q('#musicUrl'),app=q('#app');
   if(sfx)sfx.classList.toggle('on',!!S.settings.sfx);
   if(music)music.classList.toggle('on',!!S.settings.music);
   if(perf)perf.classList.toggle('on',!!S.settings.perf);
   if(sound)sound.textContent=S.settings.sfx?'🔊':'🔇';
   if(country)country.value=S.settings.countryCode+'|'+S.settings.countryName;
+  if(musicUrl)musicUrl.value=S.settings.musicUrl||DEFAULT_MUSIC_SRC;
   if(app)app.style.setProperty('--gridOpacity',S.settings.perf?'.25':'.76');
-  if(!S.settings.music)audio.stop();
+  if(S.settings.music){if(audio.unlocked)audio.start()}else audio.stop();
 }
 
 function tgUser(){
@@ -478,9 +506,10 @@ function bind(){
   q('#rGlobal').addEventListener('click',()=>{S.rank='global';q('#rGlobal').classList.add('active');q('#rCountry').classList.remove('active');renderLeader(true);audio.click()});
   q('#rCountry').addEventListener('click',()=>{S.rank='country';q('#rCountry').classList.add('active');q('#rGlobal').classList.remove('active');renderLeader(true);audio.click()});
   q('#sfx').addEventListener('click',()=>{S.settings.sfx=!S.settings.sfx;saveSet();audio.click()});
-  q('#music').addEventListener('click',()=>{S.settings.music=!S.settings.music;saveSet();S.settings.music?audio.start():audio.stop();audio.click()});
+  q('#music').addEventListener('click',()=>{let mu=q('#musicUrl');if(mu)S.settings.musicUrl=mu.value.trim()||DEFAULT_MUSIC_SRC;S.settings.music=!S.settings.music;saveSet();S.settings.music?audio.start():audio.stop();audio.click()});
   q('#perf').addEventListener('click',()=>{S.settings.perf=!S.settings.perf;saveSet();audio.click()});
-  q('#saveSettings').addEventListener('click',async()=>{let parts=q('#country').value.split('|');S.settings.countryCode=parts[0];S.settings.countryName=parts[1];saveSet();updateLocalLeader();saveLocalGame();await saveRemote(true);renderLeader(true)});
+  q('#testMusic').addEventListener('click',()=>{let mu=q('#musicUrl');if(mu)S.settings.musicUrl=mu.value.trim()||DEFAULT_MUSIC_SRC;S.settings.music=true;saveSet();audio.start();toast('Fon müziği test ediliyor.');});
+  q('#saveSettings').addEventListener('click',async()=>{let parts=q('#country').value.split('|'),mu=q('#musicUrl');S.settings.countryCode=parts[0];S.settings.countryName=parts[1];if(mu)S.settings.musicUrl=mu.value.trim()||DEFAULT_MUSIC_SRC;saveSet();if(S.settings.music)audio.start();updateLocalLeader();saveLocalGame();await saveRemote(true);renderLeader(true)});
   q('#resetLocal').addEventListener('click',()=>{localStorage.removeItem('marino_local_game');localStorage.removeItem('marino_claimed_tasks');S.claimed={};S.game=defaultGame();saveLocalGame();render();toast('Yerel test verisi sıfırlandı.')});
 }
 function openSheet(id){qa('.sheet').forEach(s=>s.classList.remove('show'));let el=q('#'+id);if(el)el.classList.add('show');audio.click()}
