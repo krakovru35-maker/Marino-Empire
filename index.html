@@ -214,6 +214,33 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
 .prof-stat { display: flex; justify-content: space-between; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
 .prof-stat strong { color: var(--text-muted); }
 .prof-stat span { font-weight: 700; color: #fff; }
+
+/* ── Slot Machine Responsive ── */
+.slot-body { width: 100%; max-width: 380px; margin: auto; }
+.slot-machine-case { 
+  display: flex; gap: 4px; padding: 10px; border-radius: 12px; 
+  background: #111; border: 4px solid #333; position: relative; 
+  height: 220px; overflow: hidden; justify-content: center;
+}
+.slot-reel { flex: 1; height: 100%; background: #000; border-radius: 8px; position: relative; overflow: hidden; }
+.slot-strip { position: absolute; top: 0; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; }
+.slot-item { height: 73px; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
+.slot-payline { position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: rgba(255,209,59,0.5); transform: translateY(-50%); z-index: 10; display: none; }
+.slot-payline.show { display: block; animation: glow 1s infinite; }
+@keyframes glow { 0% { opacity: 0.5; } 50% { opacity: 1; box-shadow: 0 0 20px #ffd13b; } 100% { opacity: 0.5; } }
+.win-target.pulse { animation: slotPulse 0.5s infinite; }
+@keyframes slotPulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); text-shadow: 0 0 15px #ffd13b; } 100% { transform: scale(1); } }
+
+/* ── Mobile Global Fixes ── */
+@media (max-width: 480px) {
+  .roulette-board { min-width: 320px !important; transform: scale(0.85); transform-origin: top center; margin-left: -5%; width: 110%; }
+  .slot-machine-case { height: 180px; }
+  .slot-item { height: 60px; font-size: 24px; }
+  .bal-coin { font-size: 32px; }
+  .nav-btn span { font-size: 9px; }
+  .item-title { font-size: 14px; }
+  .item-row { padding: 10px; gap: 8px; }
+}
 </style>
 </head>
 <body>
@@ -531,7 +558,11 @@ function processState(d) {
     pres: Number(d.state.prestige_points||0), cap: Number(d.state.offline_capacity_hours||8)
   };
   if(d.upgrades) S.game.upgrades = d.upgrades;
-  if(d.store) S.game.store = d.store;
+  if(d.store) {
+    try {
+      S.game.store = typeof d.store === 'string' ? JSON.parse(d.store) : d.store;
+    } catch(e) { S.game.store = []; }
+  }
   if(d.reward_status) S.game.reward_status = d.reward_status;
   if(d.daily_login) S.game.daily_login = d.daily_login;
   if(d.completed_tasks) S.game.completed_tasks = d.completed_tasks;
@@ -694,7 +725,8 @@ function renderTasks() {
 }
 
 function renderStore() {
-  if(!S.game) return; const items = S.game.store || [];
+  if(!S.game) return; 
+  const items = S.game.store || [];
   const rs = S.game.reward_status || {};
   const played = S.game.daily_login?.mini_games_played || 0;
   
@@ -723,10 +755,15 @@ function renderStore() {
     html += `<div class="item-row"><div class="item-ico">${g[3]}</div><div class="item-info"><div class="item-title">${g[1]}</div><div class="item-sub">Giriş: 🎟️ ${g[2]} bilet</div></div><button class="action-btn gold" onclick="openMini('${g[0]}','${g[1]}')" ${played>=5?'disabled':''}>Oyna</button></div>`;
   });
 
-  html += '<div class="sec-title">Gerçek Ödüller</div>';
-  items.forEach(i => {
-    html += `<div class="item-row"><div class="item-ico">🎟️</div><div class="item-info"><div class="item-title">${i.item_name}</div><div class="item-sub"><img src="public/assets/currency/marino-coin.png"> ${fmt(i.cost_coin)} &nbsp; 🎟️ ${i.cost_token} bilet</div></div><button class="action-btn" onclick="doAction('request_reward',{p_item_code:'${i.item_code}'})">Talep Et</button></div>`;
-  });
+  if(items.length > 0) {
+    html += '<div class="sec-title">Gerçek Ödüller</div>';
+    items.forEach(i => {
+      html += `<div class="item-row"><div class="item-ico">🎟️</div><div class="item-info"><div class="item-title">${i.item_name}</div><div class="item-sub"><img src="public/assets/currency/marino-coin.png"> ${fmt(i.cost_coin)} &nbsp; 🎟️ ${i.cost_token} bilet</div></div><button class="action-btn" onclick="doAction('request_reward',{p_item_code:'${i.item_code}'})">Talep Et</button></div>`;
+    });
+  } else {
+    html += '<div class="sec-title">Gerçek Ödüller</div>';
+    html += '<div class="alert-box" style="background:rgba(255,255,255,0.02); color:#888; border-dash:2px">Henüz eklenecek ödül bulunmuyor.</div>';
+  }
   
   q('#listStore').innerHTML = html;
 }
@@ -923,8 +960,9 @@ async function playSlot(btn, bet) {
        reel.offsetHeight; // Force reflow
        
        setTimeout(() => {
+           const itemH = reel.querySelector('.slot-item').offsetHeight || 73;
            reel.style.transition = `transform ${2 + i*0.4}s cubic-bezier(0.1, 0, 0.2, 1)`;
-           reel.style.transform = `translateY(-2450px)`; 
+           reel.style.transform = `translateY(-${itemH * 34}px)`; 
        }, 50);
     }
 
