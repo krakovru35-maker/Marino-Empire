@@ -385,6 +385,9 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
       <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center">
         <b>Sinyaller & Bildirimler</b> <button class="switch on"><i></i></button>
       </div>
+
+      <button class="action-btn" onclick="openGuide()" style="width:100%; background:linear-gradient(90deg, #2A8CFE, #2A54FE); margin: 10px 0; height:48px; border-radius:12px; font-weight:900">📖 OYUN KILAVUZU (NASIL OYNANIR?)</button>
+
       <div class="alert-box">Ayarlar otomatik kaydedilir.</div>
       
       <div style="display:flex; flex-direction:column; gap:14px; margin-top:25px; border-top:1px solid rgba(255,255,255,0.05); padding-top:20px; text-align:center">
@@ -427,6 +430,38 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
     <div class="sheet-body" style="padding:15px; max-height:70vh; overflow-y:auto">
       <div id="leagueList"></div>
     </div>
+  </div>
+</div>
+
+<!-- GUIDE SHEET -->
+<div id="shGuide" class="sheet-overlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <button class="sheet-close" onclick="q('#shGuide').classList.remove('show')">✕</button>
+    <h3 style="margin:0 0 10px; font-size:20px; text-align:center">📜 Marino İmparatorluk Rehberi</h3>
+    <div style="padding:10px; max-height:65vh; overflow-y:auto; font-size:14px; line-height:1.6">
+      <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; margin-bottom:15px">
+        <h4 style="color:var(--accent); margin-bottom:5px">💰 Coin & Pasif Gelir</h4>
+        Ekrana dokunarak manuel coin kazanabilirsin. Ancak asıl zenginlik <b>Binalar</b> sekmesindedir. Bina satın alarak her saniye coin biriktirirsin. Kasa kapasiten (varsayılan 8 saat) dolduğunda gelir durur, gelip toplamayı unutma!
+      </div>
+      <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; margin-bottom:15px">
+        <h4 style="color:#00e676; margin-bottom:5px">🎰 Casino & Çipler</h4>
+        <b>Casino</b> sekmesinde çiplerini kullanarak şansını deneyebilirsin. Rulet, Slot ve At Yarışı gibi oyunlarda kazandığın çipler seviye atlamana ve dünya sıralamasında yükselmene yardımcı olur.
+      </div>
+      <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; margin-bottom:15px">
+        <h4 style="color:#ffd13b; margin-bottom:5px">👑 Ligler & Seviye</h4>
+        Seviye atladıkça Bronz'dan İmparator'a kadar 10 farklı ligde yükselirsin. Her yeni lig sadece prestij değil, topluluk içinde saygınlık kazandırır.
+      </div>
+      <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; margin-bottom:15px">
+        <h4 style="color:#ff5252; margin-bottom:5px">💎 Prestij (Reset)</h4>
+        15. Seviyeye ulaştığında "İmparatorluğu Sıfırla" butonu açılır. Tüm coin ve binalarını kaybedersin ama kalıcı <b>+%4 Güç Çarpanı</b> kazanırsın. Bu, uzun vadede en güçlü olmanın tek yoludur!
+      </div>
+      <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; margin-bottom:15px">
+        <h4 style="color:#2a8cfe; margin-bottom:5px">📝 Görevler</h4>
+        Hızlı coin mi lazım? Görevler sekmesini kontrol et! Sosyal medya hesaplarımızı takip ederek ve arkadaş davet ederek devasa bonuslar alabilirsin.
+      </div>
+    </div>
+    <button class="action-btn" onclick="q('#shGuide').classList.remove('show')" style="margin-top:10px">ANLADIM, BAŞLAYALIM!</button>
   </div>
 </div>
 
@@ -508,6 +543,12 @@ function openLeagues() {
             ${cur.name === l.name ? '<span style="background:var(--green); color:#000; font-size:10px; font-weight:999; padding:4px 8px; border-radius:6px">ŞUANKİ</span>' : ''}
         </div>
     `).join('');
+}
+
+function openGuide() {
+    au.click();
+    q('#sheetSettings').classList.remove('show');
+    q('#shGuide').classList.add('show');
 }
 
 /* ── UI Core ── */
