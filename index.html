@@ -3,522 +3,1561 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Marino Empire v17</title>
+<meta name="theme-color" content="#030b14">
+<title>Marino Empire</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --cyan:#55ddff;--blue:#2e8cff;--gold:#f7bf4c;--green:#4df0a4;
-  --txt:#f4fbff;--muted:#abc8d8;--line:rgba(101,210,255,.25);
-  --panel:rgba(5,18,33,.78);--safeB:env(safe-area-inset-bottom,0px);--nav:78px
+/* ═══════════════════════════════════════════
+   MARINO EMPIRE — HAMSTER COMBAT STYLE UI
+   ═══════════════════════════════════════════ */
+:root {
+  --bg: #000;
+  --panel: #131722;
+  --surface: #1e2333;
+  --accent: #ffd13b;
+  --accent-glow: rgba(255, 209, 59, 0.3);
+  --blue: #2A8CFE;
+  --green: #48E085;
+  --text: #ffffff;
+  --text-muted: #8b92a5;
+  --safeB: env(safe-area-inset-bottom, 0px);
+  --navH: 72px;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{
-  height:100%;margin:0;overflow:hidden;background:#020812;color:var(--txt);
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Roboto', sans-serif; user-select: none; }
+body { margin: 0; padding: 0; background: var(--bg); color: var(--text); overflow: hidden; height: 100svh; width: 100vw; display: flex; justify-content: center; }
+
+/* ── App Container (Mobile Full, Desktop Center) ── */
+#app {
+  width: 100%;
+  max-width: 480px; /* PC'de ortada telefon gibi dursun diye, telefonda %100 olur */
+  height: 100svh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 0%, #0e1b38 0%, #000000 70%);
+  overflow: hidden;
 }
-button,select{font:inherit;color:inherit}
-button{border:0;cursor:pointer}
-#app{
-  position:relative;width:100%;max-width:480px;height:100svh;min-height:100svh;margin:auto;
-  overflow:hidden;padding:12px 14px calc(var(--nav) + 12px + var(--safeB));
-  display:flex;flex-direction:column;gap:9px;
-  background:linear-gradient(180deg,rgba(4,16,29,.34),rgba(1,7,14,.88)),url("public/assets/backgrounds/home-hero.jpg") center/cover no-repeat,#03111f;
-  box-shadow:0 0 80px rgba(0,0,0,.65)
+
+/* ── Top Header ── */
+.header { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.profile-area { display: flex; align-items: center; gap: 10px; background: rgba(30, 35, 51, 0.6); padding: 6px 12px 6px 6px; border-radius: 99px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: #2A8CFE; display: grid; place-items: center; font-size: 16px; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.p-info { display: flex; flex-direction: column; }
+.p-name { font-size: 13px; font-weight: 700; line-height: 1.1; }
+.p-role { font-size: 11px; color: var(--accent); font-weight: 500; }
+.top-btn { width: 36px; height: 36px; border-radius: 12px; background: rgba(30, 35, 51, 0.6); display: grid; place-items: center; font-size: 18px; border: none; color: #fff; cursor: pointer; transition: transform 0.1s; border:1px solid rgba(255,255,255,0.05); }
+.top-btn:active { transform: scale(0.9); }
+
+/* ── Info Cards Row ── */
+.info-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 14px 12px; }
+.card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+.card::after { content:""; position:absolute; top:0; left:20%; right:20%; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); }
+.card-lbl { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; white-space: nowrap; }
+.card-val { font-size: 12px; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.card-val img { width: 14px; height: 14px; }
+
+/* ── Balance Area ── */
+.balance-area { text-align: center; padding: 10px 0; }
+.bal-coin { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 42px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 4px 20px rgba(255, 209, 59, 0.2); }
+.bal-coin img { width: 44px; height: 44px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+
+/* ── Rank Level ── */
+.rank-row { display: flex; justify-content: space-between; align-items: center; padding: 0 30px; margin-top: 5px; font-size: 12px; font-weight: 700; }
+.rank-name { color: var(--text); display: flex; align-items: center; gap: 4px;}
+.rank-lvl { color: var(--text-muted); }
+.progress-bg { margin: 6px 30px 0; height: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 99px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+.progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #ff9e2d, var(--accent), #fffca0); box-shadow: 0 0 10px var(--accent-glow); transition: width 0.3s ease; }
+
+/* ── Main Tap Area (Hamster Style) ── */
+.tap-container { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; min-height: 0; padding: 10px; }
+.tap-target { 
+  width: min(85vw, 340px); height: min(85vw, 340px); 
+  border-radius: 50%; position: relative; 
+  display: grid; place-items: center; z-index: 10;
 }
-#app:before{
-  content:"";position:absolute;inset:0;z-index:0;
-  background:radial-gradient(circle at 50% 0,rgba(85,221,255,.22),transparent 35%),
-             linear-gradient(rgba(100,200,255,.06) 1px,transparent 1px),
-             linear-gradient(90deg,rgba(100,200,255,.06) 1px,transparent 1px);
-  background-size:auto,34px 34px,34px 34px;pointer-events:none
+.tap-halo {
+  position: absolute; inset: 15px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(42,140,254,0.15) 0%, transparent 70%);
+  animation: pulse-halo 4s infinite alternate;
 }
-#app>*{position:relative;z-index:1}
-.splash{position:absolute;inset:0;z-index:50;background:linear-gradient(180deg,#061f39,#020812);display:grid;place-items:center;transition:.35s}
-.splash.hide{opacity:0;pointer-events:none;transform:scale(1.03)}
-.splash-card{width:86%;max-width:330px;text-align:center;padding:28px 20px;border-radius:30px;border:1px solid var(--line);background:rgba(5,20,36,.82);box-shadow:0 25px 80px rgba(0,0,0,.5)}
-.logoBox{width:82px;height:82px;border-radius:25px;margin:0 auto 14px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);background:#081d31}
-.logoBox img,.brand img,.avatar img{width:100%;height:100%;object-fit:cover}
-.loader{width:50px;height:50px;border:4px solid rgba(255,255,255,.14);border-top-color:var(--cyan);border-radius:50%;margin:16px auto 0;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.top{display:flex;align-items:center;justify-content:space-between;min-height:38px}
-.brandRow{display:flex;align-items:center;gap:10px;min-width:0}
-.brand{width:36px;height:36px;border-radius:13px;overflow:hidden;border:1px solid var(--line);background:#081d31}
-.brandRow h1{margin:0;font-size:20px;letter-spacing:-.5px}
-.iconBtns{display:flex;gap:8px}
-.iconBtn{width:38px;height:38px;border-radius:15px;background:rgba(7,25,42,.8);border:1px solid var(--line);display:grid;place-items:center}
-.profile{height:82px;display:grid;grid-template-columns:58px 1fr auto;gap:11px;align-items:center;padding:11px;border-radius:26px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(15,47,74,.84),rgba(4,15,27,.72))}
-.avatar{width:58px;height:58px;border-radius:20px;overflow:hidden;border:1px solid rgba(85,221,255,.38);background:#0b2034;display:grid;place-items:center}
-.eyebrow{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#9ec4d8;font-weight:1000}
-.name{font-size:20px;font-weight:1000;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sub{font-size:12px;color:#bdd5e4;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
-.pill{height:38px;padding:0 13px;border-radius:15px;border:1px solid var(--line);background:rgba(7,25,42,.75);font-weight:1000;font-size:12px;white-space:nowrap}
-.chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;height:42px}
-.chip{border:1px solid var(--line);background:rgba(6,20,35,.72);border-radius:17px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:1000;white-space:nowrap;overflow:hidden}
-.stats{height:118px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{border:1px solid var(--line);background:linear-gradient(180deg,rgba(12,42,66,.78),rgba(2,11,21,.78));border-radius:21px;padding:10px 12px;overflow:hidden}
-.stat small{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#a7c1d1;font-weight:1000;white-space:nowrap}
-.stat b{display:block;margin-top:6px;font-size:24px;line-height:1;font-weight:1100;letter-spacing:-.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stat span{display:block;margin-top:4px;font-size:11px;color:#8eabba;font-weight:800;white-space:nowrap}
-main{flex:1;min-height:0;overflow:hidden;border-radius:26px}
-.view{display:none;height:100%}
-.view.active{display:block}
-.scroll{height:100%;overflow:auto;scrollbar-width:none;padding-right:1px}
-.scroll::-webkit-scrollbar{display:none}
-.game{height:100%;display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:26px;border:1px solid var(--line);overflow:hidden;background:linear-gradient(180deg,rgba(2,11,21,.32),rgba(0,5,11,.82)),url("public/assets/backgrounds/home-hero.jpg") center/cover no-repeat}
-.hero{display:flex;justify-content:space-between;gap:10px}
-.badge{display:inline-flex;height:30px;align-items:center;padding:0 12px;border-radius:999px;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.1);font-size:11px;font-weight:1000;letter-spacing:1.5px}
-.hero h2{font-size:27px;line-height:.98;margin:7px 0 6px;letter-spacing:-1px}
-.hero p{margin:0;color:#c8ddea;font-size:13px;line-height:1.35;font-weight:800;max-width:250px}
-.char{width:92px;height:108px;object-fit:contain;filter:drop-shadow(0 20px 30px rgba(0,0,0,.5))}
-.tapArea{display:grid;place-items:center;position:relative;flex:0 0 126px;min-height:126px;max-height:126px;padding:0;margin:-2px 0 0}
-.coinBtn{width:min(28vw,124px);height:min(28vw,124px);max-width:124px;max-height:124px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b6,#f5be47 58%,#87500c);border:4px solid rgba(255,239,152,.68);box-shadow:0 14px 34px rgba(0,0,0,.45),inset 0 7px 18px rgba(255,255,255,.4),inset 0 -9px 18px rgba(80,35,0,.34);display:grid;place-items:center;transition:.1s}
-.coinBtn:active{transform:scale(.94)}
-.coinBtn img{width:100%;height:100%;object-fit:contain}
-.coinFallback{font-size:42px;font-weight:1100;color:#402508}
-.plus{position:absolute;top:48%;left:50%;font-weight:1100;color:#fff2a0;text-shadow:0 5px 15px #000;animation:up .8s ease forwards;pointer-events:none}
-@keyframes up{from{opacity:0;transform:translate(-50%,0) scale(.8)}20%{opacity:1}to{opacity:0;transform:translate(-50%,-70px) scale(1.15)}}
-.energy{padding:9px 12px;border-radius:18px;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.1);flex:0 0 auto}
-.energyHead{display:flex;justify-content:space-between;font-size:12px;font-weight:1000;margin-bottom:8px}
-.bar{height:12px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--cyan),var(--blue));border-radius:99px;transition:.25s}
-.quick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;flex:0 0 auto}
-.actBtn{height:47px;border-radius:18px;background:rgba(7,26,43,.82);border:1px solid var(--line);font-weight:1000;font-size:12px}
-.actBtn.gold{background:linear-gradient(135deg,#ffe577,#ff9e2d);color:#160f06}
-.actBtn.blue{background:linear-gradient(135deg,#5fe4ff,#2e8cff);color:#03111e}
-.title{display:flex;justify-content:space-between;gap:10px;margin:0 0 10px;padding:0 2px}
-.title h2{margin:0;font-size:22px;letter-spacing:-.5px}
-.title p{margin:3px 0 0;color:#9eb8ca;font-size:12px;font-weight:800}
-.list{display:grid;gap:10px}
-.row{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:11px;padding:12px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(12,40,65,.84),rgba(3,14,25,.78))}
-.ico{width:48px;height:48px;border-radius:17px;border:1px solid var(--line);display:grid;place-items:center;background:rgba(85,221,255,.1);font-size:24px;overflow:hidden}
-.ico img{width:100%;height:100%;object-fit:contain}
-.row b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row span{display:block;font-size:12px;color:#aac3d2;font-weight:800;margin-top:3px}
-.smallBtn{height:38px;border-radius:15px;padding:0 13px;font-size:12px;font-weight:1100;background:linear-gradient(135deg,#5bdfff,#2e8cff);color:#04111e;white-space:nowrap}
-.smallBtn.gold{background:linear-gradient(135deg,#ffe477,#ff9d2d);color:#1a1005}
-.smallBtn.ghost{background:rgba(8,25,42,.8);border:1px solid var(--line);color:#fff}
-.smallBtn:disabled{opacity:.5}
-.reward{padding:14px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(13,43,67,.86),rgba(3,14,25,.82));display:grid;gap:11px}
-.price{height:30px;padding:0 10px;border-radius:99px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.09);display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:1000;margin-right:6px}
-.rankTabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.tab{height:42px;border-radius:16px;background:rgba(8,25,42,.78);border:1px solid var(--line);font-weight:1000;font-size:13px}
-.tab.active{background:linear-gradient(135deg,rgba(85,221,255,.28),rgba(46,140,255,.17));border-color:rgba(85,221,255,.55)}
-.rank{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;padding:12px;border-radius:20px;border:1px solid var(--line);background:rgba(6,22,37,.75)}
-.rankNo{width:36px;height:36px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.08);font-weight:1100}
-.rankScore{text-align:right;font-size:12px;font-weight:1000}
-.guide{padding:14px;border-radius:24px;border:1px solid var(--line);background:rgba(5,20,36,.78);margin-bottom:10px}
-.guide h3{margin:0 0 7px;font-size:16px}
-.guide p,.guide li{font-size:13px;line-height:1.5;color:#c7dcea;font-weight:750}
-.guide ul{margin:0;padding-left:18px}
-.secure{border-color:rgba(77,240,164,.34);background:linear-gradient(135deg,rgba(17,74,53,.34),rgba(5,20,36,.82))}
-.official{font-size:18px;color:#91ffc8;font-weight:1100}
-.nav{position:absolute;left:14px;right:14px;bottom:calc(10px + var(--safeB));height:72px;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px;border-radius:27px;background:rgba(1,10,18,.91);border:1px solid var(--line);backdrop-filter:blur(18px)}
-.nav button{border-radius:20px;background:transparent;color:#bed4df;font-size:11px;font-weight:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-.nav i{font-style:normal;font-size:21px}
-.nav button.active{color:#fff;background:linear-gradient(135deg,rgba(85,221,255,.18),rgba(46,140,255,.18));border:1px solid rgba(85,221,255,.18)}
-.sheet{position:absolute;left:14px;right:14px;bottom:calc(var(--nav) + 17px + var(--safeB));z-index:35;max-height:min(72svh,540px);border-radius:28px;border:1px solid rgba(85,221,255,.38);background:rgba(2,12,23,.96);box-shadow:0 24px 80px rgba(0,0,0,.55);backdrop-filter:blur(18px);overflow:hidden;opacity:0;transform:translateY(18px);pointer-events:none;transition:.2s}
-.sheet.show{opacity:1;transform:translateY(0);pointer-events:auto}
-.sheetHead{height:58px;padding:0 16px;display:flex;align-items:center;justify-content:space-between}
-.sheetHead h3{margin:0;font-size:18px}
-.sheetBody{max-height:calc(min(72svh,540px) - 58px);overflow:auto;padding:0 16px 16px;scrollbar-width:none}
-.x{width:34px;height:34px;border-radius:14px;background:rgba(255,255,255,.08);font-weight:1000}
-.setRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-.setRow label{font-size:13px;font-weight:900}
-.switch{width:54px;height:30px;border-radius:99px;background:rgba(255,255,255,.14);padding:3px;border:1px solid rgba(255,255,255,.1)}
-.switch i{display:block;width:22px;height:22px;border-radius:50%;background:#fff;transition:.18s}
-.switch.on{background:rgba(77,240,164,.34)}
-.switch.on i{transform:translateX(24px);background:#aaffd3}
-select,.textInput{height:40px;border-radius:14px;background:#061625;border:1px solid var(--line);padding:0 10px;outline:0;color:var(--txt);min-width:0}
-.textInput{width:min(220px,52vw);font-weight:850}
-.sectionHead{margin:14px 2px 8px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9fc6d8;font-weight:1100}
-.limitBox{padding:12px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.24);color:#c8dcea;font-size:12px;font-weight:850;line-height:1.45}
-.limitBox b{color:#fff}
-.warn{border-color:rgba(247,191,76,.35);background:rgba(247,191,76,.08)}
-.ok{border-color:rgba(77,240,164,.35);background:rgba(77,240,164,.08)}
-button:disabled{opacity:.45;filter:grayscale(.4);cursor:not-allowed}
-.toast{position:absolute;left:18px;right:18px;bottom:calc(var(--nav) + 27px + var(--safeB));z-index:60;min-height:48px;border-radius:18px;border:1px solid rgba(85,221,255,.36);background:rgba(1,10,18,.94);display:grid;place-items:center;text-align:center;padding:12px;font-weight:1000;font-size:13px;opacity:0;transform:translateY(12px);transition:.18s;pointer-events:none}
-.toast.show{opacity:1;transform:translateY(0)}
-@media(max-height:720px){#app{gap:8px}.profile{height:74px}.avatar{width:52px;height:52px}.stats{height:108px}.stat b{font-size:22px}.hero h2{font-size:24px}.hero p{display:none}.char{width:80px;height:94px}.tapArea{flex-basis:104px;min-height:104px;max-height:104px}.coinBtn{width:min(26vw,104px);height:min(26vw,104px);max-width:104px;max-height:104px}}
-@media(max-height:650px){.chips{display:none}.profile{height:70px}.stats{height:102px}.nav{height:66px}.game{padding:12px}.hero h2{font-size:22px}.tapArea{flex-basis:88px;min-height:88px;max-height:88px}.coinBtn{width:min(24vw,88px);height:min(24vw,88px);max-width:88px;max-height:88px}}
+@keyframes pulse-halo { 0% { transform: scale(0.95); opacity: 0.5; } 100% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 50px rgba(42,140,254,0.3); } }
+
+.tap-btn {
+  width: 90%; height: 90%; border-radius: 50%; border: none; background: transparent;
+  position: relative; z-index: 2; transition: transform 0.08s ease; cursor: pointer;
+}
+.tap-btn img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); pointer-events: none; }
+.tap-btn:active { transform: scale(0.94) translateY(4px); }
+.tap-btn:active img { filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); }
+
+.click-float { position: absolute; font-size: 28px; font-weight: 900; color: #fff; user-select: none; pointer-events: none; text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 10px rgba(255, 209, 59, 1); animation: floatUp 0.8s ease-out forwards; z-index: 50; }
+@keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.2); } }
+
+/* ── Bottom Energy & Boost ── */
+.bottom-controls { display: flex; justify-content: space-between; align-items: center; padding: 0 20px 14px; position: relative; z-index: 5; }
+.energy-box { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+.energy-box img { width: 20px; height: 20px; }
+.boost-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 14px; font-weight: 700; color: #fff; border: none; cursor: pointer; }
+.boost-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.15); }
+.boost-btn img { width: 22px; height: 22px; }
+
+/* ── Navigation Bottom Bar ── */
+.nav-bar { display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px 8px calc(8px + var(--safeB)); background: rgba(16, 20, 29, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 20; border-radius: 20px 20px 0 0; }
+.nav-btn { background: transparent; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px 0; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+.nav-btn .icon { font-size: 24px; position: relative; }
+.nav-btn span { font-size: 10px; font-weight: 600; }
+.nav-btn.active { color: #fff; background: rgba(42, 140, 254, 0.15); }
+.nav-btn.active .icon { text-shadow: 0 0 15px rgba(42, 140, 254, 0.8); }
+
+/* ── Views / Pages ── */
+main { flex: 1; display: none; flex-direction: column; overflow: hidden; position: relative; z-index: 2; border-radius: 24px 24px 0 0; background: var(--bg); }
+main.active { display: flex; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.page-head { text-align: center; padding: 20px 20px 10px; }
+.page-head h2 { margin: 0; font-size: 26px; font-weight: 900; }
+.page-head p { margin: 4px 0 0; color: var(--text-muted); font-size: 13px; font-weight: 500; }
+.list-scroll { flex: 1; overflow-y: auto; padding: 10px 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+.list-scroll::-webkit-scrollbar { display: none; }
+
+/* ── General List Item (Buildings/Tasks) ── */
+.item-row { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; background: rgba(30, 35, 51, 0.6); padding: 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+.item-row:active { transform: scale(0.98); background: rgba(30, 35, 51, 0.8); }
+.item-ico { width: 56px; height: 56px; border-radius: 16px; background: rgba(0,0,0,0.3); display: grid; place-items: center; font-size: 28px; }
+.item-ico img { width: 80%; height: 80%; object-fit: contain; }
+.item-info { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+.item-title { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-sub { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.item-sub img { width: 12px; height: 12px; }
+
+.action-btn { background: var(--blue); color: #fff; padding: 8px 18px; border-radius: 99px; font-weight: 700; font-size: 13px; border: none; outline: none; box-shadow: 0 4px 12px rgba(42,140,254,0.3); }
+.action-btn:active { transform: scale(0.92); }
+.action-btn:disabled { background: #333; color: #777; box-shadow: none; pointer-events: none; }
+.action-btn.gold { background: linear-gradient(135deg, #ffd13b, #ff9e2d); color: #000; box-shadow: 0 4px 12px rgba(255,209,59,0.3); }
+
+/* ── Panels / Sheets (Popup Menus) ── */
+.sheet-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(4px); }
+.sheet-overlay.show { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #131722; border-radius: 28px 28px 0 0; padding: 20px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; max-height: 85svh; }
+.sheet-overlay.show .sheet { transform: translateY(0); }
+.sheet-handle { width: 40px; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.2); margin: 0 auto 15px; }
+.sheet-close { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border-radius: 16px; background: rgba(255,255,255,0.1); display: grid; place-items: center; border: none; color: #fff; font-size: 14px; }
+
+/* ── Fullscreen Overlay (Mini Games) ── */
+.fs-overlay { position: absolute; inset: 0; z-index: 200; background: rgba(0,0,0,0.95); opacity: 0; pointer-events: none; transition: 0.3s; display: flex; flex-direction: column; }
+.fs-overlay.show { opacity: 1; pointer-events: auto; }
+.fs-header { padding: 20px; text-align: center; position: relative; }
+.fs-close { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 36px; height: 36px; border-radius: 12px; font-size: 16px; }
+.fs-body { flex: 1; display: grid; place-items: center; position: relative; }
+
+/* ── Toast ── */
+.toast { position: absolute; top: 20px; left: 50%; transform: translate(-50%, -20px); background: #fff; color: #000; padding: 12px 24px; border-radius: 99px; font-weight: 700; font-size: 14px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 300; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Limits / Warning Box */
+.alert-box { background: rgba(255, 60, 60, 0.1); border: 1px solid rgba(255, 60, 60, 0.3); border-radius: 16px; padding: 12px; font-size: 12px; text-align: center; color: #ff8888; font-weight: 600; margin-bottom: 10px; }
+.alert-box.green { background: rgba(72, 224, 133, 0.1); border-color: rgba(72, 224, 133, 0.3); color: #48E085; }
+.sec-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; margin: 10px 0 5px 5px; }
+
+/* Toggle */
+.switch { width: 50px; height: 28px; border-radius: 14px; background: rgba(255,255,255,0.1); display: inline-flex; align-items: center; padding: 3px; border: none; transition: 0.3s; }
+.switch i { display: block; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: 0.3s; }
+.switch.on { background: var(--green); }
+.switch.on i { transform: translateX(22px); }
+
+/* Roulette Betting Board */
+.roulette-board { display: grid; grid-template-columns: repeat(14, 1fr); background: #004d40; border: 2px solid #fff; border-radius: 8px; padding: 5px; gap: 2px; margin-top: 15px; user-select: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 100%; min-width: 420px; }
+.r-tile { height: 44px; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; cursor: pointer; position: relative; border-radius: 4px; transition: 0.1s; }
+.r-tile.red { background: #d32f2f; }
+.r-tile.black { background: #111; }
+.r-tile.green { background: #00c853; }
+.r-tile:active { transform: scale(0.95); opacity: 0.8; }
+.chip-marker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #000; font-size: 10px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px dashed #000; z-index: 10; pointer-events: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); background: radial-gradient(circle, #fff, #ccc); animation: pop 0.2s ease; }
+@keyframes pop { from { transform: translate(-50%, -50%) scale(0); } to { transform: translate(-50%, -50%) scale(1); } }
+
+.chip-bar { display: flex; justify-content: center; gap: 8px; margin: 15px 0; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; }
+.chip-btn { width: 44px; height: 44px; border-radius: 50%; border: 3px solid #fff; display: grid; place-items: center; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.5); position: relative; }
+.chip-btn.active { transform: scale(1.15); box-shadow: 0 0 20px rgba(255,255,255,0.8); z-index: 5; }
+.chip-1 { background: #757575; color: white; border-color: #eee; }
+.chip-5 { background: #2196f3; color: white; border-color: #bbdefb; }
+.chip-50 { background: #ffeb3b; color: black; border-color: #fff9c4; }
+.chip-100 { background: #d32f2f; color: white; border-color: #ffcdd2; }
+.chip-500 { background: #000; color: white; border-color: #ff4081; }
+
+.chi-area { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; }
+
+/* Blackjack Slots Placeholder */
+.card-slot { width: 60px; height: 90px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 8px; background: rgba(255,255,255,0.05); }
+
+/* --- Game Specific Animations --- */
+.card-flip { width: 140px; height: 200px; perspective: 1000px; cursor: pointer; }
+.card-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+.card-inner.flipped { transform: rotateY(180deg); }
+.card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,0.1); }
+.card-front { background: url('public/assets/illustrations/marino-avatar.png') center/cover, linear-gradient(135deg, #1e2333, #151924); box-shadow: inset 0 0 50px rgba(0,0,0,0.9); }
+.card-back { background: radial-gradient(circle, #ffd13b, #fcae1e); transform: rotateY(180deg); color: #000; flex-direction: column; gap: 10px; border: 4px solid #fff; box-shadow: 0 0 50px rgba(255,209,59,0.6); }
+
+.wheel-box { position: relative; width: 280px; height: 280px; }
+.wheel-pin { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #fff; z-index: 10; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
+.wheel { width: 100%; height: 100%; border-radius: 50%; background: repeating-conic-gradient(from 0deg, #1A2130 0deg 45deg, #2A8CFE 45deg 90deg, #131722 90deg 135deg, #ffd13b 135deg 180deg, #1A2130 180deg 225deg, #2A8CFE 225deg 270deg, #131722 270deg 315deg, #ffd13b 315deg 360deg); border: 10px solid #fff; transition: transform 3s cubic-bezier(0.1, 0, 0.2, 1); box-shadow: 0 0 50px rgba(42, 140, 254, 0.5), inset 0 0 20px rgba(0,0,0,0.8); position: relative; }
+.wheel::after { content: 'MARINO'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; background: #000; border-radius: 50%; border: 4px solid #ffd13b; display: grid; place-items: center; font-size: 11px; font-weight: 900; color: #ffd13b; box-shadow: 0 0 20px rgba(0,0,0,1); }
+
+.vault-box { width: 180px; height: 180px; background: #2a3142; border: 12px solid #1e2333; border-radius: 20px; display: grid; place-items: center; transition: 0.3s; position: relative; }
+.vault-dial { width: 80px; height: 80px; border-radius: 50%; background: #454d60; border: 6px solid #1e2333; transition: transform 1s; }
+.vault-box.open { background: #ffd13b; border-color: #ffaa00; transform: scale(1.1); box-shadow: 0 0 50px rgba(255,209,59,0.5); }
+.vault-box.open .vault-dial { transform: rotate(720deg); opacity: 0; }
+
+/* ── Profile Stats Table ── */
+.prof-stat { display: flex; justify-content: space-between; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+.prof-stat strong { color: var(--text-muted); }
+.prof-stat span { font-weight: 700; color: #fff; }
 </style>
 </head>
 <body>
 <div id="app">
-  <div id="splash" class="splash">
-    <div class="splash-card">
-      <div class="logoBox"><img src="public/assets/brand/logo.png" alt=""></div>
-      <h2 style="margin:0;font-size:25px">Marino Empire</h2>
-      <p style="margin:8px 0 0;color:#b7d3e5;font-weight:800">İmparatorluk yükleniyor...</p>
-      <div class="loader"></div>
+  
+  <!-- HOME VIEW (Default Hamster Kombat Style Dashboard) -->
+  <div id="view-home" class="page" style="display: flex; flex-direction: column; height: 100%; flex: 1;">
+    <!-- Header -->
+    <header class="header">
+      <div class="profile-area" id="btnProfile" style="cursor:pointer">
+        <div class="avatar"><img src="public/assets/illustrations/marino-avatar.png" onerror="this.onerror=null; this.src=''; this.parentElement.innerHTML='🧑'"></div>
+        <div class="p-info">
+          <span class="p-name" id="userName">Oyuncu</span>
+          <span class="p-role">İmparator</span>
+        </div>
+      </div>
+      <button class="top-btn" id="btnSettings">⚙️</button>
+    </header>
+
+    <!-- Info Row -->
+    <div class="info-row" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="card">
+        <div class="card-lbl">Güç</div>
+        <div class="card-val"><span id="valTap">1</span></div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">Kasa</div>
+        <div class="card-val"><span id="valCap">8s</span></div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">Saatlik</div>
+        <div class="card-val"><span id="valInc">0</span></div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">Casino</div>
+        <div class="card-val">🪙 <span id="valChips">0</span></div>
+      </div>
+    </div>
+
+    <!-- Balance -->
+    <div class="balance-area">
+      <div class="bal-coin"><img src="public/assets/currency/marino-coin.png" alt="Coin" onerror="this.src=null;"> <span id="valCoin">0</span></div>
+    </div>
+
+    <!-- Rank / Level -->
+    <div class="rank-row">
+      <span class="rank-name">Seviye <span id="valLvl">1</span></span>
+      <span class="rank-lvl">XP <span id="valXp">0</span></span>
+    </div>
+    <div class="progress-bg"><div class="progress-fill" id="valProg" style="width: 5%;"></div></div>
+
+    <!-- Tap Area -->
+    <div class="tap-container">
+      <div class="tap-halo"></div>
+      <div class="tap-target">
+        <button class="tap-btn" id="btnTap">
+          <!-- Hamster Combat style big round character in middle -->
+          <img src="public/assets/illustrations/marino-character.png" alt="Tap" onerror="this.style.display='none'; this.parentElement.innerHTML='🤜🤛'">
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="bottom-controls">
+      <div class="energy-box">
+        ⚡ <span id="valEn">0 / 0</span>
+      </div>
+      <!-- Right Boost button can open buildings/upgrades -->
+      <button class="boost-btn" id="btnCollect">
+        KASAYI TOPLA
+      </button>
     </div>
   </div>
 
-  <div class="top">
-    <div class="brandRow"><div class="brand"><img src="public/assets/brand/logo.png" alt=""></div><h1>Marino Empire</h1></div>
-    <div class="iconBtns"><button id="soundQuick" class="iconBtn">🔊</button><button id="settingsOpen" class="iconBtn">⚙️</button></div>
-  </div>
-
-  <section class="profile">
-    <div class="avatar"><img src="public/assets/illustrations/marino-avatar.png" alt=""></div>
-    <div style="min-width:0"><div class="eyebrow">İmparatorluk Durumu</div><div id="name" class="name">Oyuncu</div><div id="sub" class="sub">Hazırlanıyor...</div></div>
-    <button id="refreshBtn" class="pill">● Güncel</button>
-  </section>
-
-  <div class="chips"><div class="chip">🟢 Canlı sistem</div><div id="rankChip" class="chip">🏆 Sv. —</div><div class="chip">🛡️ Güvenli</div></div>
-
-  <section class="stats">
-    <div class="stat"><small>🟡 Marino Coin</small><b id="coin">0</b><span>Ana oyun bakiyesi</span></div>
-    <div class="stat"><small>⚡ Enerji</small><b id="energy">0/0</b><span>Dokunma gücü</span></div>
-    <div class="stat"><small>🏦 Saatlik Gelir</small><b id="income">0/saat</b><span>Pasif üretim</span></div>
-    <div class="stat"><small>🎟️ Ödül Bileti</small><b id="ticket">0</b><span>Mağaza ve mini oyun</span></div>
-  </section>
-
-  <main>
-    <section id="view-game" class="view active">
-      <div class="game">
-        <div class="hero">
-          <div>
-            <span class="badge">Marino Empire</span>
-            <h2>Coin kas,<br>kasayı büyüt.</h2>
-            <p>Dokunarak coin üret, görevleri tamamla, binanı büyüt ve sıralamada yukarı çık.</p>
-          </div>
-          <img class="char" src="public/assets/illustrations/marino-character.png" alt="">
-        </div>
-
-        <div class="tapArea">
-          <button id="tapBtn" class="coinBtn">
-            <img src="public/assets/currency/marino-coin.png" alt="" onerror="this.remove();this.parentElement.innerHTML='<span class=&quot;coinFallback&quot;>M</span>'">
-          </button>
-        </div>
-
-        <div>
-          <div class="energy">
-            <div class="energyHead"><span>Enerji</span><span id="energyPct">0%</span></div>
-            <div class="bar"><i id="energyBar"></i></div>
-          </div>
-          <div class="quick">
-            <button id="collectBtn" class="actBtn gold">Kasayı Topla</button>
-            <button id="tasksOpen" class="actBtn blue">Görevler</button>
-            <button id="miniOpen" class="actBtn">Mini Oyun</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="view-buildings" class="view">
-      <div class="scroll"><div class="title"><div><h2>Yükseltmeler</h2><p>Gelir ve dokunma gücünü büyüt.</p></div></div><div id="buildings" class="list"></div></div>
-    </section>
-
-    <section id="view-store" class="view">
-      <div class="scroll"><div class="title"><div><h2>Ödül Mağazası</h2><p>Free Spin ve Freebet talepleri admin onayına düşer.</p></div></div><div id="store" class="list"></div></div>
-    </section>
-
-    <section id="view-rank" class="view">
-      <div class="scroll"><div class="title"><div><h2>Sıralama</h2><p>Dünya ve ülke rekabeti.</p></div></div><div class="rankTabs"><button id="rGlobal" class="tab active">Dünya</button><button id="rCountry" class="tab">Ülke</button></div><div id="leader" class="list"></div></div>
-    </section>
-
-    <section id="view-guide" class="view">
-      <div class="scroll">
-        <div class="title"><div><h2>Kılavuz</h2><p>Oyunun mantığı ve güvenli kullanım.</p></div></div>
-        <div class="guide">
-          <h3>Nasıl oynanır?</h3>
-          <ul>
-            <li>Ortadaki Marino Coin’e dokunarak coin kazanırsın.</li>
-            <li>Dokunma Gücü yükseldikçe tek dokunuş kazancı artar.</li>
-            <li>Binalar saatlik pasif gelir üretir; kasayı düzenli toplarsın.</li>
-            <li>Görevler az ama düzenli coin verir; ekonomi şişmesin diye ödül ölçülüdür.</li>
-            <li>Mini oyunlar Ödül Bileti ister; kazanç şansa bağlıdır.</li>
-          </ul>
-        </div>
-        <div class="guide secure">
-          <h3>Güvenlik</h3>
-          <p class="official">Marino Casino</p>
-          <p>Ödül talepleri doğrudan admin paneline düşer. Gerçek ödül teslimi site kurallarına göre yönetilir.</p>
-          <ul><li>Günde maksimum 1 gerçek ödül talebi.</li><li>Aynı anda sadece 1 bekleyen talep.</li><li>Çevrimdışı gelir maksimum 8 saatten başlar, kapasite yükseltilebilir.</li><li>Geç seviye oyuncular için Prestij ve oyun içi para yakma alanları vardır.</li></ul>
-        </div>
-      </div>
-    </section>
+  <!-- OTHER VIEWS (Using standard list design) -->
+  <main id="view-buildings">
+    <div class="page-head"><h2>Binalar & Yükseltmeler</h2><p>Saatlik geliri ve dokunma gücünü artır.</p></div>
+    <div id="listBuildings" class="list-scroll"></div>
   </main>
 
-  <nav id="nav" class="nav">
-    <button class="active" data-tab="game"><i>🎰</i><span>Oyun</span></button>
-    <button data-tab="buildings"><i>🏗️</i><span>Binalar</span></button>
-    <button data-tab="store"><i>🎁</i><span>Mağaza</span></button>
-    <button data-tab="rank"><i>🏆</i><span>Sıralama</span></button>
-    <button data-tab="guide"><i>📘</i><span>Kılavuz</span></button>
+  <main id="view-store">
+    <div class="page-head"><h2>Vegas Casino & Kasa</h2><p>Şansını dene, servetini katla veya kaybet!</p></div>
+    <div id="listStore" class="list-scroll"></div>
+  </main>
+
+  <main id="view-tasks">
+    <div class="page-head"><h2>Görevler</h2><p>Görevleri tamamla, anında coin kazan.</p></div>
+    <div id="listTasks" class="list-scroll"></div>
+  </main>
+
+  <main id="view-friends">
+    <div class="page-head"><h2>Arkadaşlar & Sıralama</h2><p>Topluluğunu büyüt, ödülleri kap!</p></div>
+    <div style="display:flex; gap:10px; padding:0 14px 10px;">
+      <button class="action-btn" id="tabRef" style="flex:1">Davet Et</button>
+      <button class="action-btn" id="tabRank" style="flex:1; background:rgba(255,255,255,0.1)">Sıralama</button>
+    </div>
+    <div id="listRef" class="list-scroll"></div>
+    <div id="listRank" class="list-scroll" style="display:none"></div>
+  </main>
+
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <button class="nav-btn active" data-tab="home">
+      <div class="icon">⚡</div><span>Tıkla</span>
+    </button>
+    <button class="nav-btn" data-tab="buildings">
+      <div class="icon">⛏️</div><span>Binalar</span>
+    </button>
+    <button class="nav-btn" data-tab="tasks">
+      <div class="icon">📝</div><span>Görevler</span>
+    </button>
+    <button class="nav-btn" data-tab="store">
+      <div class="icon">🎰</div><span>Casino</span>
+    </button>
+    <button class="nav-btn" data-tab="friends">
+      <div class="icon">👥</div><span>Dostlar</span>
+    </button>
   </nav>
 
-  <div id="tasksSheet" class="sheet"><div class="sheetHead"><h3>Seviye Görevleri</h3><button class="x" data-close="tasksSheet">✕</button></div><div id="tasks" class="sheetBody"></div></div>
-  <div id="miniSheet" class="sheet"><div class="sheetHead"><h3>Mini Oyunlar</h3><button class="x" data-close="miniSheet">✕</button></div><div id="mini" class="sheetBody"></div></div>
+  <!-- SETTINGS SHEET -->
+  <div id="sheetSettings" class="sheet-overlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <button class="sheet-close" data-close="sheetSettings">✕</button>
+      <h3 style="margin:0 0 20px; font-size:20px; text-align:center">Ayarlar</h3>
+      
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center">
+        <b>Ses Efektleri</b> <button class="switch" id="swSfx"><i></i></button>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center">
+        <b>Müzik</b> <button class="switch" id="swMus"><i></i></button>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center">
+        <b>Sinyaller & Bildirimler</b> <button class="switch on"><i></i></button>
+      </div>
+      <div class="alert-box">Ayarlar otomatik kaydedilir.</div>
+      
+      <div style="display:flex; flex-direction:column; gap:14px; margin-top:25px; border-top:1px solid rgba(255,255,255,0.05); padding-top:20px; text-align:center">
+        <a href="https://t.me/betmarinocom" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:700; font-size:14px">Kullanım Şartları (Terms of Service)</a>
+        <a href="https://t.me/betmarinocom" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:700; font-size:14px">Gizlilik Politikası (Privacy)</a>
+        <a href="https://t.me/betmarinocom" target="_blank" style="color:var(--text-muted); text-decoration:none; font-weight:700; font-size:14px">Destek / İletişim (Support)</a>
+      </div>
+    </div>
+  </div>
 
-  <div id="settingsSheet" class="sheet">
-    <div class="sheetHead"><h3>Ayarlar</h3><button class="x" data-close="settingsSheet">✕</button></div>
-    <div class="sheetBody">
-      <div class="setRow"><label>Ülke sıralaması</label><select id="country"><option value="TR|Türkiye">Türkiye</option><option value="CY|Kıbrıs">Kıbrıs</option><option value="KG|Kırgızistan">Kırgızistan</option><option value="AZ|Azerbaycan">Azerbaycan</option><option value="DE|Almanya">Almanya</option><option value="NL|Hollanda">Hollanda</option></select></div>
-      <div class="setRow"><label>Ses Efektleri</label><button id="sfx" class="switch on"><i></i></button></div>
-      <div class="setRow"><label>Fon Müziği</label><button id="music" class="switch"><i></i></button></div>
-      <div class="setRow"><label>Fon Müziği Dosyası</label><input id="musicPath" class="textInput" placeholder="public/assets/audio/fon.mp3"></div>
-      <div class="limitBox warn">Müzik dosyanı GitHub reposunda <b>public/assets/audio/fon.mp3</b> olarak tutarsan direkt çalışır. Başka dosya adı kullanırsan yolu buraya yaz.</div>
-      <button id="saveSettings" class="smallBtn gold" style="width:100%;margin-top:14px">Ayarları Kaydet</button>
+  <!-- PROFILE & PRESTIGE SHEET -->
+  <div id="sheetProfile" class="sheet-overlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <button class="sheet-close" data-close="sheetProfile">✕</button>
+      <h3 style="margin:0 0 20px; font-size:20px; text-align:center">Oyuncu Profili</h3>
+      
+      <div style="margin-bottom: 20px">
+        <div class="prof-stat"><strong>İmparator</strong> <span id="pName">...</span></div>
+        <div class="prof-stat"><strong>Prestij Seviyesi</strong> <span id="pPres" style="color:var(--accent)">0</span></div>
+        <div class="prof-stat"><strong>Aktif Seri (Gün)</strong> <span id="pStreak">0</span></div>
+        <div class="prof-stat"><strong>Kazanılan DP</strong> <span id="pXp">0</span></div>
+      </div>
+
+      <div class="alert-box green" style="margin-bottom: 15px">
+        🏆 <b>Prestij Sistemi (Rebirth)</b><br>
+        Her prestij yaptığında tüm başarım ve yatırımların sıfırlanır, karşılığında kalıcı +%4 Çarpan ve rozet kazanırsın. (Gereksinim: Seviye 15)
+      </div>
+      <button class="action-btn gold" id="btnPrestige" style="width:100%;height:44px">İmparatorluğu Sıfırla (Prestij Yap)</button>
+    </div>
+  </div>
+
+  <!-- DAILY LOGIN FS OVERLAY -->
+  <div id="fsDaily" class="fs-overlay" style="z-index:250; background:rgba(4,15,28,0.98)">
+    <div class="fs-header">
+      <h2 style="margin:0; font-size:26px; font-weight:900" class="gold-text">Günlük Ödül</h2>
+      <p style="color:var(--text-muted); font-size:14px; margin-top:8px">Her gün oyuna girerek ödül havuzunu katla.</p>
+    </div>
+    <div class="fs-body" style="align-items:start; padding:0 20px">
+      <div class="cal-grid" id="calGrid" style="width:100%"></div>
+      <button class="action-btn gold" id="btnClaimDaily" style="width:100%;height:54px;font-size:18px;margin-top:20px">Al</button>
+    </div>
+  </div>
+
+  <!-- MINI GAME FULLSCREEN OVERLAY -->
+  <div id="fsMini" class="fs-overlay">
+    <div class="fs-header">
+      <button class="fs-close" id="closeMini">✕</button>
+      <h2 style="margin:0; font-size:24px" id="miniTitle">Mini Oyun</h2>
+    </div>
+    <div class="fs-body" id="miniBody">
+      <!-- Game injected here -->
     </div>
   </div>
 
   <div id="toast" class="toast"></div>
+  <!-- Background Music -->
+  <audio id="bgMusic" src="public/assets/audio/fon.mp3" loop preload="auto"></audio>
 </div>
 
 <script>
-const MARINO_EMPIRE_VERSION='v17-coin-layout-fix';
-console.log('Marino Empire', MARINO_EMPIRE_VERSION);
-const SUPABASE_URL='https://vxfjprvahjtfhvtuvsoy.supabase.co';
-const SUPABASE_KEY='sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU';
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const tg=window.Telegram?.WebApp;
-const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
-const fmt=n=>{n=Number(n||0); if(n>=1e9)return(n/1e9).toFixed(1)+'B'; if(n>=1e6)return(n/1e6).toFixed(1)+'M'; if(n>=1e4)return Math.round(n/1000)+'K'; return new Intl.NumberFormat('tr-TR').format(n)};
-const uid=()=>Date.now()+'_'+Math.random().toString(16).slice(2);
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-let S={user:null,game:null,busy:false,rank:'global',settings:loadSet()};
+/* ── Engine / Config ── */
+const SUPABASE_URL = 'https://vxfjprvahjtfhvtuvsoy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU';
+const db = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function loadSet(){
-  try{return Object.assign({countryCode:'TR',countryName:'Türkiye',sfx:true,music:false,musicPath:'public/assets/audio/fon.mp3'},JSON.parse(localStorage.marino_settings||'{}'))}
-  catch{return{countryCode:'TR',countryName:'Türkiye',sfx:true,music:false,musicPath:'public/assets/audio/fon.mp3'}}
-}
-function saveSet(){localStorage.marino_settings=JSON.stringify(S.settings);applySet()}
-function toast(m){const e=q('#toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2500)}
+const tg = window.Telegram?.WebApp;
+const isTest = new URLSearchParams(location.search).has('testmode');
 
-const audio={
-  ctx:null,nodes:[],bg:null,unlocked:false,
-  init(){
-    if(!this.ctx){let A=window.AudioContext||window.webkitAudioContext;if(A)this.ctx=new A()}
-    this.unlocked=true;
-    if(this.ctx?.state==='suspended')this.ctx.resume().catch(()=>{})
-  },
-  tone(f=500,d=.07,type='sine',g=.035){
-    if(!S.settings.sfx)return;
-    this.init(); if(!this.ctx)return;
-    let o=this.ctx.createOscillator(),v=this.ctx.createGain();
-    o.type=type;o.frequency.value=f;v.gain.value=g;o.connect(v);v.connect(this.ctx.destination);
-    o.start();v.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+d);o.stop(this.ctx.currentTime+d+.03)
-  },
-  click(){this.tone(520,.05,'triangle',.025)},
-  tap(){this.tone(760,.06);setTimeout(()=>this.tone(1040,.05),45)},
-  win(){this.tone(620,.08,'triangle');setTimeout(()=>this.tone(900,.09,'triangle'),90);setTimeout(()=>this.tone(1180,.12,'triangle'),180)},
-  bad(){this.tone(180,.12,'sawtooth',.025)},
-  start(){
-    this.init();
-    const src=S.settings.musicPath||'public/assets/audio/fon.mp3';
-    if(!this.bg || this.bg._marinoSrc!==src){
-      try{this.bg?.pause()}catch(e){}
-      this.bg=new Audio(src);this.bg.loop=true;this.bg.volume=.32;this.bg.preload='auto';this.bg._marinoSrc=src;
-    }
-    this.bg.play().catch(()=>toast('Müzik ilk dokunuştan sonra başlayacak.'))
-  },
-  stop(){this.nodes.forEach(n=>{try{n.stop?.();n.disconnect?.()}catch(e){}});this.nodes=[];try{this.bg?.pause()}catch(e){}}
+const q = s => document.querySelector(s);
+const fmt = n => new Intl.NumberFormat('en-US').format(Number(n||0));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+
+let S = { 
+  user: null, game: null, busy: false, rankTab: 'global',
+  settings: JSON.parse(localStorage.getItem('m_set') || '{"sfx":true,"mus":true}') 
 };
 
-function applySet(){
-  q('#sfx').classList.toggle('on',S.settings.sfx);
-  q('#music').classList.toggle('on',S.settings.music);
-  q('#soundQuick').textContent=S.settings.sfx?'🔊':'🔇';
-  q('#country').value=S.settings.countryCode+'|'+S.settings.countryName;
-  if(q('#musicPath'))q('#musicPath').value=S.settings.musicPath||'public/assets/audio/fon.mp3';
-  if(!S.settings.music)audio.stop()
+/* ── UI Core ── */
+function toast(msg) {
+  const t = q('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t.to); t.to = setTimeout(() => t.classList.remove('show'), 3000);
 }
-async function rpc(n,a){let r=await db.rpc(n,a); if(r.error)throw r.error; return r.data}
 
-function tgUser(){
-  let u=tg?.initDataUnsafe?.user;
-  if(u)return{telegram_id:String(u.id),telegram_username:u.username||'',first_name:u.first_name||'Oyuncu',last_name:u.last_name||'',language_code:u.language_code||'tr'};
-  let x=JSON.parse(localStorage.marino_local_user||'null')||{telegram_id:'999001',telegram_username:'test_oyuncu',first_name:'Test Oyuncu',last_name:'',language_code:'tr'};
-  localStorage.marino_local_user=JSON.stringify(x);return x
-}
-function normalizeState(x){
-  x=x||{};
-  return Object.assign({},x,{
-    marino_coin: Number(x.marino_coin ?? x.coin ?? 0),
-    reward_token: Number(x.reward_token ?? 0),
-    energy: Number(x.energy ?? 0),
-    max_energy: Number(x.max_energy ?? x.energy_max ?? 500),
-    tap_power: Number(x.tap_power ?? 1),
-    passive_income_per_hour: Number(x.passive_income_per_hour ?? x.current_income_per_hour ?? x.income_per_hour ?? 0),
-    casino_level: Number(x.casino_level ?? 1),
-    reputation: Number(x.reputation ?? 0),
-    claimable_coin: Number(x.claimable_coin ?? 0),
-    offline_capacity_hours: Number(x.offline_capacity_hours ?? 8),
-    prestige_points: Number(x.prestige_points ?? 0)
-  })
-}
-function applyGameData(d){
-  if(!d)return d;
-  if(d.state)d.state=normalizeState(d.state);
-  return d
-}
-function st(){return normalizeState(S.game?.state)}
-function usr(){return S.game?.user||S.user||{}}
-
-async function start(){
-  try{tg?.ready();tg?.expand();tg?.disableVerticalSwipes?.();tg?.setHeaderColor?.('#071827');tg?.setBottomBarColor?.('#020812')}catch(e){}
-  applySet();
-  document.addEventListener('pointerdown',()=>{audio.init();if(S.settings.music)audio.start()},{once:true});
-  S.user=tgUser();
-  await loadGame();
-  bind();
-  setTimeout(()=>q('#splash').classList.add('hide'),350)
-}
-async function loadGame(){
-  try{
-    let site=S.user.telegram_username||S.user.first_name||('user_'+S.user.telegram_id);
-    S.game=applyGameData(await rpc('start_game',{p_telegram_id:S.user.telegram_id,p_site_username:site,p_display_name:S.user.first_name||site,p_country_code:S.settings.countryCode||'TR',p_country_name:S.settings.countryName||'Türkiye'}));
-    await saveRemote(false);
-    render()
-  }catch(e){console.error(e);toast('SQL bağlantısı kurulamadı: '+(e.message||'Oyun verisi alınamadı'))}
-}
-function render(){renderTop();renderBuildings();renderStore();renderTasks();renderMini();renderLeader()}
-function renderTop(){
-  let s=st(),u=usr();
-  q('#name').textContent=u.first_name||u.telegram_username||u.site_username||'Oyuncu';
-  q('#sub').textContent=(u.site_username||u.telegram_username||'oyuncu')+' • Sv. '+(s.casino_level||1)+' • XP '+fmt(s.reputation);
-  q('#coin').textContent=fmt(s.marino_coin);
-  q('#energy').textContent=fmt(s.energy)+'/'+fmt(s.max_energy);
-  q('#income').textContent=fmt(s.passive_income_per_hour)+'/saat';
-  q('#ticket').textContent=fmt(s.reward_token);
-  q('#rankChip').textContent='🏆 Sv. '+(s.casino_level||1);
-  let p=Math.max(0,Math.min(100,Math.round(Number(s.energy||0)/Math.max(1,Number(s.max_energy||1))*100)));
-  q('#energyPct').textContent=p+'%';
-  q('#energyBar').style.width=p+'%'
-}
-function renderBuildings(){
-  let s=st();
-  let tapCost=Math.round(500+Math.pow(Number(s.tap_power||1),2)*350*(1+(Number(s.prestige_points||0)*0.04)));
-  let capCost=Math.round(2500+Math.pow(Math.max(1,Number(s.offline_capacity_hours||8)-7),2)*900);
-  let prestigeReady=Number(s.casino_level||1)>=50 || Number(s.reputation||0)>=50000;
-  let prestigeBonus=Math.round(Number(s.prestige_points||0)*5);
-  let out=[
-    `<div class="limitBox ok"><b>Ekonomi freni aktif:</b> Çevrimdışı gelir maksimum ${fmt(s.offline_capacity_hours||8)} saat birikir. Çok gelişen oyuncu sınırsız ödül basamaz; coin oyun içi yükseltme, prestij ve sezon harcamalarına akar.</div>`,
-    `<div class="row"><div class="ico">👆</div><div><b>Dokunma Gücü</b><span>Seviye ${s.tap_power||1} • Maliyet ${fmt(tapCost)} coin</span></div><button class="smallBtn gold" data-act="tapUp">Yükselt</button></div>`,
-    `<div class="row"><div class="ico">🧰</div><div><b>Kasa Kapasitesi</b><span>Çevrimdışı gelir limiti ${fmt(s.offline_capacity_hours||8)} saat • Maliyet ${fmt(capCost)} coin</span></div><button class="smallBtn" data-act="capacityUp">Yükselt</button></div>`,
-    `<div class="row"><div class="ico">👑</div><div><b>Prestij Sistemi</b><span>${prestigeReady?'Sıfırla, kalıcı +%5 güç kazan.':'Sv. 50 veya 50K XP sonrası açılır.'} • Mevcut kalıcı bonus +%${prestigeBonus}</span></div><button class="smallBtn ${prestigeReady?'gold':'ghost'}" ${prestigeReady?'':'disabled'} data-act="prestige">Prestij</button></div>`
-  ];
-  (S.game?.upgrades||[]).forEach(b=>out.push(`<div class="row"><div class="ico">${ico(b.building_key)}</div><div><b>${esc(b.building_name)}</b><span>Seviye ${b.level} • ${fmt(b.current_income_per_hour)}/saat • Maliyet ${fmt(b.next_cost_coin)}</span></div><button class="smallBtn" data-act="building" data-key="${esc(b.building_key)}">Yükselt</button></div>`));
-  q('#buildings').innerHTML=out.join('')
-}
-function ico(k){return{casino_lobby:'🎰',slot_area:'🎲',sportsbook_area:'⚽',vip_casino:'💎',rewards_office:'🎁',admin_control:'🛡️'}[k]||'🏦'}
-function renderStore(){
-  let items=S.game?.store||[];
-  let rs=S.game?.reward_status||{};
-  let pending=Number(rs.pending_count||0), used=Number(rs.daily_used||0), limit=Number(rs.daily_limit||1);
-  let can=rs.can_request!==false && pending<1 && used<limit;
-  let status=`<div class="limitBox ${can?'ok':'warn'}"><b>Ödül kontrolü:</b> Günlük ${used}/${limit} talep kullanıldı. Bekleyen talep: ${pending}. ${can?'Yeni talep oluşturabilirsin.':'Limit, bekleyen talep veya cooldown nedeniyle yeni gerçek ödül kapalı.'}</div>`;
-  let real='<div class="sectionHead">Gerçek ödül talepleri</div>'+items.map(i=>`<div class="reward"><div class="row" style="padding:0;border:0;background:transparent"><div class="ico"><img src="public/assets/currency/reward-token.png" alt="" onerror="this.remove();this.parentElement.textContent='🎟️'"></div><div><b>${esc(i.item_name)}</b><span>${esc(i.description||'Admin onayına talep gönderir.')} • Cooldown ${i.cooldown_hours||24} saat</span></div></div><div><span class="price">🟡 ${fmt(i.cost_coin)} coin</span><span class="price">🎟️ ${fmt(i.cost_token)} ödül bileti</span></div><button class="smallBtn" ${can?'':'disabled'} data-act="reward" data-code="${esc(i.item_code)}">Talep Oluştur</button></div>`).join('')||'<div class="guide">Mağaza verisi bulunamadı.</div>';
-  let sinks=[
-    ['season_pass','🎫','Sezon Bileti','7 günlük oyun içi prestij rozeti ve sıralama görünürlüğü.',15000,0],
-    ['vip_badge','💠','VIP Rozet','Profilde özel rozet. Gerçek ödül değildir, coin yakma alanıdır.',25000,5],
-    ['income_boost','🚀','2 Saat Gelir Artışı','Pasif gelire geçici oyun içi destek verir.',12000,2],
-    ['profile_frame','🖼️','Profil Çerçevesi','Sıralama ve profil görünümünde kozmetik avantaj.',18000,3]
-  ];
-  let sinkHtml='<div class="sectionHead">Oyun içi para yakma alanları</div>'+sinks.map(x=>`<div class="row"><div class="ico">${x[1]}</div><div><b>${x[2]}</b><span>${x[3]} • ${fmt(x[4])} coin ${x[5]?`+ ${x[5]} bilet`:''}</span></div><button class="smallBtn gold" data-act="sink" data-code="${x[0]}">Satın Al</button></div>`).join('');
-  q('#store').innerHTML=status+real+sinkHtml
-}
-function reward(l,t){let b=Math.min(2500,120+l*20);return Math.round(b*(t==1?1:t==2?1.25:1.5))}
-function renderTasks(){
-  let level=Math.max(1,Number(st().casino_level||1)),max=Math.min(100,Math.max(8,level+3));
-  let names=[['Coin üret','Ana ekranda coin butonuna dokun.'],['Kasayı büyüt','Bina veya dokunma gücü yükselt.'],['Rekabet puanı','Oyuna girip seviyeni canlı tut.']];
-  let rows=[];
-  for(let l=1;l<=max;l++){
-    names.forEach((n,i)=>{
-      let lock=l>level,id=`L${l}_G${i+1}`;
-      rows.push(`<div class="row"><div class="ico">${lock?'🔒':'✅'}</div><div><b>Sv. ${l} • ${n[0]}</b><span>${n[1]} • Ödül ${fmt(reward(l,i+1))} coin</span></div><button class="smallBtn ${lock?'ghost':''}" ${lock?'disabled':''} data-act="task" data-task="${id}" data-level="${l}">${lock?'Kilitli':'Al'}</button></div>`)
-    })
+function showTab(t) {
+  q('#view-home').style.display = 'none';
+  document.querySelectorAll('main').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
+  
+  if (t === 'home') {
+    q('#view-home').style.display = 'flex';
+  } else {
+    q('#view-' + t).classList.add('active');
   }
-  q('#tasks').innerHTML='<div class="guide"><b>100 seviyelik görev sistemi</b><p>Ödüller ölçülü: oyuncuyu umutlandırır ama ekonomiyi bozmaz.</p></div><div class="list">'+rows.join('')+'</div>'
-}
-function renderMini(){
-  let gs=[['card','🃏','Kart Çevir',25,'Hızlı ve düşük maliyetli.'],['wheel','🎡','Şans Çarkı',35,'Orta maliyet, orta ödül.'],['vault','🔐','Kasa Aç',50,'Pahalı ama daha güçlü.']];
-  q('#mini').innerHTML='<div class="guide"><b>Mini oyun kuralı</b><p>Her oyun Ödül Bileti harcar. Kazanç coin olarak anında eklenir.</p></div><div class="list">'+gs.map(g=>`<div class="row"><div class="ico">${g[1]}</div><div><b>${g[2]}</b><span>${g[4]} • Giriş ${g[3]} Ödül Bileti</span></div><button class="smallBtn gold" data-act="mini" data-game="${g[0]}">Oyna</button></div>`).join('')+'</div><div class="guide"><h3>Reklamla coin kazan</h3><p>Reklam sağlayıcısı bağlanınca tamamlanan reklam başına +250 coin verilir.</p><button class="smallBtn" style="width:100%" data-act="ad">Reklam İzle +250 Coin</button></div>'
-}
-async function renderLeader(){
-  let list=S.game?.leaderboard||[];
-  try{list=await rpc('marino_get_leaderboard',{p_scope:S.rank,p_country_code:S.settings.countryCode})}catch(e){}
-  q('#leader').innerHTML=(list||[]).map((r,i)=>`<div class="rank"><div class="rankNo">${r.rank_no||i+1}</div><div><b>${esc(r.display_name||r.site_username||'Oyuncu')}</b><span>${esc(r.site_username||'')} • ${esc(r.country_name||'Dünya')}</span></div><div class="rankScore">Sv. ${r.casino_level||1}<br>XP ${fmt(r.reputation)}</div></div>`).join('')||'<div class="guide"><b>Henüz kayıt yok.</b><p>Ülke seçimini ayarlardan yap.</p></div>'
 }
 
-function bind(){
-  q('#nav').onclick=e=>{let b=e.target.closest('button[data-tab]');if(!b)return;switchTab(b.dataset.tab)};
-  document.body.onclick=e=>{let c=e.target.closest('[data-close]');if(c){q('#'+c.dataset.close).classList.remove('show');audio.click();return}let a=e.target.closest('[data-act]');if(a)handle(a)};
-  q('#refreshBtn').onclick=()=>{audio.click();loadGame()};
-  q('#tapBtn').onclick=tap;
-  q('#collectBtn').onclick=collect;
-  q('#tasksOpen').onclick=()=>{q('#tasksSheet').classList.add('show');audio.click()};
-  q('#miniOpen').onclick=()=>{q('#miniSheet').classList.add('show');audio.click()};
-  q('#settingsOpen').onclick=()=>{q('#settingsSheet').classList.add('show');audio.click()};
-  q('#soundQuick').onclick=()=>{S.settings.sfx=!S.settings.sfx;saveSet();audio.click()};
-  q('#rGlobal').onclick=()=>{S.rank='global';q('#rGlobal').classList.add('active');q('#rCountry').classList.remove('active');renderLeader();audio.click()};
-  q('#rCountry').onclick=()=>{S.rank='country';q('#rCountry').classList.add('active');q('#rGlobal').classList.remove('active');renderLeader();audio.click()};
-  q('#sfx').onclick=()=>{S.settings.sfx=!S.settings.sfx;saveSet();audio.click()};
-  q('#music').onclick=()=>{S.settings.music=!S.settings.music;S.settings.musicPath=q('#musicPath')?.value?.trim()||S.settings.musicPath||'public/assets/audio/fon.mp3';saveSet();S.settings.music?audio.start():audio.stop();audio.click()};
-  q('#saveSettings').onclick=async()=>{let [cc,cn]=q('#country').value.split('|');S.settings.countryCode=cc;S.settings.countryName=cn;S.settings.musicPath=q('#musicPath').value.trim()||'public/assets/audio/fon.mp3';saveSet();audio.stop();if(S.settings.music)audio.start();await saveRemote(true);renderLeader()}
+/* ── Audio ── */
+const au = {
+  ctx: null, setup() { if(!this.ctx && window.AudioContext) this.ctx = new AudioContext(); if(this.ctx?.state === 'suspended') this.ctx.resume(); },
+  play(f, d, t='sine') {
+    if(!S.settings.sfx || !this.ctx) return;
+    let o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = t; o.frequency.value = f; g.gain.value = 0.05;
+    o.connect(g); g.connect(this.ctx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + d); o.stop(this.ctx.currentTime + d + 0.1);
+  },
+  tap() { this.play(800, 0.05); }, click() { this.play(500, 0.05, 'triangle'); },
+  win() { this.play(600,0.1,'triangle'); setTimeout(()=>this.play(900,0.15,'triangle'), 100); },
+  fail() { this.play(200,0.2,'sawtooth'); }
+};
+
+/* ── Bootstrap ── */
+async function init() {
+  try { tg?.ready(); tg?.expand(); tg?.disableVerticalSwipes?.(); } catch(e){}
+  
+  S.user = tg?.initDataUnsafe?.user ? { id: tg.initDataUnsafe.user.id, name: tg.initDataUnsafe.user.first_name, user: tg.initDataUnsafe.user.username } : 
+           (isTest ? { id: '999123', name: 'Test User', user: 'tester' } : { id: '0000', name: 'Misafir', user: '' });
+           
+  // Bind UI
+  document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { au.click(); showTab(b.dataset.tab); });
+  document.querySelectorAll('.sheet-close').forEach(b => b.onclick = () => { au.click(); q('#'+b.dataset.close).classList.remove('show'); });
+  
+  q('#btnSettings').onclick = () => { au.click(); q('#sheetSettings').classList.add('show'); };
+  q('#btnProfile').onclick = () => { au.click(); renderProfile(); q('#sheetProfile').classList.add('show'); };
+  q('#btnPrestige').onclick = handlePrestige;
+  q('#closeMini').onclick = () => { 
+      au.click(); 
+      q('#fsMini').classList.remove('show'); 
+      if(typeof sportsInterval !== 'undefined' && sportsInterval) clearInterval(sportsInterval); 
+  };
+  q('#btnClaimDaily').onclick = claimDaily;
+  
+  // Settings
+  const applySet = () => { 
+    q('#swSfx').classList.toggle('on', S.settings.sfx); 
+    q('#swMus').classList.toggle('on', S.settings.mus); 
+    const bg = q('#bgMusic');
+    if (S.settings.mus) {
+      bg.play().catch(e => {
+        // Browser autplay blocked, bind to next click
+        document.body.addEventListener('click', () => { if(S.settings.mus) bg.play(); }, {once:true});
+      });
+    } else {
+      bg.pause();
+    }
+  };
+  applySet();
+  
+  q('#swSfx').onclick = () => { S.settings.sfx = !S.settings.sfx; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
+  q('#swMus').onclick = () => { S.settings.mus = !S.settings.mus; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
+
+  // Actions
+  q('#btnTap').onpointerdown = e => { au.setup(); handleTap(e); };
+  q('#btnCollect').onclick = handleCollect;
+
+  // Initial load
+  await fetchGame();
+  
+  // Energy Regen Loop (1 per min)
+  setInterval(() => {
+    if(S.game?.state && S.game.state.energy < S.game.state.max_energy) {
+      S.game.state.energy++; renderTop();
+    }
+  }, 60000);
 }
-function switchTab(t){
-  audio.click();
-  qa('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
-  qa('.view').forEach(v=>v.classList.remove('active'));
-  q('#view-'+t).classList.add('active');
-  let m={game:'home-hero.jpg',buildings:'buildings.jpg',store:'store.jpg',rank:'leaderboard.jpg',guide:'guide.jpg'};
-  let img=`public/assets/backgrounds/${m[t]||'home-hero.jpg'}`;
-  q('#app').style.background=`linear-gradient(180deg,rgba(4,16,29,.38),rgba(1,7,14,.9)),url("${img}") center/cover no-repeat,#03111f`
+
+/* ── API & Data ── */
+async function rpc(name, p) {
+  const { data, error } = await db.rpc(name, p);
+  if(error) throw error;
+  return data;
 }
-async function tap(){
-  if(S.busy)return;
-  let s=st();
-  if(Number(s.energy)<=0){toast('Enerji bitti. Biraz bekle.');audio.bad();return}
-  S.busy=true;
-  try{
-    let d=await rpc('tap_coin',{p_telegram_id:S.user.telegram_id,p_taps:1});
-    if(d?.state)S.game.state=normalizeState(d.state);else if(d?.marino_coin!==undefined||d?.coin!==undefined)S.game.state=normalizeState(d);
-    plus('+'+fmt(st().tap_power||1));audio.tap();render()
-  }catch(e){toast(e.message||'Dokunma işlemi başarısız.');audio.bad()}finally{S.busy=false}
+
+function processState(d) {
+  if(d.state) S.game.state = {
+    coin: Number(d.state.marino_coin||0), chips: Number(d.state.casino_chips||0), token: Number(d.state.reward_token||0),
+    en: Number(d.state.energy||0), maxEn: Number(d.state.max_energy||500),
+    tap: Number(d.state.tap_power||1), inc: Number(d.state.passive_income_per_hour||0),
+    lvl: Number(d.state.casino_level||1), xp: Number(d.state.reputation||0),
+    pres: Number(d.state.prestige_points||0), cap: Number(d.state.offline_capacity_hours||8)
+  };
+  if(d.upgrades) S.game.upgrades = d.upgrades;
+  if(d.store) S.game.store = d.store;
+  if(d.reward_status) S.game.reward_status = d.reward_status;
+  if(d.daily_login) S.game.daily_login = d.daily_login;
+  if(d.completed_tasks) S.game.completed_tasks = d.completed_tasks;
 }
-function plus(t){let e=document.createElement('div');e.className='plus';e.textContent=t;q('.tapArea').appendChild(e);setTimeout(()=>e.remove(),850)}
-async function collect(){
-  if(S.busy)return;
-  S.busy=true;
-  try{let d=await rpc('collect_income',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d?.state)S.game.state=normalizeState(d.state);toast('Kasa toplandı.');audio.win();render()}
-  catch(e){toast(e.message||'Kasa toplanamadı.');audio.bad()}finally{S.busy=false}
+
+async function fetchGame() {
+  try {
+    const sp = tg && tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
+    const refBy = (sp && sp.startsWith('ref_')) ? sp.replace('ref_', '') : '';
+    
+    const res = await rpc('start_game', { 
+      p_telegram_id: String(S.user.id), 
+      p_site_username: S.user.user||'', 
+      p_display_name: S.user.name||'',
+      p_country_code: 'TR',
+      p_country_name: 'Türkiye',
+      p_referred_by: refBy
+    });
+    
+    S.game = {}; processState(res);
+    renderAll();
+    
+    // Check Sports Coupons
+    try {
+        const cp = await rpc('marino_check_coupons', { p_telegram_id: String(S.user.id) });
+        if(cp && cp.win_count > 0) {
+            setTimeout(() => {
+                toast(`🎉 TEBRİKLER! Biten maçlardan ${fmt(cp.total_win_amount)} ÇİP Kazandın!`);
+                au.win();
+                S.game.state.chips += Number(cp.total_win_amount);
+                renderTop();
+            }, 1500);
+        }
+    } catch(e) {}
+
+    // Check Daily Login Trigger
+    if(S.game.daily_login?.can_claim_today) {
+      setTimeout(() => openDaily(), 500);
+    }
+  } catch(e) { toast('Veritabanı Hatası: Lütfen SQL güncellemelerini çalıştırın. ' + e.message); console.error(e); }
 }
-async function handle(a){
-  if(S.busy)return;
-  S.busy=true;audio.click();
-  try{
-    let d,act=a.dataset.act;
-    if(act==='building'){d=await rpc('upgrade_building',{p_telegram_id:S.user.telegram_id,p_building_key:a.dataset.key,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);if(d.upgrades)S.game.upgrades=d.upgrades;toast('Bina yükseltildi.');audio.win()}
-    if(act==='tapUp'){d=await rpc('marino_upgrade_tap',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast('Dokunma gücü yükseltildi.');audio.win()}
-    if(act==='capacityUp'){d=await rpc('marino_upgrade_capacity',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast('Kasa kapasitesi yükseltildi.');audio.win()}
-    if(act==='prestige'){if(!confirm('Prestij yapınca binalar ve dokunma gücü sıfırlanır; kalıcı +%5 güç kazanırsın. Devam?')){S.busy=false;return}d=await rpc('marino_prestige',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);if(d.upgrades)S.game.upgrades=d.upgrades;toast('Prestij tamamlandı. Kalıcı güç arttı.');audio.win()}
-    if(act==='reward'){d=await rpc('request_reward',{p_telegram_id:S.user.telegram_id,p_item_code:a.dataset.code,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);if(d.reward_status)S.game.reward_status=d.reward_status;toast('Ödül talebi admin paneline gönderildi.');audio.win()}
-    if(act==='sink'){d=await rpc('marino_buy_sink',{p_telegram_id:S.user.telegram_id,p_sink_code:a.dataset.code,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast(d.message||'Oyun içi satın alım tamamlandı.');audio.win()}
-    if(act==='task'){d=await rpc('marino_claim_task',{p_telegram_id:S.user.telegram_id,p_task_id:a.dataset.task,p_level_no:Number(a.dataset.level),p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast(d.message||'Görev ödülü alındı.');audio.win()}
-    if(act==='mini'){d=await rpc('marino_play_mini_game',{p_telegram_id:S.user.telegram_id,p_game_key:a.dataset.game,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast(d.message||'Mini oyun tamamlandı.');d.reward_coin?audio.win():audio.bad()}
-    if(act==='ad')await watchAd();
-    render()
-  }catch(e){console.error(e);toast(e.message||'İşlem tamamlanamadı. SQL güncellemesini çalıştır.');audio.bad()}finally{S.busy=false}
+
+/* ── Actions ── */
+async function handleTap(e) {
+  if(S.busy || !S.game) return;
+  const s = S.game.state;
+  if(s.en <= 0) { toast('Enerji bitti!'); au.fail(); return; }
+  
+  // Optimistic UI updates
+  s.coin += s.tap; s.en -= 1;
+  renderTop(); au.tap();
+  
+  // Float Animation
+  const btn = q('#btnTap');
+  const rect = btn.getBoundingClientRect();
+  const x = e.clientX ? (e.clientX - rect.left) : (rect.width/2);
+  const y = e.clientY ? (e.clientY - rect.top) : (rect.height/2);
+  const flt = document.createElement('div');
+  flt.className = 'click-float'; flt.textContent = '+' + fmt(s.tap);
+  flt.style.left = x + 'px'; flt.style.top = y + 'px';
+  btn.appendChild(flt); setTimeout(() => flt.remove(), 800);
+
+  // Buffer and sync (simplified for stability, sending 1 hit)
+  try {
+    const d = await rpc('tap_coin', { p_telegram_id: String(S.user.id), p_taps: 1 });
+    // Don't fully overwrite state continuously to avoid flicker, just sync if needed
+  } catch(err) { /* silent fail on tap */ }
 }
-async function watchAd(){
-  let dev=location.search.includes('devads=1')||location.hostname==='localhost'||location.hostname==='127.0.0.1';
-  if(window.MarinoAdProvider?.showRewarded)await window.MarinoAdProvider.showRewarded();
-  else if(dev){toast('Test reklamı gösteriliyor...');await new Promise(r=>setTimeout(r,2200))}
-  else{toast('Reklam sağlayıcısı henüz bağlanmadı. Test için URL sonuna ?devads=1 ekle.');return}
-  let d=await rpc('marino_claim_ad_reward',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});
-  if(d.state)S.game.state=normalizeState(d.state);toast(d.message||'Reklam ödülü eklendi.');audio.win()
+
+async function handleCollect() {
+  if(S.busy) return; S.busy = true; au.click();
+  try {
+    const d = await rpc('collect_income', { p_telegram_id: String(S.user.id), p_request_id: uid() });
+    processState(d); toast('Kasa toplandı! +' + fmt(d.collected)); au.win(); renderAll();
+  } catch(e) { toast(e.message); au.fail(); }
+  finally { S.busy = false; }
 }
-async function saveRemote(show){
-  try{await rpc('marino_save_settings',{p_telegram_id:S.user.telegram_id,p_country_code:S.settings.countryCode,p_country_name:S.settings.countryName,p_sound_enabled:!!S.settings.sfx,p_music_enabled:!!S.settings.music,p_music_path:S.settings.musicPath||'public/assets/audio/fon.mp3'});if(show)toast('Ayarlar kaydedildi.')}
-  catch(e){if(show)toast('Ayarlar yerel kaydedildi. SQL ayar fonksiyonu yok.')}
+
+async function doAction(cmd, p) {
+  if(S.busy) return; S.busy = true; au.click();
+  try {
+    p.p_telegram_id = String(S.user.id);
+    p.p_request_id = uid();
+    const d = await rpc(cmd, p);
+    processState(d);
+    if(d.message) toast(d.message);
+    au.win(); renderAll();
+  } catch(e) { toast(e.message); au.fail(); }
+  finally { S.busy = false; }
 }
-start();
+
+/* ── Rendering ── */
+function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); renderRank(); }
+
+function renderTop() {
+  if(!S.game) return; const s = S.game.state;
+  q('#userName').textContent = S.user.name;
+  q('#valTap').textContent = `+${fmt(s.tap)}`;
+  q('#valCap').textContent = `${s.cap}s`;
+  q('#valInc').textContent = `+${fmt(s.inc)}`;
+  q('#valCoin').textContent = fmt(s.coin);
+  const ch = q('#valChips'); if(ch) ch.textContent = fmt(s.chips||0);
+  q('#valLvl').textContent = s.lvl;
+  q('#valXp').textContent = fmt(s.xp);
+  q('#valEn').textContent = `${fmt(s.en)} / ${fmt(s.maxEn)}`;
+  q('#valProg').style.width = Math.min(100, Math.max(5, (s.xp / (s.lvl * 500)) * 100)) + '%';
+}
+
+function renderBuildings() {
+  if(!S.game) return; const s = S.game.state;
+  let html = '';
+  // Top upgrades
+  const tapCost = Math.floor(500 * Math.pow(1.18, s.tap) * (1 + s.pres*0.04));
+  const capCost = Math.floor(2500 + Math.pow(Math.max(1, s.cap-7), 2)*900);
+  
+  html += `<div class="alert-box green">Çevrimdışı gelir max <b>${s.cap} saat</b> birikir. Sık sık girip topla!</div>`;
+  
+  html += `<div class="item-row"><div class="item-ico">👆</div><div class="item-info"><div class="item-title">Çoklu Tıklama</div><div class="item-sub">Sviye ${s.tap} • <img src="public/assets/currency/marino-coin.png"> ${fmt(tapCost)}</div></div><button class="action-btn" onclick="doAction('marino_upgrade_tap',{})">Geliştir</button></div>`;
+  
+  html += `<div class="item-row"><div class="item-ico">🔋</div><div class="item-info"><div class="item-title">Kasa Kapasitesi</div><div class="item-sub">Limit ${s.cap}s • <img src="public/assets/currency/marino-coin.png"> ${fmt(capCost)}</div></div><button class="action-btn" onclick="doAction('marino_upgrade_capacity',{})" ${s.cap>=24?'disabled':''}>Geliştir</button></div>`;
+
+  (S.game.upgrades || []).forEach(b => {
+    const lock = s.lvl < (b.unlock_level||1);
+    html += `<div class="item-row"><div class="item-ico">🏗️</div><div class="item-info"><div class="item-title">${b.building_name}</div><div class="item-sub">${lock ? `🔒 Sv. ${b.unlock_level} gerekli` : `Sv. ${b.level} • +${fmt(b.current_income_per_hour)}/s`}</div><div class="item-sub" style="color:var(--accent)"><img src="public/assets/currency/marino-coin.png"> ${fmt(b.next_cost_coin)}</div></div><button class="action-btn" onclick="doAction('upgrade_building',{p_building_key:'${b.building_key}'})" ${lock?'disabled':''}>Yükselt</button></div>`;
+  });
+  
+  q('#listBuildings').innerHTML = html;
+}
+
+function renderTasks() {
+  if(!S.game) return; const s = S.game.state; const done = S.game.completed_tasks || [];
+  let html = '';
+
+  // Social Tasks
+  html += '<div class="sec-title">Sosyal Usta</div>';
+  const sts = [ 
+    {id:'soc_tg', n:'Telegram Grubuna Katıl', img:'📢', r:5000, link:'https://t.me/betmarinocom'}, 
+    {id:'soc_tw', n:'X (Twitter) Takip Et', img:'🐦', r:2500, link:'https://x.com/marinoetkinlik'} 
+  ];
+  sts.forEach(t => {
+    const isD = done.includes(t.id);
+    html += `<div class="item-row"><div class="item-ico">${t.img}</div><div class="item-info"><div class="item-title">${t.n}</div><div class="item-sub"><img src="public/assets/currency/marino-coin.png"> ${fmt(t.r)} Coin</div></div><button class="action-btn ${isD?'':'gold'}" onclick="if(!${isD}){ if(window.Telegram?.WebApp && window.Telegram.WebApp.openLink) window.Telegram.WebApp.openLink('${t.link}'); else window.open('${t.link}', '_blank'); doAction('marino_claim_task',{p_task_id:'${t.id}', p_level_no:1}); }" ${isD?'disabled':''}>${isD?'Alındı':'Tamamla'}</button></div>`;
+  });
+
+  html += '<div class="sec-title">Günlük Görevler</div>';
+  const dts = [ {id:'daily_tap', n:'100 Dokunuş'}, {id:'daily_collect', n:'Kasa Topla'}, {id:'daily_mini', n:'Mini Oyun Oyna'} ];
+  dts.forEach(t => {
+    const isD = done.includes(t.id);
+    html += `<div class="item-row"><div class="item-ico">${isD?'✅':'📅'}</div><div class="item-info"><div class="item-title">${t.n}</div><div class="item-sub"><img src="public/assets/currency/marino-coin.png"> 200 Coin</div></div><button class="action-btn ${isD?'':'gold'}" onclick="doAction('marino_claim_task',{p_task_id:'${t.id}', p_level_no:1})" ${isD?'disabled':''}>${isD?'Alındı':'Tamamla'}</button></div>`;
+  });
+
+  html += `<div class="sec-title">Seviye Görevleri (Sv. ${s.lvl})</div>`;
+  const m = Math.min(100, Math.max(8, s.lvl + 3));
+  for(let l=1; l<=m; l++) {
+    const tId = `L${l}_G1`; const isD = done.includes(tId); const lock = l > s.lvl;
+    if(l<s.lvl && isD) continue; // Hide old
+    html += `<div class="item-row"><div class="item-ico">${lock?'🔒':(isD?'✅':'🔸')}</div><div class="item-info"><div class="item-title">Sv. ${l} Ulaş</div><div class="item-sub"><img src="public/assets/currency/marino-coin.png"> ${fmt(l*100)} Coin</div></div><button class="action-btn ${lock||isD?'':'gold'}" onclick="doAction('marino_claim_task',{p_task_id:'${tId}', p_level_no:${l}})" ${lock||isD?'disabled':''}>${lock?'Kilitli':(isD?'Alındı':'Al')}</button></div>`;
+  }
+  q('#listTasks').innerHTML = html;
+}
+
+function renderStore() {
+  if(!S.game) return; const items = S.game.store || [];
+  const rs = S.game.reward_status || {};
+  const played = S.game.daily_login?.mini_games_played || 0;
+  
+  let html = `<div class="alert-box"><b>Ödül Limiti:</b> Haftalık ${rs.weekly_used||0}/3 | Bugün ${rs.daily_used||0}/1</div>`;
+  
+  html += '<div class="sec-title">Vezne (Çip İşlemleri)</div>';
+  html += `<div class="item-row"><div class="item-ico" style="background:transparent"><div style="width:40px;height:40px;border-radius:50%;border:4px dashed #ffd13b;background:#1e2333;color:#ffd13b;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;box-shadow:0 4px 10px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.8)">ÇİP</div></div><div class="item-info"><div class="item-title">Casino Çipi Satın Al</div><div class="item-sub">100 Çip = 100.000 Coin</div><div class="item-sub">Bakiye: ${fmt(S.game.state.chips)} Çip</div></div><button class="action-btn gold" onclick="buyChipsPopup()">Çip Satın Al</button></div>`;
+
+  html += '<div class="sec-title">Gerçek Casino Games</div>';
+  html += `<div class="item-row"><div class="item-ico">🍒</div><div class="item-info"><div class="item-title">Klasik Slot (Coin)</div><div class="item-sub">Kasa Payı: %5</div></div><button class="action-btn gold" onclick="openMini('slot','Klasik Slot')">Oyna</button></div>`;
+  html += `<div class="item-row"><div class="item-ico">🌑</div><div class="item-info"><div class="item-title">VIP Rulet (Çip)</div><div class="item-sub">Avrupa Masası • Tam Bahis</div></div><button class="action-btn gold" onclick="openMini('roulette','VIP Rulet')">Oyna</button></div>`;
+  html += `<div class="item-row"><div class="item-ico">🃏</div><div class="item-info"><div class="item-title">Blackjack (Çip)</div><div class="item-sub">Vegas Rules • Canlı</div></div><button class="action-btn gold" onclick="openMini('blackjack','VIP Blackjack')">Oyna</button></div>`;
+  html += `<div class="item-row"><div class="item-ico" style="font-size:24px">♠️</div><div class="item-info"><div class="item-title">Casino Stud Poker (Çip)</div><div class="item-sub">5-Card Stud • Yüksek Kazanç</div></div><button class="action-btn gold" onclick="openMini('poker','VIP Poker')">Oyna</button></div>`;
+  html += `<div class="item-row"><div class="item-ico" style="font-size:24px">🐎</div><div class="item-info"><div class="item-title">Gerçek At Yarışı (Çip)</div><div class="item-sub">6 Kulvarlı • Canlı Animasyon</div></div><button class="action-btn gold" onclick="openMini('horse','At Yarışı')">Oyna</button></div>`;
+
+  html += '<div class="sec-title">Sanal Lig (Spor Bahisleri)</div>';
+  html += `<div class="item-row"><div class="item-ico" style="background:#1e2333; position:relative; overflow:hidden">
+             <img src="public/assets/teams/gs.png" style="position:absolute; width:28px; height:28px; top:-2px; left:-2px; z-index:2; filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.8))">
+             <img src="public/assets/teams/fb.png" style="position:absolute; width:28px; height:28px; bottom:-2px; right:-2px; z-index:1; filter:drop-shadow(-2px -2px 2px rgba(0,0,0,0.8))">
+           </div><div class="item-info"><div class="item-title">Canlı İddaa Bülteni</div><div class="item-sub">Gerçek Zamanlı Motor</div></div><button class="action-btn gold" onclick="openMini('sports','Sanal Sporlar')">Canlı İzle</button></div>`;
+
+  html += '<div class="sec-title">Şans Oyunları (Bilet İle)</div>';
+  html += `<div class="alert-box green"><b>Günlük Limit:</b> ${played}/5 oynandı</div>`;
+  const mgs = [['card','Kart Çevir',25,'🃏'],['wheel','Şans Çarkı',35,'🎡'],['vault','Kasa Aç',50,'🔐']];
+  mgs.forEach(g => {
+    html += `<div class="item-row"><div class="item-ico">${g[3]}</div><div class="item-info"><div class="item-title">${g[1]}</div><div class="item-sub">Giriş: 🎟️ ${g[2]} bilet</div></div><button class="action-btn gold" onclick="openMini('${g[0]}','${g[1]}')" ${played>=5?'disabled':''}>Oyna</button></div>`;
+  });
+
+  html += '<div class="sec-title">Gerçek Ödüller</div>';
+  items.forEach(i => {
+    html += `<div class="item-row"><div class="item-ico">🎟️</div><div class="item-info"><div class="item-title">${i.item_name}</div><div class="item-sub"><img src="public/assets/currency/marino-coin.png"> ${fmt(i.cost_coin)} &nbsp; 🎟️ ${i.cost_token} bilet</div></div><button class="action-btn" onclick="doAction('request_reward',{p_item_code:'${i.item_code}'})">Talep Et</button></div>`;
+  });
+  
+  q('#listStore').innerHTML = html;
+}
+
+async function renderRank() {
+  let html = '<div class="alert-box" style="background:rgba(42,140,254,0.1); border-color:rgba(42,140,254,0.3); color:#2A8CFE">Oyun henüz Alpha sürümündedir. Sıralamada yukarı tırman!</div>';
+  try {
+    const list = await rpc('marino_get_leaderboard', { p_scope: 'global', p_country_code: 'TR' });
+    list.forEach((r, i) => {
+      let rk = r.rank_no || (i+1);
+      html += `<div class="item-row" style="background:rgba(255,255,255,0.02)"><div class="item-ico" style="font-size:18px; font-weight:900; background:${rk==1?'#ffd13b':rk==2?'#ccc':rk==3?'#cd7f32':'rgba(0,0,0,0.4)'}; color:${rk<=3?'#000':'#fff'}">${rk}</div><div class="item-info"><div class="item-title">${r.display_name||'Oyuncu'}</div><div class="item-sub">Sv. ${r.casino_level||1} • XP: ${fmt(r.reputation)}</div></div></div>`;
+    });
+  } catch(e) { html += '<div style="text-align:center;color:#888;padding:20px">Sıralama yüklenemedi.</div>'; }
+  q('#listRank').innerHTML = html;
+}
+
+async function renderReferrals() {
+  const link = `t.me/MarinoEmpireBot?startapp=ref_${S.user.id}`;
+  let html = `<div style="text-align:center; margin-bottom:15px">
+    <p style="color:var(--text-muted);font-size:13px">Sahte davetleri engellemek için kurallar değişti!<br>Davet ettiğin arkadaşın <b>5. Seviyeye</b> ulaşınca <b>50.000 Coin ve 5 Bilet</b> kazanırsın.</p>
+    <button class="action-btn gold" style="width:100%;height:44px" onclick="navigator.clipboard.writeText('${link}');toast('Davet linki kopyalandı!')">Davet Linkini Kopyala 🔗</button>
+  </div><div class="sec-title">Davet Ettiklerin</div>`;
+  
+  try {
+    const list = await rpc('marino_get_referrals', { p_telegram_id: String(S.user.id) });
+    if(list.length === 0) {
+      html += '<div class="alert-box">Henüz hiç arkadaşını davet etmedin.</div>';
+    } else {
+      list.forEach(r => {
+        const canClaim = r.level >= 5 && !r.is_claimed;
+        const msg = r.is_claimed ? 'Alındı' : (r.level < 5 ? `Seviye Bekleniyor (${r.level}/5)` : 'Ödülü Al');
+        html += `<div class="item-row"><div class="item-ico">🧑</div><div class="item-info"><div class="item-title">${r.name||'Oyuncu'}</div><div class="item-sub">Seviye ${r.level}</div></div><button class="action-btn ${canClaim?'gold':''}" onclick="doAction('marino_claim_referral',{p_referred_id:'${r.id}'})" ${!canClaim?'disabled':''}>${msg}</button></div>`;
+      });
+    }
+  } catch(e) { html += '<div class="alert-box">Bağlantı hatası</div>'; }
+  
+  q('#listRef').innerHTML = html;
+}
+
+q('#tabRef').onclick = () => { q('#tabRef').style.background=''; q('#tabRank').style.background='rgba(255,255,255,0.1)'; q('#listRef').style.display='block'; q('#listRank').style.display='none'; renderReferrals(); };
+q('#tabRank').onclick = () => { q('#tabRank').style.background=''; q('#tabRef').style.background='rgba(255,255,255,0.1)'; q('#listRank').style.display='block'; q('#listRef').style.display='none'; renderRank(); };
+
+/* ── Mini Games UI Engine ── */
+function openMini(id, title) {
+  if(typeof sportsInterval !== 'undefined' && sportsInterval) clearInterval(sportsInterval);
+  au.click(); q('#miniTitle').textContent = title;
+  const b = q('#miniBody'); b.innerHTML = '';
+  q('#fsMini').classList.add('show');
+  
+  if (id === 'slot') {
+    b.innerHTML = `
+      <div class="slot-body" style="background: linear-gradient(180deg, #880e4f, #310014); border-radius: 20px; padding: 20px; box-shadow: inset 0 10px 30px rgba(255,255,255,0.1), 0 10px 50px rgba(0,0,0,1); border: 4px solid #ff4081; position:relative; overflow: hidden; margin-bottom: 20px">
+         <div style="text-align:center; font-size:26px; font-weight:900; color:#ffd13b; text-shadow: 0 0 20px #ffd13b, 0 0 10px #ff0000; letter-spacing: 2px; margin-bottom:20px; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid #ffab00;">🎰 MEGA JACKPOT 🎰</div>
+         
+         <div class="slot-machine-case" style="margin-bottom: 25px; box-shadow: 0 20px 50px rgba(0,0,0,1); border-color:#ffd13b;">
+           <div id="slotPayline" class="slot-payline"></div>
+           <div class="slot-reel"><div class="slot-strip" id="reel0"><div class="slot-item">➖</div><div class="slot-item">❓</div><div class="slot-item">➖</div></div></div>
+           <div class="slot-reel"><div class="slot-strip" id="reel1"><div class="slot-item">➖</div><div class="slot-item">❓</div><div class="slot-item">➖</div></div></div>
+           <div class="slot-reel"><div class="slot-strip" id="reel2"><div class="slot-item">➖</div><div class="slot-item">❓</div><div class="slot-item">➖</div></div></div>
+           <div class="slot-reel"><div class="slot-strip" id="reel3"><div class="slot-item">➖</div><div class="slot-item">❓</div><div class="slot-item">➖</div></div></div>
+           <div class="slot-reel"><div class="slot-strip" id="reel4"><div class="slot-item">➖</div><div class="slot-item">❓</div><div class="slot-item">➖</div></div></div>
+         </div>
+         
+         <div style="background: #111; padding: 15px; border-radius: 12px; border: 2px solid #333; box-shadow: inset 0 5px 15px rgba(0,0,0,0.8);">
+            <div id="mgRes" style="margin-bottom:15px;font-weight:900;font-size:18px;text-align:center;min-height:30px;background:#000;border:2px solid #00e676;color:#00e676;border-radius:6px;padding:5px;text-shadow: 0 0 10px #00e676; letter-spacing:1px; display:flex; align-items:center; justify-content:center;">💰 BAHİS SEÇ</div>
+            <div style="display:flex; justify-content:center; gap:10px; width:100%">
+               <button class="action-btn" style="flex:1; height:60px; font-size:20px; font-weight:900; text-shadow:0 2px 5px #000; background: linear-gradient(#006064, #00363a); box-shadow: inset 0 2px 10px rgba(255,255,255,0.2), 0 5px 15px rgba(0,0,0,0.8); border: 2px solid #00bcd4; color:#fff" onclick="playSlot(this, 10000)">10K</button>
+               <button class="action-btn" style="flex:1; height:60px; font-size:20px; font-weight:900; text-shadow:0 2px 5px #000; background: linear-gradient(#ff6f00, #e65100); box-shadow: inset 0 2px 10px rgba(255,255,255,0.4), 0 5px 15px rgba(0,0,0,0.8); border: 2px solid #fff; color:#fff" onclick="playSlot(this, 100000)">100K</button>
+            </div>
+         </div>
+         <div class="alert-box" style="margin-top:15px; border-color:#ff4081; color:#ff4081; background:rgba(255,64,129,0.1)">Seviye: Slot Alanı Sv. 10 Görünümlü Model</div>
+      </div>
+    `;
+  } else if (id === 'roulette') {
+    const seq = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+    const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+    let grad = [];
+    let wheelNumbersHtml = '';
+    const sliceAngle = 360 / 37;
+    for(let i=0; i<37; i++) {
+       let c = seq[i]===0?'#00c853':(reds.includes(seq[i])?'#d32f2f':'#111');
+       grad.push(`${c} ${(i*sliceAngle).toFixed(2)}deg ${((i+1)*sliceAngle).toFixed(2)}deg`);
+       let rot = i * sliceAngle + (sliceAngle/2);
+       wheelNumbersHtml += `<div style="position:absolute; width:20px; height:50%; left:50%; margin-left:-10px; top:0; transform-origin:bottom center; transform:rotate(${rot}deg); display:flex; justify-content:center; padding-top:4px; font-size:9px; font-weight:900; color:#fff; text-shadow:0 1px 3px #000; z-index:5;">${seq[i]}</div>`;
+    }
+    const bgStr = `conic-gradient(${grad.join(', ')})`;
+    window.rouletteBets = {};
+    window.selChip = 1;
+    
+    // Top Row: 3, 6, 9...
+    // Mid Row: 2, 5, 8...
+    // Bot Row: 1, 4, 7...
+    const getBoardHtml = () => {
+       let h = '<div class="roulette-board" style="grid-template-rows: repeat(5, auto);">';
+       h += `<div class="r-tile green" style="grid-column: 1; grid-row: 1 / 4; height: auto;" onclick="addRouletteBet('0')">0<div id="bet-0"></div></div>`;
+       for(let col=0; col<12; col++) {
+          const numTop = col*3 + 3;
+          h += `<div class="r-tile ${reds.includes(numTop)?'red':'black'}" style="grid-column: ${col+2}; grid-row: 1;" onclick="addRouletteBet('${numTop}')">${numTop}<div id="bet-${numTop}"></div></div>`;
+          const numMid = col*3 + 2;
+          h += `<div class="r-tile ${reds.includes(numMid)?'red':'black'}" style="grid-column: ${col+2}; grid-row: 2;" onclick="addRouletteBet('${numMid}')">${numMid}<div id="bet-${numMid}"></div></div>`;
+          const numBot = col*3 + 1;
+          h += `<div class="r-tile ${reds.includes(numBot)?'red':'black'}" style="grid-column: ${col+2}; grid-row: 3;" onclick="addRouletteBet('${numBot}')">${numBot}<div id="bet-${numBot}"></div></div>`;
+       }
+       h += `<div class="r-tile" style="grid-column: 14; grid-row: 1;" onclick="addRouletteBet('col3')">2to1<div id="bet-col3"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 14; grid-row: 2;" onclick="addRouletteBet('col2')">2to1<div id="bet-col2"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 14; grid-row: 3;" onclick="addRouletteBet('col1')">2to1<div id="bet-col1"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 2/6; grid-row: 4;" onclick="addRouletteBet('1st12')">1st 12<div id="bet-1st12"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 6/10; grid-row: 4;" onclick="addRouletteBet('2nd12')">2nd 12<div id="bet-2nd12"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 10/14; grid-row: 4;" onclick="addRouletteBet('3rd12')">3rd 12<div id="bet-3rd12"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 2/4; grid-row: 5;" onclick="addRouletteBet('low')">1-18<div id="bet-low"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 4/6; grid-row: 5;" onclick="addRouletteBet('even')">Even<div id="bet-even"></div></div>`;
+       h += `<div class="r-tile red" style="grid-column: 6/8; grid-row: 5;" onclick="addRouletteBet('red')">RED<div id="bet-red"></div></div>`;
+       h += `<div class="r-tile black" style="grid-column: 8/10; grid-row: 5;" onclick="addRouletteBet('black')">BLACK<div id="bet-black"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 10/12; grid-row: 5;" onclick="addRouletteBet('odd')">Odd<div id="bet-odd"></div></div>`;
+       h += `<div class="r-tile" style="grid-column: 12/14; grid-row: 5;" onclick="addRouletteBet('high')">19-36<div id="bet-high"></div></div>`;
+       h += '</div>'; return h;
+    };
+
+    b.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; width:100%; padding-bottom:50px">
+        <div style="position:relative; width:220px; height:220px; border-radius:50%; border:10px solid #2a3142; box-shadow:0 0 30px #000; margin-bottom:20px;">
+           <div id="mgR" style="position:absolute; inset:0; border-radius:50%; background:${bgStr}; transition: transform 0s">
+              ${wheelNumbersHtml}
+              <div id="mgRBallWrap" style="position:absolute; width:100%; height:100%; z-index:10; transition: transform 0s">
+                 <div id="mgRBall" style="position:absolute; width:10px; height:10px; background:#fff; border-radius:50%; top:8px; left:50%; margin-left:-5px; box-shadow:0 0 10px #fff;"></div>
+              </div>
+           </div>
+           <div style="width:80px; height:80px; background:#1e2333; border-radius:50%; z-index:20; border:3px solid #ffd13b; display:grid; place-items:center; color:#ffd13b; font-weight:900; box-shadow:0 0 15px rgba(0,0,0,0.8); text-align:center; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:12px;">MARINO</div>
+        </div>
+
+        <div style="width:100%; overflow-x:auto; padding:10px 0; -webkit-overflow-scrolling: touch;">
+           ${getBoardHtml()}
+        </div>
+
+        <div class="chi-area">
+           <div class="chip-balance" style="background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 99px; display: flex; align-items: center; gap: 8px; font-weight: 900; color: #ffd13b; border: 1px solid #ffd13b;">Çip: <span id="chipsInMini">${fmt(S.game.state.chips)}</span></div>
+           <div class="chip-bar">
+              <div class="chip-btn chip-1 active" onclick="setRChip(1, this)">1</div>
+              <div class="chip-btn chip-5" onclick="setRChip(5, this)">5</div>
+              <div class="chip-btn chip-50" onclick="setRChip(50, this)">50</div>
+              <div class="chip-btn chip-100" onclick="setRChip(100, this)">100</div>
+              <div class="chip-btn chip-500" onclick="setRChip(500, this)">500</div>
+           </div>
+           <div style="display:flex; gap:10px; width:100%">
+              <button class="action-btn" style="flex:1; background:#666" onclick="clearRBets()">Temizle</button>
+              <button class="action-btn" style="flex:1; background:#fb8c00" onclick="buyChipsPopup()">Vezne</button>
+              <button class="action-btn gold" style="flex:1.5" onclick="playRouletteV2(this)">DÖNDÜR</button>
+           </div>
+        </div>
+        <div id="mgRes" style="margin-top:10px;font-weight:900;font-size:18px;text-align:center;min-height:30px"></div>
+      </div>
+    `;
+  } else if (id === 'blackjack') {
+    renderBlackjack();
+  } else if (id === 'sports') {
+    renderSports();
+  } else if (id === 'poker') {
+    renderPoker();
+  } else if (id === 'horse') {
+    renderHorse();
+  } else if (id === 'card') {
+    b.innerHTML = `<div class="card-flip" id="mgC"><div class="card-inner"><div class="card-face card-front"></div><div class="card-face card-back"><h3 style="margin:0">Sonuç</h3><div id="mgRes" style="font-weight:900;font-size:18px">...</div></div></div></div><p style="color:#888">Çevirmek için dokun</p>`;
+    q('#mgC').onclick = async () => playMini(id, q('.card-inner'), 'flipped');
+  } else if (id === 'wheel') {
+    b.innerHTML = `<div class="wheel-box"><div class="wheel-pin"></div><div class="wheel" id="mgW"></div></div><button class="action-btn gold" id="mgBtn" style="margin-top:40px;width:200px;height:50px;font-size:16px">Çevir (🎟️ 35)</button><div id="mgRes" style="margin-top:20px;font-weight:900;font-size:20px;text-align:center;min-height:30px"></div>`;
+    q('#mgBtn').onclick = async () => playMini(id, q('#mgW'));
+  } else if (id === 'vault') {
+    b.innerHTML = `<div class="vault-box" id="mgV"><div class="vault-dial"></div></div><button class="action-btn gold" id="mgBtn" style="margin-top:40px;width:200px;height:50px;font-size:16px">Kasayı Karıştır (🎟️ 50)</button><div id="mgRes" style="margin-top:20px;font-weight:900;font-size:20px;text-align:center;min-height:30px"></div>`;
+    q('#mgBtn').onclick = async () => playMini(id, q('#mgV'), 'open');
+  }
+}
+
+async function playSlot(btn, bet) {
+  if(S.busy) return; S.busy = true;
+  q('#mgRes').innerHTML = '<span style="color:#888">Makine dönüyor...</span>';
+  try {
+    const d = await rpc('marino_play_slot', { p_telegram_id: String(S.user.id), p_bet_amount: bet, p_request_id: uid() });
+    processState(d);
+    
+    const syms = ['🍒', '🥑', '🔔', '💎', '👑', '7️⃣'];
+    for(let i=0; i<5; i++) {
+       let stripHtml = '';
+       for(let j=0; j<35; j++) stripHtml += `<div class="slot-item">${syms[Math.floor(Math.random()*6)]}</div>`;
+       stripHtml += `<div class="slot-item">${syms[Math.floor(Math.random()*6)]}</div>`; // Top row
+       stripHtml += `<div class="slot-item win-target">${d.symbols[i]||'❔'}</div>`; // Center row
+       stripHtml += `<div class="slot-item">${syms[Math.floor(Math.random()*6)]}</div>`; // Bottom row
+       stripHtml += `<div class="slot-item"></div><div class="slot-item"></div>`; // padding
+       
+       const reel = q('#reel'+i);
+       reel.style.transition = 'none';
+       reel.style.transform = 'translateY(0px)';
+       reel.innerHTML = stripHtml;
+       
+       reel.offsetHeight; // Force reflow
+       
+       setTimeout(() => {
+           reel.style.transition = `transform ${2 + i*0.4}s cubic-bezier(0.1, 0, 0.2, 1)`;
+           reel.style.transform = `translateY(-2450px)`; 
+       }, 50);
+    }
+
+    if(q('#slotPayline')) q('#slotPayline').classList.remove('show');
+
+    setTimeout(() => {
+         if(d.win_amount > 0) {
+             q('#slotPayline').classList.add('show');
+             // Make center items pulse
+             document.querySelectorAll('.win-target').forEach(el => el.classList.add('pulse'));
+             q('#mgRes').innerHTML = `<span style="color:var(--green)">🎉 KAZANÇ: +${fmt(d.win_amount)}</span>`;
+             au.win();
+         } else {
+             q('#mgRes').innerHTML = '<span style="color:#ff4444">❌ KAYIP</span>';
+             au.fail();
+         }
+         S.busy = false; renderAll();
+    }, 3800);
+  } catch(e) { toast(e.message); au.fail(); S.busy=false; }
+}
+
+/* ── Roulette V2.5 Functions ── */
+function setRChip(v, el) {
+  window.selChip = v;
+  document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  au.click();
+}
+
+function addRouletteBet(key) {
+  if(S.busy) return;
+  const current = window.rouletteBets[key] || 0;
+  // Optmistic check
+  if(S.game.state.chips < window.selChip) { 
+     toast("Yetersiz Çip! Vezneden alabilirsin."); 
+     return; 
+  }
+  window.rouletteBets[key] = current + window.selChip;
+  S.game.state.chips -= window.selChip; // Deduct immediately for UI feedback
+  
+  // Visual update
+  const container = q('#bet-' + key);
+  if(container) {
+     container.innerHTML = `<div class="chip-marker">${window.rouletteBets[key]}</div>`;
+  }
+  if(q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips);
+  au.tap();
+}
+
+function clearRBets() {
+  if(S.busy) return;
+  // Refund locally
+  const total = Object.values(window.rouletteBets).reduce((a,b)=>a+b, 0);
+  S.game.state.chips += total;
+  window.rouletteBets = {};
+  document.querySelectorAll('[id^="bet-"]').forEach(el => el.innerHTML = '');
+  if(q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips);
+  au.click();
+}
+
+async function buyChipsPopup() {
+  const amt = prompt("Kaç adet Çip satın almak istiyorsun?\n(1 Çip = 1,000 Coin)", "1000");
+  if(!amt) return;
+  const n = parseInt(amt);
+  if(isNaN(n) || n <= 0) return;
+  
+  if(S.busy) return; S.busy = true;
+  try {
+     const d = await rpc('marino_buy_chips', { p_telegram_id: String(S.user.id), p_chip_amount: n });
+     processState({state: d});
+     toast(`${fmt(n)} Çip alındı!`);
+     au.win();
+     renderAll();
+     if(q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips);
+  } catch(e) { toast(e.message); au.fail(); }
+  finally { S.busy = false; }
+}
+
+async function playRouletteV2(btn) {
+  if(S.busy) return;
+  if(Object.keys(window.rouletteBets).length === 0) { toast("Lütfen masaya bahis koyun!"); return; }
+  
+  S.busy = true;
+  q('#mgRes').innerHTML = '<span style="color:#888">Rulet dönüyor...</span>';
+  try {
+    // Note: p_bets is already local-subtracted, we send the package to backend to verify and roll
+    const d = await rpc('marino_play_roulette_v2', { 
+       p_telegram_id: String(S.user.id), 
+       p_bets: window.rouletteBets, 
+       p_request_id: uid() 
+    });
+    processState(d);
+    
+    const seq = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+    const targetIdx = seq.indexOf(d.roll);
+    
+    // Physical Physics Simulation Constants
+    const pocketDeg = targetIdx * (360/37) + (360/74);
+    const wheelRot = 360 * 4 + Math.floor(Math.random()*360);
+    const ballFinalRot = -(360 * 10) + pocketDeg;
+    
+    // Reset positions
+    q('#mgR').style.transition = 'none'; q('#mgR').style.transform = 'rotate(0deg)';
+    q('#mgRBallWrap').style.transition = 'none'; q('#mgRBallWrap').style.transform = 'rotate(0deg)';
+    q('#mgR').offsetHeight;
+    
+    setTimeout(() => {
+        q('#mgR').style.transition = 'transform 9s cubic-bezier(0.1, 0, 0.2, 1)';
+        q('#mgRBallWrap').style.transition = 'transform 5.5s cubic-bezier(0.1, 0.8, 0.4, 1)';
+        q('#mgR').style.transform = `rotate(${wheelRot}deg)`;
+        q('#mgRBallWrap').style.transform = `rotate(${ballFinalRot}deg)`;
+    }, 50);
+    
+    setTimeout(() => {
+        const colorC = d.color==='red'?'#ff4444':(d.color==='black'?'#888':'#00c853');
+        q('#mgRes').innerHTML = `Gelen: <span style="color:${colorC}">${d.roll}</span><br>${d.win_amount > 0 ? `<span style="color:var(--green)">🎉 +${fmt(d.win_amount)} ÇİP</span>` : '<span style="color:#ff4444">❌ KAYIP</span>'}`;
+        d.win_amount > 0 ? au.win() : au.fail();
+        if(q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips);
+        window.rouletteBets = {}; // Reset bets for next round
+        document.querySelectorAll('[id^="bet-"]').forEach(el => el.innerHTML = '');
+        S.busy = false; renderAll();
+        
+        setTimeout(() => {
+            q('#mgR').style.transition = 'none'; q('#mgR').style.transform = `rotate(${wheelRot%360}deg)`;
+            q('#mgRBallWrap').style.transition = 'none'; q('#mgRBallWrap').style.transform = `rotate(${ballFinalRot%360}deg)`;
+        }, 3600);
+    }, 5500);
+    
+  } catch(e) { 
+     toast(e.message); au.fail(); S.busy=false; 
+     // Refund on error
+     clearRBets();
+  }
+}
+
+async function playMini(id, el, cl = '') {
+  if(S.busy) return; S.busy = true;
+  if(q('#mgBtn')) q('#mgBtn').disabled = true;
+  
+  try {
+    const d = await rpc('marino_play_mini_game', { p_telegram_id: String(S.user.id), p_game_key: id, p_request_id: uid() });
+    processState(d);
+    
+    // Animate based on outcome
+    if(id === 'card') {
+      el.classList.add(cl);
+      q('#mgRes').innerHTML = d.won ? `🎉 ${fmt(d.reward_coin)}` : '❌ Boş';
+      d.won ? au.win() : au.fail();
+      setTimeout(() => { S.busy = false; renderAll(); }, 1500);
+    } else if (id === 'wheel') {
+      const deg = d.won ? (360 * 6 + 45) : (360 * 6 + 180);
+      el.style.transform = `rotate(${deg}deg)`;
+      setTimeout(() => {
+        q('#mgBtn').style.display = 'none';
+        q('#mgRes').innerHTML = d.won ? `🎉 ${fmt(d.reward_coin)} Coin` : '❌ Kaybettin';
+        d.won ? au.win() : au.fail();
+        S.busy = false; renderAll();
+      }, 3000);
+    } else if (id === 'vault') {
+      el.classList.add(cl);
+      setTimeout(() => {
+        q('#mgBtn').style.display = 'none';
+        el.innerHTML = `<div style="color:#000;font-weight:900;font-size:22px;text-align:center">${d.won ? `🎉<br>${fmt(d.reward_coin)}` : '❌<br>Boş'}</div>`;
+        d.won ? au.win() : au.fail();
+        S.busy = false; renderAll();
+      }, 1000);
+    }
+  } catch(e) { 
+    toast(e.message); au.fail(); S.busy = false; 
+    if(q('#mgBtn')) q('#mgBtn').disabled = false;
+  }
+}
+
+/* ── Custom Casino Views ── */
+window.playBj = async (action, bet = 0) => {
+   if(S.busy) return; S.busy = true;
+   try {
+     let d;
+     if(action === 'deal') d = await rpc('marino_bj_deal', { p_telegram_id: String(S.user.id), p_bet_amount: bet });
+     else if(action === 'hit') d = await rpc('marino_bj_hit', { p_telegram_id: String(S.user.id) });
+     else if(action === 'stand') d = await rpc('marino_bj_stand', { p_telegram_id: String(S.user.id) });
+     processState({state: d.player});
+     S.game.state.active_game_state = d.state;
+     renderBlackjack();
+     if(action !== 'deal' && d.state.win_amount !== undefined) d.state.win_amount > 0 ? au.win() : au.fail();
+   } catch(e) { toast(e.message); au.fail(); }
+   S.busy = false;
+};
+
+function renderBlackjack() {
+   const b = q('#miniBody');
+   const state = S.game.state.active_game_state;
+   const isPlaying = state && state.status === 'playing';
+   const isEnd = state && state.status !== 'playing';
+   
+   let pCardsHtml = '';
+   let dCardsHtml = '';
+   if(state && state.player_hand) {
+      state.player_hand.forEach(c => { pCardsHtml += `<img src="public/assets/cards/${c}.png" style="width:60px; margin:-15px; border-radius:6px; box-shadow:0 4px 10px rgba(0,0,0,0.5); position:relative">`; });
+      state.dealer_hand.forEach((c, i) => {
+         if(isPlaying && i === 1) dCardsHtml += `<img src="public/assets/cards/back.png" style="width:60px; margin:-15px; border-radius:6px; position:relative">`;
+         else dCardsHtml += `<img src="public/assets/cards/${c}.png" style="width:60px; margin:-15px; border-radius:6px; box-shadow:0 4px 10px rgba(0,0,0,0.5); position:relative">`;
+      });
+   }
+   
+   let actionsHtml = '';
+   if(isPlaying) {
+      actionsHtml = `
+         <div style="display:flex; justify-content:center; gap:15px">
+            <button class="action-btn" style="background:#ff5252; width:120px; font-size:16px" onclick="playBj('stand')">DUR ✋</button>
+            <button class="action-btn gold" style="width:120px; font-size:16px" onclick="playBj('hit')">ÇEK 👆</button>
+         </div>`;
+   } else {
+      actionsHtml = `
+         <div style="display:flex; flex-direction:column; align-items:center; gap:15px">
+            ${isEnd && state.win_amount!==undefined ? `<div style="font-weight:900; font-size:24px; color:${state.win_amount>0?'#00e676':'#ff5252'}; text-shadow:0 0 10px rgba(0,0,0,0.8)">${state.win_amount>0?`🎉 +${fmt(state.win_amount)} ÇİP`:'❌ KAYBETTİN'}</div>` : ''}
+            <div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.4); padding:12px; border-radius:12px">
+               <b>Bahis Yatır (Çip):</b>
+               <button class="action-btn" onclick="playBj('deal', 10)">10</button>
+               <button class="action-btn" onclick="playBj('deal', 50)">50</button>
+               <button class="action-btn" onclick="playBj('deal', 100)">100</button>
+               <button class="action-btn gold" onclick="playBj('deal', 500)">500</button>
+            </div>
+         </div>`;
+   }
+
+   b.innerHTML = `
+      <div style="background:radial-gradient(circle, #2e7d32, #1b5e20); padding:20px; border-radius:20px; border:8px solid #3e2723; box-shadow:inset 0 0 50px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5); min-height:350px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden">
+         <div style="position:absolute; inset:0; opacity:0.1; background:repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 10px);"></div>
+         
+         <!-- Dealer Area -->
+         <div style="text-align:center; z-index:2">
+            <div style="color:#a5d6a7; font-weight:900; margin-bottom:20px; font-size:12px; letter-spacing:2px">KRUPİYE</div>
+            <div style="display:flex; justify-content:center; align-items:center; min-height:90px; padding-left:15px">${dCardsHtml||'<div style="opacity:0.3; color:#fff">Bekleniyor...</div>'}</div>
+         </div>
+         
+         <div style="text-align:center; opacity:0.1; font-weight:900; font-size:26px; color:#fff; pointer-events:none; margin:10px 0; z-index:1; line-height:1">BLACKJACK<br><span style="font-size:14px">PAYS 3 TO 2</span></div>
+         
+         <!-- Player Area -->
+         <div style="text-align:center; z-index:2">
+            <div style="display:flex; justify-content:center; align-items:center; min-height:90px; padding-left:15px">${pCardsHtml||'<div style="opacity:0.3; color:#fff">Bekleniyor...</div>'}</div>
+            <div style="color:#a5d6a7; font-weight:900; margin-top:20px; font-size:12px; letter-spacing:2px">SENİN ELİN</div>
+         </div>
+      </div>
+      <div style="margin-top:20px">${actionsHtml}</div>
+   `;
+}
+
+/* ── HORSE RACING ENGINE ── */
+let horseRaceActive = false;
+function renderHorse() {
+   const b = q('#miniBody');
+   let html = `
+      <div style="background:#2a3142; border-radius:12px; padding:15px; margin-bottom:20px; box-shadow:0 10px 30px rgba(0,0,0,0.8)">
+         <div style="text-align:center; font-weight:900; font-size:20px; color:#ffd13b; margin-bottom:15px; text-shadow:0 2px 4px #000">MARINO HIPODROMU</div>
+         <div id="horseTrack" style="position:relative; width:100%; height:260px; background:#4caf50; border:4px solid #fff; border-radius:8px; overflow:hidden">
+            <div style="position:absolute; right:20px; top:0; bottom:0; width:6px; background:repeating-linear-gradient(45deg, #fff 0, #fff 10px, #000 10px, #000 20px); z-index:10"></div>
+   `;
+   const colors = ['#f44336', '#2196f3', '#9c27b0', '#ffeb3b', '#ff9800', '#00bcd4'];
+   for(let i=1; i<=6; i++) {
+       html += `
+         <div style="position:absolute; top:${(i-1)*42 + 10}px; left:0; width:100%; height:42px; border-bottom:1px dashed rgba(255,255,255,0.4)">
+            <div class="horse-runner" id="hr_${i}" style="position:absolute; left:10px; top:5px; transition: left 0.5s linear; z-index:11">
+               <div style="display:flex; align-items:center;">
+                  <div style="width:24px; height:24px; border-radius:50%; background:${colors[i-1]}; color:#fff; display:grid; place-items:center; font-weight:900; font-size:12px; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,0.5)">${i}</div>
+                  <span style="font-size:24px; filter: drop-shadow(2px 2px 0 #000);">🐎</span>
+               </div>
+            </div>
+         </div>
+       `;
+   }
+   html += `</div></div>
+      <div style="background:#111; padding:15px; border-radius:12px; text-align:center; border:2px solid #333">
+         <div style="margin-bottom:15px; font-weight:900; color:#fff">BAHİS YAP (Oran: 5x)</div>
+         <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <select id="hSel" style="flex:1; padding:10px; background:#222; border:2px solid #555; color:#fff; border-radius:8px; font-weight:900; outline:none">
+               <option value="1">1 Numaralı At</option>
+               <option value="2">2 Numaralı At</option>
+               <option value="3">3 Numaralı At</option>
+               <option value="4">4 Numaralı At</option>
+               <option value="5">5 Numaralı At</option>
+               <option value="6">6 Numaralı At</option>
+            </select>
+            <input type="number" id="hBet" placeholder="Çip" style="flex:1; padding:10px; background:#222; border:2px solid #555; color:#fff; border-radius:8px; font-weight:900; outline:none">
+         </div>
+         <button class="action-btn gold" onclick="playHorse()" style="width:100%; height:50px; font-size:18px" id="hBtn">YARIŞI BAŞLAT</button>
+      </div>
+   `;
+   b.innerHTML = html;
+}
+
+window.playHorse = async () => {
+   if(horseRaceActive || S.busy) return;
+   const bet = parseInt(q('#hBet').value);
+   const hid = parseInt(q('#hSel').value);
+   if(isNaN(bet) || bet <= 0) return toast("Bahis miktarı giriniz!");
+   
+   try {
+       S.busy = true; q('#hBtn').disabled = true; horseRaceActive = true;
+       // Reset positions
+       for(let i=1; i<=6; i++) q('#hr_'+i).style.left = '10px';
+       
+       const d = await rpc('marino_play_horse_racing', { p_telegram_id: String(S.user.id), p_bet_amount: bet, p_horse_id: hid });
+       S.game.state.chips = d.new_balance; renderTop();
+       
+       let ticks = 0;
+       let trackW = q('#horseTrack').offsetWidth - 60;
+       let pos = {1:10, 2:10, 3:10, 4:10, 5:10, 6:10};
+       au.click();
+       
+       const inter = setInterval(() => {
+          ticks++;
+          let maxPos = 0;
+          for(let i=1; i<=6; i++) {
+             let winBias = (i === d.winner) ? 1.5 : 0.8;
+             pos[i] += (Math.random() * 25 * winBias);
+             if(pos[i] > trackW) pos[i] = trackW;
+             q('#hr_'+i).style.left = pos[i] + 'px';
+             if(pos[i] > maxPos) maxPos = pos[i];
+          }
+          if(maxPos >= trackW || ticks > 18) {
+             clearInterval(inter);
+             for(let i=1; i<=6; i++) {
+                if(i === d.winner) q('#hr_'+i).style.left = trackW + 'px';
+                else if(pos[i] >= trackW) q('#hr_'+i).style.left = (trackW - 20 - Math.random()*20) + 'px'; // ensure only winner crosses finish perfectly
+             }
+             setTimeout(() => {
+                 horseRaceActive = false; S.busy = false; q('#hBtn').disabled = false;
+                 if(d.is_win) { au.win(); toast(`Kazandı! ${d.winner} numara. +${fmt(d.payout)} Çip`); }
+                 else { au.fail(); toast(`Kaybettin! Kazanan: ${d.winner} numara.`); }
+             }, 800);
+          }
+       }, 400);
+   } catch(e) { toast(e.message); S.busy = false; horseRaceActive = false; q('#hBtn').disabled = false; }
+};
+
+/* ── POKER ENGINE ── */
+window.playPoker = async (bet) => {
+   if(S.busy) return;
+   S.busy = true;
+   try {
+      const d = await rpc('marino_play_poker', { p_telegram_id: String(S.user.id), p_bet_amount: bet });
+      S.game.state.chips = d.new_balance; renderTop();
+      q('#pkRes').innerHTML = '<span style="color:#888; animation:pulse 1s infinite">Kartlar Dağıtılıyor...</span>';
+      
+      let pCardsHtml = '';
+      d.player_hand.forEach(c => pCardsHtml += `<img src="public/assets/cards/${c}.png" style="width:50px; margin:-10px; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.5); transform:rotate(${(Math.random()-0.5)*15}deg)">`);
+      let dCardsHtml = '';
+      d.dealer_hand.forEach(c => dCardsHtml += `<img src="public/assets/cards/${c}.png" style="width:50px; margin:-10px; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.5); transform:rotate(${(Math.random()-0.5)*15}deg)">`);
+
+      setTimeout(() => {
+          q('#pkDealer').innerHTML = dCardsHtml;
+          q('#pkPlayer').innerHTML = pCardsHtml;
+          
+          if(d.winner === 'player' || d.winner === 'draw') {
+              q('#pkRes').innerHTML = `<span style="color:#00e676">KAZANDIN • ${d.desc} • +${fmt(d.payoutAmount)} ÇİP</span>`;
+              if(d.winner==='player') au.win(); else au.click();
+          } else {
+              q('#pkRes').innerHTML = `<span style="color:#ff5252">KAYBETTİN • ${d.desc}</span>`;
+              au.fail();
+          }
+          S.busy = false;
+      }, 1500);
+   } catch(e) { toast(e.message); S.busy = false; }
+};
+
+function renderPoker() {
+   const b = q('#miniBody');
+   b.innerHTML = `
+      <div style="background:radial-gradient(circle, #004d40, #00251a); padding:20px; border-radius:20px; border:8px solid #3e2723; box-shadow:inset 0 0 50px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5); min-height:400px; display:flex; flex-direction:column; position:relative; overflow:hidden">
+         <div style="position:absolute; inset:0; opacity:0.05; background:repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 10px);"></div>
+         
+         <div style="text-align:center; margin-bottom:30px; z-index:2">
+            <div style="color:#a5d6a7; font-weight:900; margin-bottom:20px; font-size:12px; letter-spacing:2px">KRUPİYE</div>
+            <div id="pkDealer" style="display:flex; justify-content:center; align-items:center; min-height:80px; padding-left:10px"><div style="opacity:0.3; color:#fff">Kapalı Desteler</div></div>
+         </div>
+         
+         <div style="text-align:center; opacity:0.1; font-weight:900; font-size:26px; color:#fff; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); pointer-events:none; width:100%; z-index:1">CASINO STUD POKER<br><span style="font-size:14px">5-CARD DRAW RULES</span></div>
+         
+         <div style="text-align:center; margin-top:auto; z-index:2">
+            <div id="pkPlayer" style="display:flex; justify-content:center; align-items:center; min-height:80px; padding-left:10px; margin-bottom:20px"><div style="opacity:0.3; color:#fff">Kart Bekleniyor...</div></div>
+            <div style="color:#a5d6a7; font-weight:900; font-size:12px; letter-spacing:2px">SENİN ELİN</div>
+         </div>
+      </div>
+      
+      <div style="background:#111; padding:15px; border-radius:12px; text-align:center; margin-top:20px; border:2px solid #333">
+         <div id="pkRes" style="margin-bottom:15px; font-weight:900; font-size:16px; color:#fff; min-height:24px; text-shadow:0 2px 4px #000; padding:10px; background:#000; border-radius:8px; border:1px solid #444">BAHİS SEÇ VE DAĞIT</div>
+         <div style="display:flex; gap:10px; align-items:center; justify-content:center;">
+             <button class="action-btn" onclick="playPoker(50)" style="flex:1; background:#004d40; border-color:#009688">50</button>
+             <button class="action-btn" onclick="playPoker(100)" style="flex:1; background:#1b5e20; border-color:#4caf50">100</button>
+             <button class="action-btn" onclick="playPoker(500)" style="flex:1; background:#e65100; border-color:#ff9800">500</button>
+             <button class="action-btn gold" onclick="playPoker(1000)" style="flex:1">1000</button>
+         </div>
+      </div>
+   `;
+}
+
+let sportsInterval = null;
+
+async function renderSports() {
+   const b = q('#miniBody');
+   b.innerHTML = '<div style="text-align:center; padding:50px"><span style="color:#888">Canlı bülten yükleniyor...</span></div>';
+   if(sportsInterval) clearInterval(sportsInterval);
+   
+   try {
+      let ml = await rpc('marino_get_live_matches', {});
+      
+      let activeMl = ml ? ml.filter(m => !m.is_finished) : [];
+      
+      // AUTO-GENERATE MATCHES IF EMPTY (Autonomous Engine)
+      if(activeMl.length === 0) {
+          try {
+             await rpc('marino_generate_matches', { p_match_count: 15 });
+             ml = await rpc('marino_get_live_matches', {});
+             activeMl = ml ? ml.filter(m => !m.is_finished) : [];
+          } catch(e) { console.error("Auto-generate failed", e); }
+      }
+
+      if(activeMl.length === 0) {
+          b.innerHTML = '<div class="alert-box" style="margin-top:20px">Şu an aktif canlı maç bulunmuyor. Yeni bülten yakında açılacak.</div>';
+          return;
+      }
+      
+      let html = `<div style="width:100%; max-width:400px; display:flex; flex-direction:column; margin:auto; padding-bottom:50px">
+                  <div style="padding:10px; text-align:center; background:#111; border-radius:10px; margin-bottom:15px; border:1px solid #333"><h3 style="color:#fff; margin:0">🔴 CANLI İDDAA BÜLTENİ</h3></div>`;
+      activeMl.forEach(m => {
+          let hLg = `onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name='+encodeURIComponent('${m.home}')+'&background=random&color=fff&bold=true'"`
+          let aLg = `onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name='+encodeURIComponent('${m.away}')+'&background=random&color=fff&bold=true'"`
+          let score = m.minute > 0 ? `${m.home_score} - ${m.away_score}` : 'MS';
+          if(m.minute === 0) score = '0 - 0'; // Başlamadı
+          let minHtml = m.is_finished ? `<span style="color:#ff5252; font-weight:900">MS</span>` : `<span style="color:#00e676; font-weight:900; animation:pulse 1s infinite">${m.minute}'</span>`;
+          html += `
+          <div style="background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between">
+              <div style="display:flex; flex-direction:column; align-items:center; width:35%">
+                  <img src="${m.home_logo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover" ${hLg}>
+                  <div style="font-weight:900;font-size:10px;margin-top:5px;text-align:center;line-height:1.2">${m.home}</div>
+              </div>
+              <div style="text-align:center; width:20%">
+                  <div style="font-weight:900;font-size:18px">${score}</div>
+                  <div style="font-size:12px; font-weight:700">${minHtml}</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; width:35%">
+                  <img src="${m.away_logo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover" ${aLg}>
+                  <div style="font-weight:900;font-size:10px;margin-top:5px;text-align:center;line-height:1.2">${m.away}</div>
+              </div>
+              <div style="width:10%; text-align:right">
+                 <button class="action-btn gold" style="padding:8px 12px; border-radius:8px" onclick="openMatch('${m.id}')">İzle</button>
+              </div>
+          </div>`;
+      });
+      html += `</div>`;
+      b.innerHTML = html;
+   } catch(e) { b.innerHTML = '<div class="alert-box">Bülten hatası</div>'; }
+}
+
+window.openMatch = async (id) => {
+    S.activeMatchId = id;
+    const b = q('#miniBody'); b.removeAttribute('data-view');
+    renderLiveMatch();
+    if(sportsInterval) clearInterval(sportsInterval);
+    sportsInterval = setInterval(renderLiveMatch, 2000);
+}
+
+async function renderLiveMatch() {
+    const b = q('#miniBody');
+    if(b.getAttribute('data-view') !== 'match') {
+        b.innerHTML = '<div style="text-align:center; padding:50px">Saha yükleniyor...</div>';
+        b.setAttribute('data-view', 'match');
+    }
+    
+    try {
+        const ml = await rpc('marino_get_live_matches', {});
+        const m = ml.find(x => x.id === S.activeMatchId);
+        if(!m) { clearInterval(sportsInterval); b.innerHTML = '<div class="alert-box">Maç bilgisi bulunamadı.</div>'; return; }
+        
+        let hLg = `onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name='+encodeURIComponent('${m.home}')+'&background=random&color=fff&bold=true'"`;
+        let aLg = `onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name='+encodeURIComponent('${m.away}')+'&background=random&color=fff&bold=true'"`;
+
+        let eventHtml = '';
+        if(m.events && m.events.length > 0) {
+            let lastE = m.events[m.events.length-1];
+            eventHtml = `<div style="background:rgba(0,230,118,0.2); border:1px solid #00e676; border-radius:8px; padding:10px; margin-bottom:10px; display:flex; align-items:center; gap:10px; animation: flash 1s alternate infinite;">
+               <div style="background:#00e676; padding:5px; border-radius:4px; color:#000; font-weight:900; font-size:12px">${lastE.minute}'</div>
+               <div style="color:#fff; font-weight:900; font-size:14px">⚽ GOL! ${lastE.player_name}</div>
+            </div>`;
+        }
+        
+        let betHtml = m.is_finished || m.minute >= 85 ? `<div class="alert-box">Bahisler Kapandı</div>` : `
+            <div style="display:flex; justify-content:center; gap:10px; margin-top:15px; background:rgba(0,0,0,0.4); padding:15px; border-radius:12px">
+                <input type="number" id="matchBetAmt" placeholder="Miktar (Çip)" style="width:110px; padding:10px; border-radius:8px; border:none; text-align:center; font-weight:900; background:#fff; color:#000">
+                <button class="action-btn" style="background:#b71c1c" onclick="placeSportsBet('${m.id}', '1')">MS1</button>
+                <button class="action-btn" style="background:#455a64" onclick="placeSportsBet('${m.id}', 'X')">MSX</button>
+                <button class="action-btn" style="background:#01579b" onclick="placeSportsBet('${m.id}', '2')">MS2</button>
+            </div>
+        `;
+
+        if(q('#valMin') && b.getAttribute('data-view') === 'match') {
+            q('#valMin').innerHTML = m.is_finished ? `<span style="color:#ff5252">MS</span>` : `${m.minute}'`;
+            q('#valScore').textContent = `${m.home_score} - ${m.away_score}`;
+            if(q('#eventBox') && m.events.length > 0) q('#eventBox').innerHTML = eventHtml;
+            
+            // Sadece DOM'daki nesnelerin stilini güncelle ki transition çalışsın!
+            if(q('#d_ball')) {
+                let focusX = 10 + Math.random()*80;
+                let focusY = 10 + Math.random()*80;
+                q('#d_ball').style.top = focusY + '%';
+                q('#d_ball').style.left = focusX + '%';
+                
+                let f = {
+                    h: [ [50, 5], [20, 20], [40, 20], [60, 20], [80, 20], [30, 40], [50, 40], [70, 40], [20, 60], [80, 60], [50, 75] ],
+                    a: [ [50, 95], [20, 80], [40, 80], [60, 80], [80, 80], [30, 60], [50, 60], [70, 60], [20, 40], [80, 40], [50, 25] ]
+                };
+                for(let i=1; i<=11; i++) {
+                   if(q('#d_h'+i)) {
+                      let hb = f.h[i-1];
+                      let top = hb[0] + (focusY - hb[0]) * 0.35 + (Math.random()*8 - 4);
+                      let left = hb[1] + (focusX - hb[1]) * 0.35 + (Math.random()*8 - 4);
+                      q('#d_h'+i).style.top = top + '%'; q('#d_h'+i).style.left = left + '%';
+                   }
+                   if(q('#d_a'+i)) {
+                      let ab = f.a[i-1];
+                      let top = ab[0] + (focusY - ab[0]) * 0.35 + (Math.random()*8 - 4);
+                      let left = ab[1] + (focusX - ab[1]) * 0.35 + (Math.random()*8 - 4);
+                      q('#d_a'+i).style.top = top + '%'; q('#d_a'+i).style.left = left + '%';
+                   }
+                }
+            }
+        } else {
+            let pitchHtml = `
+            <div style="background:#1b5e20; width:100%; height:150px; border-radius:8px; border:2px solid #fff; position:relative; overflow:hidden; box-shadow:inset 0 0 40px rgba(0,0,0,0.8)">
+                <div style="position:absolute; width:2px; height:100%; background:rgba(255,255,255,0.3); left:50%"></div>
+                <div style="position:absolute; width:50px; height:50px; border:2px solid rgba(255,255,255,0.3); border-radius:50%; left:50%; top:50%; margin-left:-25px; margin-top:-25px"></div>
+                
+                <!-- Kale cizgileri -->
+                <div style="position:absolute; width:6%; height:30%; border:2px solid rgba(255,255,255,0.4); border-left:none; top:35%; left:0;"></div>
+                <div style="position:absolute; width:15%; height:50%; border:2px solid rgba(255,255,255,0.3); border-left:none; top:25%; left:0;"></div>
+                <div style="position:absolute; width:6%; height:30%; border:2px solid rgba(255,255,255,0.4); border-right:none; top:35%; right:0;"></div>
+                <div style="position:absolute; width:15%; height:50%; border:2px solid rgba(255,255,255,0.3); border-right:none; top:25%; right:0;"></div>
+
+                <div id="d_ball" style="position:absolute; width:10px; height:10px; background:#fff; border-radius:50%; top:50%; left:50%; transition:all 0.5s ease-out; box-shadow:0 0 10px #fff; z-index:10; margin:-5px 0 0 -5px"></div>`;
+            
+            let f = {
+                h: [ [50, 5], [20, 20], [40, 20], [60, 20], [80, 20], [30, 40], [50, 40], [70, 40], [20, 60], [80, 60], [50, 75] ],
+                a: [ [50, 95], [20, 80], [40, 80], [60, 80], [80, 80], [30, 60], [50, 60], [70, 60], [20, 40], [80, 40], [50, 25] ]
+            };
+            for(let i=1; i<=11; i++) {
+                pitchHtml += `<div id="d_h${i}" style="position:absolute; width:10px; height:10px; border-radius:50%; transition:all 2s linear; border:1px solid #000; z-index:5; margin:-5px 0 0 -5px; background:#ffeb3b; top:${f.h[i-1][0]}%; left:${f.h[i-1][1]}%;"></div>`;
+                pitchHtml += `<div id="d_a${i}" style="position:absolute; width:10px; height:10px; border-radius:50%; transition:all 2s linear; border:1px solid #000; z-index:5; margin:-5px 0 0 -5px; background:#29b6f6; top:${f.a[i-1][0]}%; left:${f.a[i-1][1]}%;"></div>`;
+            }
+            pitchHtml += `</div>`;
+            
+            b.innerHTML = `
+              <div style="width:100%; max-width:400px; display:flex; flex-direction:column; margin:auto">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
+                    <button class="action-btn" style="padding:5px 15px; font-size:12px" onclick="clearInterval(sportsInterval);q('#miniBody').removeAttribute('data-view');renderSports()">⬅ Geri</button>
+                    <div style="font-weight:900; font-size:16px; color:#00e676" id="valMin">${m.is_finished ? `<span style="color:#ff5252">MS</span>` : m.minute+"'"}</div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px; background:rgba(255,255,255,0.05); padding:10px; border-radius:12px">
+                    <div style="text-align:center; width:33%"><img src="${m.home_logo}" style="height:40px;width:40px;border-radius:50%;object-fit:cover" ${hLg}><br><b style="font-size:11px">${m.home}</b></div>
+                    <div style="font-size:32px; font-weight:900; width:33%; text-align:center; text-shadow:0 0 10px rgba(0,0,0,0.5)" id="valScore">${m.home_score} - ${m.away_score}</div>
+                    <div style="text-align:center; width:33%"><img src="${m.away_logo}" style="height:40px;width:40px;border-radius:50%;object-fit:cover" ${aLg}><br><b style="font-size:11px">${m.away}</b></div>
+                </div>
+                <div id="eventBox">${eventHtml}</div>
+                <div id="pitchBox" style="margin-bottom:15px">${pitchHtml}</div>
+                ${betHtml}
+              </div>
+            `;
+            
+            // Kick-off animation after render
+            setTimeout(() => {
+                if(q('#d_ball')) {
+                    q('#d_ball').style.top = (20 + Math.random()*60) + '%';
+                    q('#d_ball').style.left = (10 + Math.random()*80) + '%';
+                }
+            }, 50);
+        }
+    } catch(e) { }
+}
+
+window.placeSportsBet = async (matchId, choice) => {
+    const bet = parseInt(q('#matchBetAmt')?q('#matchBetAmt').value:0) || 0;
+    if(bet <= 0) return toast("Bahis miktarı girin!");
+    if(S.busy) return; S.busy = true;
+    try {
+        const d = await rpc('marino_place_sports_bet', { p_telegram_id: String(S.user.id), p_match_id: matchId, p_selection: choice, p_amount: bet });
+        toast(`✅ Bahis Onaylandı! Canlı Oran: ${d.locked_odds}x`);
+        au.win();
+    } catch(e) { toast(e.message); au.fail(); }
+    S.busy = false;
+};
+
+/* ── Special Flows ── */
+function renderProfile() {
+  const s = S.game.state;
+  q('#pName').textContent = S.user.name;
+  q('#pPres').textContent = s.pres || 0;
+  q('#pStreak').textContent = S.game.daily_login?.current_streak || 0;
+  q('#pXp').textContent = fmt(s.xp || 0);
+  q('#btnPrestige').disabled = (s.lvl < 15);
+}
+
+async function handlePrestige() {
+  if(!confirm("Karakterin ve gelişimin başa dönecek. Kazanım: Kalıcı +%4 Çarpan. Emin misin?")) return;
+  await doAction('marino_prestige', {});
+  q('#sheetProfile').classList.remove('show');
+}
+
+function openDaily() {
+  au.click(); q('#fsDaily').classList.add('show');
+  
+  let strk = S.game.daily_login?.current_streak || 0;
+  let html = '';
+  // Show 8 days logic
+  for(let i=1; i<=8; i++) {
+    const val = i <= 7 ? i*500 : 5000;
+    const claimed = i <= strk;
+    const active = i === strk + 1;
+    html += `<div class="cal-day ${claimed?'claimed':''} ${active?'active':''}"><div class="cal-day-num">Gün ${i}</div><div class="cal-day-val"><img src="public/assets/currency/marino-coin.png">${fmt(val)}</div></div>`;
+  }
+  q('#calGrid').innerHTML = html;
+}
+
+async function claimDaily() {
+  if(S.busy) return; S.busy = true; q('#btnClaimDaily').disabled = true; au.click();
+  try {
+    const d = await rpc('marino_claim_daily_login', { p_telegram_id: String(S.user.id), p_request_id: uid() });
+    processState(d); toast('Günlük ödül alındı!'); au.win(); renderTop();
+    setTimeout(() => { q('#fsDaily').classList.remove('show'); q('#btnClaimDaily').disabled = false; S.busy = false; }, 1000);
+  } catch(e) { toast(e.message); au.fail(); q('#btnClaimDaily').disabled = false; S.busy = false; }
+}
+
+/* ── Run ── */
+init();
 </script>
 </body>
 </html>
