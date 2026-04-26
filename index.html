@@ -505,6 +505,7 @@ async function init() {
       au.click(); 
       q('#fsMini').classList.remove('show'); 
       if(typeof sportsInterval !== 'undefined' && sportsInterval) clearInterval(sportsInterval); 
+      if(window.rouletteInterval) clearInterval(window.rouletteInterval);
   };
   q('#btnClaimDaily').onclick = claimDaily;
   
@@ -809,6 +810,7 @@ q('#tabRank').onclick = () => { q('#tabRank').style.background=''; q('#tabRef').
 /* ── Mini Games UI Engine ── */
 function openMini(id, title) {
   if(typeof sportsInterval !== 'undefined' && sportsInterval) clearInterval(sportsInterval);
+  if(window.rouletteInterval) clearInterval(window.rouletteInterval);
   au.click(); q('#miniTitle').textContent = title;
   const b = q('#miniBody'); b.innerHTML = '';
   q('#fsMini').classList.add('show');
@@ -883,39 +885,47 @@ function openMini(id, title) {
     };
 
     b.innerHTML = `
-      <div style="display:flex; flex-direction:column; align-items:center; width:100%; padding-bottom:50px">
-        <div style="position:relative; width:220px; height:220px; border-radius:50%; border:10px solid #2a3142; box-shadow:0 0 30px #000; margin-bottom:20px;">
+      <div style="display:flex; flex-direction:column; align-items:center; width:100%; padding-bottom:20px; height:100%; overflow-y:auto">
+        <!-- Compact Header & Timer -->
+        <div style="width:100%; display:flex; justify-content:space-between; align-items:center; padding:0 20px 10px; border-bottom:1px solid rgba(255,255,255,0.05)">
+           <div style="background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 99px; font-weight: 900; color: #ffd13b; border: 1px solid #ffd13b; font-size:12px">Çip: <span id="chipsInMini">${fmt(S.game.state.chips)}</span></div>
+           <div id="rouletteTimerBox" style="font-weight:900; font-size:16px; color:#ff4444; background:rgba(0,0,0,0.5); padding:5px 15px; border-radius:8px; border:1px solid #ff4444">⏳ <span id="rTimer">30</span>s</div>
+        </div>
+
+        <!-- Smaller Wheel -->
+        <div style="position:relative; width:160px; height:160px; border-radius:50%; border:6px solid #2a3142; box-shadow:0 0 20px #000; margin:15px 0;">
            <div id="mgR" style="position:absolute; inset:0; border-radius:50%; background:${bgStr}; transition: transform 0s">
               ${wheelNumbersHtml}
               <div id="mgRBallWrap" style="position:absolute; width:100%; height:100%; z-index:10; transition: transform 0s">
-                 <div id="mgRBall" style="position:absolute; width:10px; height:10px; background:#fff; border-radius:50%; top:8px; left:50%; margin-left:-5px; box-shadow:0 0 10px #fff;"></div>
+                 <div id="mgRBall" style="position:absolute; width:8px; height:8px; background:#fff; border-radius:50%; top:6px; left:50%; margin-left:-4px; box-shadow:0 0- 10px #fff;"></div>
               </div>
            </div>
-           <div style="width:80px; height:80px; background:#1e2333; border-radius:50%; z-index:20; border:3px solid #ffd13b; display:grid; place-items:center; color:#ffd13b; font-weight:900; box-shadow:0 0 15px rgba(0,0,0,0.8); text-align:center; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:12px;">MARINO</div>
+           <div style="width:50px; height:50px; background:#1e2333; border-radius:50%; z-index:20; border:2px solid #ffd13b; display:grid; place-items:center; color:#ffd13b; font-weight:900; box-shadow:0 0 10px rgba(0,0,0,0.8); text-align:center; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:9px;">MARINO</div>
         </div>
 
-        <div style="width:100%; overflow-x:auto; padding:10px 0; -webkit-overflow-scrolling: touch;">
+        <!-- Responsive Board with horizontal scroll container -->
+        <div style="width:100%; overflow-x:auto; padding:5px 0; -webkit-overflow-scrolling: touch; background:rgba(0,0,0,0.2); border-radius:12px">
            ${getBoardHtml()}
         </div>
 
-        <div class="chi-area">
-           <div class="chip-balance" style="background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 99px; display: flex; align-items: center; gap: 8px; font-weight: 900; color: #ffd13b; border: 1px solid #ffd13b;">Çip: <span id="chipsInMini">${fmt(S.game.state.chips)}</span></div>
-           <div class="chip-bar">
+        <!-- Chips & Actions -->
+        <div class="chi-area" style="padding-top:10px">
+           <div class="chip-bar" style="margin:5px 0">
               <div class="chip-btn chip-1 active" onclick="setRChip(1, this)">1</div>
               <div class="chip-btn chip-5" onclick="setRChip(5, this)">5</div>
               <div class="chip-btn chip-50" onclick="setRChip(50, this)">50</div>
               <div class="chip-btn chip-100" onclick="setRChip(100, this)">100</div>
               <div class="chip-btn chip-500" onclick="setRChip(500, this)">500</div>
            </div>
-           <div style="display:flex; gap:10px; width:100%">
-              <button class="action-btn" style="flex:1; background:#666" onclick="clearRBets()">Temizle</button>
-              <button class="action-btn" style="flex:1; background:#fb8c00" onclick="buyChipsPopup()">Vezne</button>
-              <button class="action-btn gold" style="flex:1.5" onclick="playRouletteV2(this)">DÖNDÜR</button>
+           <div style="display:flex; gap:8px; width:100%">
+              <button class="action-btn" style="flex:1; background:#666; height:45px" onclick="clearRBets()">Temizle</button>
+              <button class="action-btn" style="flex:1.5; background:#fb8c00; height:45px" onclick="playRouletteV2()">BAHİSİ ONAYLA</button>
            </div>
         </div>
-        <div id="mgRes" style="margin-top:10px;font-weight:900;font-size:18px;text-align:center;min-height:30px"></div>
+        <div id="mgRes" style="margin-top:10px;font-weight:900;font-size:16px;text-align:center;min-height:25px"></div>
       </div>
     `;
+    startRouletteTimer();
   } else if (id === 'blackjack') {
     renderBlackjack();
   } else if (id === 'sports') {
@@ -1041,9 +1051,32 @@ async function buyChipsPopup() {
   finally { S.busy = false; }
 }
 
-async function playRouletteV2(btn) {
-  if(S.busy) return;
-  if(Object.keys(window.rouletteBets).length === 0) { toast("Lütfen masaya bahis koyun!"); return; }
+function startRouletteTimer() {
+  window.rouletteTime = 30;
+  if(window.rouletteInterval) clearInterval(window.rouletteInterval);
+  window.rouletteInterval = setInterval(() => {
+    window.rouletteTime--;
+    if(q('#rTimer')) q('#rTimer').textContent = window.rouletteTime;
+    if(window.rouletteTime <= 0) {
+      clearInterval(window.rouletteInterval);
+      if(Object.keys(window.rouletteBets).length > 0) {
+        playRouletteV2();
+      } else {
+        toast("Bahis alınmadı, yeni tur bekleniyor...");
+        setTimeout(startRouletteTimer, 2000);
+      }
+    }
+  }, 1000);
+}
+
+async function playRouletteV2() {
+  if(S.busy) return; 
+  if(Object.keys(window.rouletteBets).length === 0) {
+     // If called via button but no bets, ignore
+     return;
+  }
+  
+  if(window.rouletteInterval) clearInterval(window.rouletteInterval);
   
   S.busy = true;
   q('#mgRes').innerHTML = '<span style="color:#888">Rulet dönüyor...</span>';
@@ -1088,6 +1121,8 @@ async function playRouletteV2(btn) {
         setTimeout(() => {
             q('#mgR').style.transition = 'none'; q('#mgR').style.transform = `rotate(${wheelRot%360}deg)`;
             q('#mgRBallWrap').style.transition = 'none'; q('#mgRBallWrap').style.transform = `rotate(${ballFinalRot%360}deg)`;
+            // Restart timer for next round
+            startRouletteTimer();
         }, 3600);
     }, 5500);
     
