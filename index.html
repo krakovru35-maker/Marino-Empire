@@ -331,7 +331,28 @@ function tgUser(){
   let x=JSON.parse(localStorage.marino_local_user||'null')||{telegram_id:'999001',telegram_username:'test_oyuncu',first_name:'Test Oyuncu',last_name:'',language_code:'tr'};
   localStorage.marino_local_user=JSON.stringify(x);return x
 }
-function st(){return S.game?.state||{marino_coin:0,reward_token:0,energy:0,max_energy:500,tap_power:1,passive_income_per_hour:0,casino_level:1,reputation:0,claimable_coin:0,offline_capacity_hours:8,prestige_points:0}}
+function normalizeState(x){
+  x=x||{};
+  return Object.assign({},x,{
+    marino_coin: Number(x.marino_coin ?? x.coin ?? 0),
+    reward_token: Number(x.reward_token ?? 0),
+    energy: Number(x.energy ?? 0),
+    max_energy: Number(x.max_energy ?? x.energy_max ?? 500),
+    tap_power: Number(x.tap_power ?? 1),
+    passive_income_per_hour: Number(x.passive_income_per_hour ?? x.current_income_per_hour ?? x.income_per_hour ?? 0),
+    casino_level: Number(x.casino_level ?? 1),
+    reputation: Number(x.reputation ?? 0),
+    claimable_coin: Number(x.claimable_coin ?? 0),
+    offline_capacity_hours: Number(x.offline_capacity_hours ?? 8),
+    prestige_points: Number(x.prestige_points ?? 0)
+  })
+}
+function applyGameData(d){
+  if(!d)return d;
+  if(d.state)d.state=normalizeState(d.state);
+  return d
+}
+function st(){return normalizeState(S.game?.state)}
 function usr(){return S.game?.user||S.user||{}}
 
 async function start(){
@@ -346,7 +367,7 @@ async function start(){
 async function loadGame(){
   try{
     let site=S.user.telegram_username||S.user.first_name||('user_'+S.user.telegram_id);
-    S.game=await rpc('start_game',{p_telegram_id:S.user.telegram_id,p_site_username:site,p_telegram_username:S.user.telegram_username||'',p_first_name:S.user.first_name||'',p_last_name:S.user.last_name||'',p_language_code:S.user.language_code||'tr',p_referred_by:''});
+    S.game=applyGameData(await rpc('start_game',{p_telegram_id:S.user.telegram_id,p_site_username:site,p_display_name:S.user.first_name||site,p_country_code:S.settings.countryCode||'TR',p_country_name:S.settings.countryName||'Türkiye'}));
     await saveRemote(false);
     render()
   }catch(e){console.error(e);toast(e.message||'Oyun verisi alınamadı')}
@@ -452,7 +473,7 @@ async function tap(){
   S.busy=true;
   try{
     let d=await rpc('tap_coin',{p_telegram_id:S.user.telegram_id,p_taps:1});
-    if(d?.state)S.game.state=d.state;else if(d?.marino_coin!==undefined)S.game.state=d;
+    if(d?.state)S.game.state=normalizeState(d.state);else if(d?.marino_coin!==undefined||d?.coin!==undefined)S.game.state=normalizeState(d);
     plus('+'+fmt(st().tap_power||1));audio.tap();render()
   }catch(e){toast(e.message||'Dokunma işlemi başarısız.');audio.bad()}finally{S.busy=false}
 }
@@ -460,7 +481,7 @@ function plus(t){let e=document.createElement('div');e.className='plus';e.textCo
 async function collect(){
   if(S.busy)return;
   S.busy=true;
-  try{let d=await rpc('collect_income',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d?.state)S.game.state=d.state;toast('Kasa toplandı.');audio.win();render()}
+  try{let d=await rpc('collect_income',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d?.state)S.game.state=normalizeState(d.state);toast('Kasa toplandı.');audio.win();render()}
   catch(e){toast(e.message||'Kasa toplanamadı.');audio.bad()}finally{S.busy=false}
 }
 async function handle(a){
@@ -468,14 +489,14 @@ async function handle(a){
   S.busy=true;audio.click();
   try{
     let d,act=a.dataset.act;
-    if(act==='building'){d=await rpc('upgrade_building',{p_telegram_id:S.user.telegram_id,p_building_key:a.dataset.key,p_request_id:uid()});if(d.state)S.game.state=d.state;if(d.upgrades)S.game.upgrades=d.upgrades;toast('Bina yükseltildi.');audio.win()}
-    if(act==='tapUp'){d=await rpc('marino_upgrade_tap',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=d.state;toast('Dokunma gücü yükseltildi.');audio.win()}
-    if(act==='capacityUp'){d=await rpc('marino_upgrade_capacity',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=d.state;toast('Kasa kapasitesi yükseltildi.');audio.win()}
-    if(act==='prestige'){if(!confirm('Prestij yapınca binalar ve dokunma gücü sıfırlanır; kalıcı +%5 güç kazanırsın. Devam?')){S.busy=false;return}d=await rpc('marino_prestige',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=d.state;if(d.upgrades)S.game.upgrades=d.upgrades;toast('Prestij tamamlandı. Kalıcı güç arttı.');audio.win()}
-    if(act==='reward'){d=await rpc('request_reward',{p_telegram_id:S.user.telegram_id,p_item_code:a.dataset.code,p_request_id:uid()});if(d.state)S.game.state=d.state;if(d.reward_status)S.game.reward_status=d.reward_status;toast('Ödül talebi admin paneline gönderildi.');audio.win()}
-    if(act==='sink'){d=await rpc('marino_buy_sink',{p_telegram_id:S.user.telegram_id,p_sink_code:a.dataset.code,p_request_id:uid()});if(d.state)S.game.state=d.state;toast(d.message||'Oyun içi satın alım tamamlandı.');audio.win()}
-    if(act==='task'){d=await rpc('marino_claim_task',{p_telegram_id:S.user.telegram_id,p_task_id:a.dataset.task,p_level_no:Number(a.dataset.level)});if(d.state)S.game.state=d.state;toast(d.message||'Görev ödülü alındı.');audio.win()}
-    if(act==='mini'){d=await rpc('marino_play_mini_game',{p_telegram_id:S.user.telegram_id,p_game_key:a.dataset.game,p_request_id:uid()});if(d.state)S.game.state=d.state;toast(d.message||'Mini oyun tamamlandı.');d.reward_coin?audio.win():audio.bad()}
+    if(act==='building'){d=await rpc('upgrade_building',{p_telegram_id:S.user.telegram_id,p_building_key:a.dataset.key,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);if(d.upgrades)S.game.upgrades=d.upgrades;toast('Bina yükseltildi.');audio.win()}
+    if(act==='tapUp'){d=await rpc('marino_upgrade_tap',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast('Dokunma gücü yükseltildi.');audio.win()}
+    if(act==='capacityUp'){d=await rpc('marino_upgrade_capacity',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast('Kasa kapasitesi yükseltildi.');audio.win()}
+    if(act==='prestige'){if(!confirm('Prestij yapınca binalar ve dokunma gücü sıfırlanır; kalıcı +%5 güç kazanırsın. Devam?')){S.busy=false;return}d=await rpc('marino_prestige',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);if(d.upgrades)S.game.upgrades=d.upgrades;toast('Prestij tamamlandı. Kalıcı güç arttı.');audio.win()}
+    if(act==='reward'){d=await rpc('request_reward',{p_telegram_id:S.user.telegram_id,p_item_code:a.dataset.code,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);if(d.reward_status)S.game.reward_status=d.reward_status;toast('Ödül talebi admin paneline gönderildi.');audio.win()}
+    if(act==='sink'){d=await rpc('marino_buy_sink',{p_telegram_id:S.user.telegram_id,p_sink_code:a.dataset.code,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast(d.message||'Oyun içi satın alım tamamlandı.');audio.win()}
+    if(act==='task'){d=await rpc('marino_claim_task',{p_telegram_id:S.user.telegram_id,p_task_id:a.dataset.task,p_level_no:Number(a.dataset.level),p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast(d.message||'Görev ödülü alındı.');audio.win()}
+    if(act==='mini'){d=await rpc('marino_play_mini_game',{p_telegram_id:S.user.telegram_id,p_game_key:a.dataset.game,p_request_id:uid()});if(d.state)S.game.state=normalizeState(d.state);toast(d.message||'Mini oyun tamamlandı.');d.reward_coin?audio.win():audio.bad()}
     if(act==='ad')await watchAd();
     render()
   }catch(e){console.error(e);toast(e.message||'İşlem tamamlanamadı. SQL güncellemesini çalıştır.');audio.bad()}finally{S.busy=false}
@@ -486,7 +507,7 @@ async function watchAd(){
   else if(dev){toast('Test reklamı gösteriliyor...');await new Promise(r=>setTimeout(r,2200))}
   else{toast('Reklam sağlayıcısı henüz bağlanmadı. Test için URL sonuna ?devads=1 ekle.');return}
   let d=await rpc('marino_claim_ad_reward',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});
-  if(d.state)S.game.state=d.state;toast(d.message||'Reklam ödülü eklendi.');audio.win()
+  if(d.state)S.game.state=normalizeState(d.state);toast(d.message||'Reklam ödülü eklendi.');audio.win()
 }
 async function saveRemote(show){
   try{await rpc('marino_save_settings',{p_telegram_id:S.user.telegram_id,p_country_code:S.settings.countryCode,p_country_name:S.settings.countryName,p_sound_enabled:!!S.settings.sfx,p_music_enabled:!!S.settings.music,p_music_path:S.settings.musicPath||'public/assets/audio/fon.mp3'});if(show)toast('Ayarlar kaydedildi.')}
