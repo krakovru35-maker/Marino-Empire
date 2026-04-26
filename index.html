@@ -272,12 +272,12 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
 </head>
 <body>
   <div id="introAnim" class="intro-overlay">
-    <img src="public/assets/intro_hero.png" class="intro-hero" onerror="this.src='public/assets/character.png'">
+    <video id="introVid" src="public/assets/intro.mp4" muted playsinline autoplay style="position:absolute; width:100%; height:100%; object-fit:cover; z-index:1"></video>
     <div class="intro-content">
       <div style="font-size: 14px; font-weight: 800; color: #ffd13b; letter-spacing: 2px; margin-bottom: 5px">PRESENTING</div>
-      <h1 class="intro-title">MARINO EMPIRE</h1>
-      <div class="intro-bar"><div class="intro-progress"></div></div>
-      <div style="margin-top: 15px; font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600">ALPHA ACCESS v1.2</div>
+      <h1 class="intro-title" style="font-size:36px">MARINO EMPIRE</h1>
+      <div class="intro-bar"><div class="intro-progress" style="animation-duration: 8s"></div></div>
+      <div id="skipIntro" onclick="finishIntro()" style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 900; background:rgba(255,255,255,0.1); padding:8px 20px; border-radius:99px; cursor:pointer; display:inline-block; border:1px solid rgba(255,255,255,0.1); z-index:10; position:relative">VİDEOYU ATLA ❯</div>
     </div>
   </div>
 
@@ -583,6 +583,13 @@ function openLeagues() {
     `).join('');
 }
 
+function finishIntro() {
+    const intro = q('#introAnim');
+    if(!intro) return;
+    intro.style.opacity = '0';
+    setTimeout(() => intro.remove(), 1000);
+}
+
 function openGuide() {
     au.click();
     q('#sheetSettings').classList.remove('show');
@@ -624,14 +631,13 @@ const au = {
 
 /* ── Bootstrap ── */
 async function init() {
-  // Cinematic Intro Fade Out
-  setTimeout(() => {
-    const intro = q('#introAnim');
-    if(intro) {
-      intro.style.opacity = '0';
-      setTimeout(() => intro.remove(), 1000);
-    }
-  }, 2800);
+  // Video Intro Logic
+  const v = q('#introVid');
+  if(v) {
+    v.onended = () => finishIntro();
+    // Fallback if video fails
+    setTimeout(() => finishIntro(), 9000);
+  }
 
   try { tg?.ready(); tg?.expand(); tg?.disableVerticalSwipes?.(); } catch(e){}
   
