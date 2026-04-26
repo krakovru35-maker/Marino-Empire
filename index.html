@@ -1599,6 +1599,40 @@ function renderProfile() {
   q('#btnPrestige').disabled = (s.lvl < 15);
 }
 
+/* ── Notification System ── */
+async function checkNotifications() {
+  if(!S.user) return;
+  try {
+    const n = await rpc('marino_get_my_notifications', { p_telegram_id: String(S.user.id) });
+    if(n) {
+      const isApp = n.status === 'approved';
+      const title = isApp ? '🎉 Ödülünüz Onaylandı!' : '❌ Talep Reddedildi';
+      const color = isApp ? 'var(--green)' : '#ff4444';
+      
+      const box = document.createElement('div');
+      box.id = 'notifOverlay';
+      box.style = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:20000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)';
+      box.innerHTML = `
+        <div style="background:#1a2333;width:100%;max-width:320px;border-radius:24px;border:2px solid ${color};padding:30px;text-align:center;box-shadow:0 0 50px ${color}33">
+           <div style="font-size:50px;margin-bottom:15px">${isApp ? '🎁' : '⚠️'}</div>
+           <h2 style="color:${color};font-weight:900;margin-bottom:10px">${title}</h2>
+           <p style="color:#fff;font-size:16px;font-weight:600;margin-bottom:5px">${n.item_name}</p>
+           <div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:12px;margin:15px 0;font-style:italic;color:#ddd;font-size:14px;border-left:4px solid ${color}">
+             "${n.note || 'İşlem tamamlandı.'}"
+           </div>
+           <button class="action-btn" style="width:100%;background:${color};color:${isApp?'#000':'#fff'};font-weight:900;height:48px;border-radius:12px" onclick="this.closest('#notifOverlay').remove()">ANLADIM</button>
+        </div>
+      `;
+      document.body.appendChild(box);
+      isApp ? au.win() : au.fail();
+    }
+  } catch(e) { console.error("Notif Error:", e); }
+}
+// Check every 45 seconds
+setInterval(checkNotifications, 45000);
+// Also check on start
+setTimeout(checkNotifications, 3000);
+
 async function handlePrestige() {
   if(!confirm("Karakterin ve gelişimin başa dönecek. Kazanım: Kalıcı +%4 Çarpan. Emin misin?")) return;
   await doAction('marino_prestige', {});
