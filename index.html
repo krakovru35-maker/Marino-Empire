@@ -1207,7 +1207,7 @@
 
       try {
         const data = await rpc("start_game", {
-          p_telegram_id: state.telegram.id,
+          p_telegram_id: String(state.telegram.id),
           p_site_username: siteUsername,
           p_telegram_username: state.telegram.username,
           p_first_name: state.telegram.first_name,
@@ -1304,7 +1304,7 @@
 
       try {
         const data = await rpc("tap_coin", {
-          p_telegram_id: state.telegram.id,
+          p_telegram_id: String(state.telegram.id),
           p_taps: taps
         });
 
@@ -1324,7 +1324,7 @@
 
       try {
         const data = await rpc("collect_income", {
-          p_telegram_id: state.telegram.id,
+          p_telegram_id: String(state.telegram.id),
           p_request_id: requestId("COLLECT")
         });
 
@@ -1342,7 +1342,7 @@
 
       try {
         const data = await rpc("upgrade_building", {
-          p_telegram_id: state.telegram.id,
+          p_telegram_id: String(state.telegram.id),
           p_building_key: buildingKey,
           p_request_id: requestId("UPGRADE")
         });
@@ -1361,7 +1361,7 @@
 
       try {
         const data = await rpc("request_reward", {
-          p_telegram_id: state.telegram.id,
+          p_telegram_id: String(state.telegram.id),
           p_item_code: itemCode,
           p_request_id: requestId("REWARD")
         });
