@@ -286,8 +286,8 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
     </div>
 
     <!-- League Badge -->
-    <div style="display:flex; justify-content:center; margin-bottom:10px;">
-      <div onclick="openLeagues()" id="leagueBadge" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.4); padding:6px 14px; border-radius:99px; border:1px solid #ffd13b; cursor:pointer; transition:0.2s">
+    <div style="display:flex; justify-content:center; margin-bottom:10px; position:relative; z-index:10">
+      <div onclick="openLeagues()" id="leagueBadge" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.6); padding:8px 16px; border-radius:99px; border:1px solid #ffd13b; cursor:pointer; transition:0.2s; box-shadow:0 4px 15px rgba(0,0,0,0.5)">
           <span id="leagueIcon">🥉</span>
           <span id="leagueName" style="font-weight:900; font-size:12px; color:#ffd13b">BRONZ LİGİ</span>
           <span style="color:var(--text-muted); font-size:10px">❯</span>
@@ -342,9 +342,10 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
 
   <main id="view-friends">
     <div class="page-head"><h2>Arkadaşlar & Sıralama</h2><p>Topluluğunu büyüt, ödülleri kap!</p></div>
-    <div style="display:flex; gap:10px; padding:0 14px 10px;">
-      <button class="action-btn" id="tabRef" style="flex:1">Davet Et</button>
-      <button class="action-btn" id="tabRank" style="flex:1; background:rgba(255,255,255,0.1)">Sıralama</button>
+    <div style="display:flex; gap:8px; padding:0 14px 10px;">
+      <button class="action-btn" id="tabRef" style="flex:1; font-size:12px">Davet Et</button>
+      <button class="action-btn" id="tabRank" style="flex:1; background:rgba(255,255,255,0.1); font-size:12px">Küresel</button>
+      <button class="action-btn" id="tabLeagueRank" style="flex:1; background:rgba(255,255,255,0.1); font-size:12px">LİGİM</button>
     </div>
     <div id="listRef" class="list-scroll"></div>
     <div id="listRank" class="list-scroll" style="display:none"></div>
@@ -421,15 +422,12 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
   </div>
 
 <!-- LEAGUES SHEET -->
-<div id="shLeagues" class="sheet">
-  <div class="sheet-content">
-    <div class="sheet-header">
-      <h2 style="font-weight:900">Lig Klasmanları</h2>
-      <button class="close-btn" onclick="q('#shLeagues').classList.remove('show')">✕</button>
-    </div>
-    <div class="sheet-body" style="padding:15px; max-height:70vh; overflow-y:auto">
-      <div id="leagueList"></div>
-    </div>
+<div id="sheetLeagues" class="sheet-overlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <button class="sheet-close" data-close="sheetLeagues">✕</button>
+    <h3 style="margin:0 0 20px; font-size:20px; text-align:center">Lig Klasmanları</h3>
+    <div id="leagueList" style="padding:10px 5px; max-height:60vh; overflow-y:auto"></div>
   </div>
 </div>
 
@@ -530,9 +528,12 @@ function getLeague(lvl) {
 }
 
 function openLeagues() {
-    au.click();
-    const cur = getLeague(S.game.state.casino_level);
-    q('#shLeagues').classList.add('show');
+    if(!S.game || !S.game.state) return;
+    au.setup(); au.click();
+    const cur = getLeague(S.game.state.lvl || 1);
+    const sh = q('#sheetLeagues');
+    if(!sh) return console.error('Sheet not found');
+    sh.classList.add('show');
     q('#leagueList').innerHTML = LEAGUES.map(l => `
         <div style="display:flex; align-items:center; gap:15px; background:rgba(255,255,255,${cur.name===l.name?0.1:0.03}); padding:12px 15px; border-radius:16px; margin-bottom:8px; border:${cur.name===l.name?'1px solid '+l.color:'1px solid transparent'}">
             <div style="font-size:28px">${l.icon}</div>
@@ -873,13 +874,35 @@ function renderStore() {
   q('#listStore').innerHTML = html;
 }
 
+function mask(s) {
+  if(!s) return 'Misafir';
+  if(s.length <= 2) return s;
+  return s[0] + '*'.repeat(s.length - 2) + s[s.length-1];
+}
+
 async function renderRank() {
-  let html = '<div class="alert-box" style="background:rgba(42,140,254,0.1); border-color:rgba(42,140,254,0.3); color:#2A8CFE">Oyun henüz Alpha sürümündedir. Sıralamada yukarı tırman!</div>';
+  const scope = S.rankTab || 'global';
+  const lg = getLeague(S.game.state.lvl);
+  const title = scope === 'global' ? 'Küresel Sıralama' : `${lg.name} Ligi Sıralaması`;
+  let html = `<div class="sec-title">${title} (Top 100)</div>`;
   try {
-    const list = await rpc('marino_get_leaderboard', { p_scope: 'global', p_country_code: 'TR' });
+    const params = { p_scope: scope };
+    if(scope === 'league') {
+      params.p_min_lvl = lg.min;
+      params.p_max_lvl = lg.max;
+    }
+    const list = await rpc('marino_get_leaderboard', params);
+    if(list.length === 0) html += '<div class="alert-box">Bu klasmanda henüz oyuncu yok.</div>';
     list.forEach((r, i) => {
       let rk = r.rank_no || (i+1);
-      html += `<div class="item-row" style="background:rgba(255,255,255,0.02)"><div class="item-ico" style="font-size:18px; font-weight:900; background:${rk==1?'#ffd13b':rk==2?'#ccc':rk==3?'#cd7f32':'rgba(0,0,0,0.4)'}; color:${rk<=3?'#000':'#fff'}">${rk}</div><div class="item-info"><div class="item-title">${r.display_name||'Oyuncu'}</div><div class="item-sub">Sv. ${r.casino_level||1} • XP: ${fmt(r.reputation)}</div></div></div>`;
+      html += `<div class="item-row" style="background:rgba(255,255,255,0.02)">
+        <div class="item-ico" style="font-size:18px; font-weight:900; background:${rk==1?'#ffd13b':rk==2?'#ccc':rk==3?'#cd7f32':'rgba(0,0,0,0.4)'}; color:${rk<=3?'#000':'#fff'}">${rk}</div>
+        <div class="item-info">
+          <div class="item-title">${mask(r.display_name)}</div>
+          <div class="item-sub">Sv. ${r.casino_level||1} • XP: ${fmt(r.reputation)}</div>
+        </div>
+        ${rk <= 3 ? '<span>🏅</span>' : ''}
+      </div>`;
     });
   } catch(e) { html += '<div style="text-align:center;color:#888;padding:20px">Sıralama yüklenemedi.</div>'; }
   q('#listRank').innerHTML = html;
@@ -908,8 +931,9 @@ async function renderReferrals() {
   q('#listRef').innerHTML = html;
 }
 
-q('#tabRef').onclick = () => { q('#tabRef').style.background=''; q('#tabRank').style.background='rgba(255,255,255,0.1)'; q('#listRef').style.display='block'; q('#listRank').style.display='none'; renderReferrals(); };
-q('#tabRank').onclick = () => { q('#tabRank').style.background=''; q('#tabRef').style.background='rgba(255,255,255,0.1)'; q('#listRank').style.display='block'; q('#listRef').style.display='none'; renderRank(); };
+q('#tabRef').onclick = () => { q('#tabRef').style.background=''; q('#tabRank').style.background='rgba(255,255,255,0.1)'; q('#tabLeagueRank').style.background='rgba(255,255,255,0.1)'; q('#listRef').style.display='block'; q('#listRank').style.display='none'; renderReferrals(); };
+q('#tabRank').onclick = () => { S.rankTab = 'global'; q('#tabRank').style.background=''; q('#tabRef').style.background='rgba(255,255,255,0.1)'; q('#tabLeagueRank').style.background='rgba(255,255,255,0.1)'; q('#listRank').style.display='block'; q('#listRef').style.display='none'; renderRank(); };
+q('#tabLeagueRank').onclick = () => { S.rankTab = 'league'; q('#tabLeagueRank').style.background=''; q('#tabRef').style.background='rgba(255,255,255,0.1)'; q('#tabRank').style.background='rgba(255,255,255,0.1)'; q('#listRank').style.display='block'; q('#listRef').style.display='none'; renderRank(); };
 
 /* ── Mini Games UI Engine ── */
 function openMini(id, title) {
