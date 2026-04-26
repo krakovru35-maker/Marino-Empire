@@ -285,6 +285,15 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
       <div class="bal-coin"><img src="public/assets/currency/marino-coin.png" alt="Coin" onerror="this.src=null;"> <span id="valCoin">0</span></div>
     </div>
 
+    <!-- League Badge -->
+    <div style="display:flex; justify-content:center; margin-bottom:10px;">
+      <div onclick="openLeagues()" id="leagueBadge" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.4); padding:6px 14px; border-radius:99px; border:1px solid #ffd13b; cursor:pointer; transition:0.2s">
+          <span id="leagueIcon">🥉</span>
+          <span id="leagueName" style="font-weight:900; font-size:12px; color:#ffd13b">BRONZ LİGİ</span>
+          <span style="color:var(--text-muted); font-size:10px">❯</span>
+      </div>
+    </div>
+
     <!-- Rank / Level -->
     <div class="rank-row">
       <span class="rank-name">Seviye <span id="valLvl">1</span></span>
@@ -408,6 +417,19 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
     </div>
   </div>
 
+<!-- LEAGUES SHEET -->
+<div id="shLeagues" class="sheet">
+  <div class="sheet-content">
+    <div class="sheet-header">
+      <h2 style="font-weight:900">Lig Klasmanları</h2>
+      <button class="close-btn" onclick="q('#shLeagues').classList.remove('show')">✕</button>
+    </div>
+    <div class="sheet-body" style="padding:15px; max-height:70vh; overflow-y:auto">
+      <div id="leagueList"></div>
+    </div>
+  </div>
+</div>
+
   <!-- DAILY LOGIN FS OVERLAY -->
   <div id="fsDaily" class="fs-overlay" style="z-index:250; background:rgba(4,15,28,0.98)">
     <div class="fs-header">
@@ -453,6 +475,40 @@ let S = {
   user: null, game: null, busy: false, rankTab: 'global',
   settings: JSON.parse(localStorage.getItem('m_set') || '{"sfx":true,"mus":true}') 
 };
+
+/* ── Global Tiers ── */
+const LEAGUES = [
+    { name: 'Bronz', icon: '🥉', min: 0, max: 9, color: '#cd7f32' },
+    { name: 'Gümüş', icon: '🥈', min: 10, max: 19, color: '#c0c0c0' },
+    { name: 'Altın', icon: '🥇', min: 20, max: 29, color: '#ffd700' },
+    { name: 'Platin', icon: '💎', min: 30, max: 39, color: '#e5e4e2' },
+    { name: 'Elmas', icon: '✨', min: 40, max: 49, color: '#b9f2ff' },
+    { name: 'Usta', icon: '🔮', min: 50, max: 59, color: '#a855f7' },
+    { name: 'Yüce', icon: '🎭', min: 60, max: 69, color: '#ef4444' },
+    { name: 'Şampiyon', icon: '🏆', min: 70, max: 79, color: '#f59e0b' },
+    { name: 'Efsane', icon: '🐉', min: 80, max: 89, color: '#10b981' },
+    { name: 'İmparator', icon: '👑', min: 90, max: 9999, color: '#ffd13b' }
+];
+
+function getLeague(lvl) {
+    return LEAGUES.find(l => lvl >= l.min && lvl <= l.max) || LEAGUES[0];
+}
+
+function openLeagues() {
+    au.click();
+    const cur = getLeague(S.game.state.casino_level);
+    q('#shLeagues').classList.add('show');
+    q('#leagueList').innerHTML = LEAGUES.map(l => `
+        <div style="display:flex; align-items:center; gap:15px; background:rgba(255,255,255,${cur.name===l.name?0.1:0.03}); padding:12px 15px; border-radius:16px; margin-bottom:8px; border:${cur.name===l.name?'1px solid '+l.color:'1px solid transparent'}">
+            <div style="font-size:28px">${l.icon}</div>
+            <div style="flex:1">
+                <div style="font-weight:900; color:${l.color}; font-size:14px">${l.name.toUpperCase()}</div>
+                <div style="font-size:11px; color:var(--text-muted)">Seviye ${l.min}${l.max>1000?'++':'-'+l.max}</div>
+            </div>
+            ${cur.name === l.name ? '<span style="background:var(--green); color:#000; font-size:10px; font-weight:999; padding:4px 8px; border-radius:6px">ŞUANKİ</span>' : ''}
+        </div>
+    `).join('');
+}
 
 /* ── UI Core ── */
 function toast(msg) {
@@ -655,7 +711,7 @@ async function doAction(cmd, p) {
   finally { S.busy = false; }
 }
 
-/* ── Rendering ── */
+/* ── UI Rendering ── */
 function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); renderRank(); }
 
 function renderTop() {
@@ -670,6 +726,13 @@ function renderTop() {
   q('#valXp').textContent = fmt(s.xp);
   q('#valEn').textContent = `${fmt(s.en)} / ${fmt(s.maxEn)}`;
   q('#valProg').style.width = Math.min(100, Math.max(5, (s.xp / (s.lvl * 500)) * 100)) + '%';
+
+  // League Update
+  const lg = getLeague(s.lvl);
+  q('#leagueIcon').textContent = lg.icon;
+  q('#leagueName').textContent = lg.name.toUpperCase() + ' LİGİ';
+  q('#leagueName').style.color = lg.color;
+  q('#leagueBadge').style.borderColor = lg.color;
 }
 
 function renderBuildings() {
@@ -1599,9 +1662,10 @@ function renderProfile() {
   q('#btnPrestige').disabled = (s.lvl < 15);
 }
 
+
 /* ── Notification System ── */
 async function checkNotifications() {
-  if(!S.user) return;
+  if(!S.user || !S.game) return;
   try {
     const n = await rpc('marino_get_my_notifications', { p_telegram_id: String(S.user.id) });
     if(n) {
