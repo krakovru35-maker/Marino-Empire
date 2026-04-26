@@ -7,29 +7,256 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--cyan:#55ddff;--blue:#2e8cff;--gold:#f7bf4c;--green:#4df0a4;--txt:#f4fbff;--muted:#abc8d8;--line:rgba(101,210,255,.25);--panel:rgba(5,18,33,.78);--safeT:env(safe-area-inset-top,0px);--safeB:env(safe-area-inset-bottom,0px);--nav:78px}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0;overflow:hidden;background:#020812;color:var(--txt);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}button,select{font:inherit;color:inherit}button{border:0;cursor:pointer}#app{position:relative;width:100%;max-width:480px;height:100dvh;min-height:100dvh;margin:auto;overflow:hidden;padding:calc(12px + var(--safeT)) 14px calc(var(--nav) + 12px + var(--safeB));display:flex;flex-direction:column;gap:9px;background:linear-gradient(180deg,rgba(4,16,29,.34),rgba(1,7,14,.88)),url("public/assets/backgrounds/home-hero.jpg") center/cover no-repeat,#03111f;box-shadow:0 0 80px rgba(0,0,0,.65)}#app:before{content:"";position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 50% 0,rgba(85,221,255,.22),transparent 35%),linear-gradient(rgba(100,200,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(100,200,255,.06) 1px,transparent 1px);background-size:auto,34px 34px,34px 34px;pointer-events:none}#app>*{position:relative;z-index:1}.splash{position:absolute;inset:0;z-index:50;background:linear-gradient(180deg,#061f39,#020812);display:grid;place-items:center;transition:.35s}.splash.hide{opacity:0;pointer-events:none;transform:scale(1.03)}.splash-card{width:86%;max-width:330px;text-align:center;padding:28px 20px;border-radius:30px;border:1px solid var(--line);background:rgba(5,20,36,.82);box-shadow:0 25px 80px rgba(0,0,0,.5)}.logoBox{width:82px;height:82px;border-radius:25px;margin:0 auto 14px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);background:#081d31}.logoBox img,.brand img,.avatar img{width:100%;height:100%;object-fit:cover}.loader{width:50px;height:50px;border:4px solid rgba(255,255,255,.14);border-top-color:var(--cyan);border-radius:50%;margin:16px auto 0;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.top{display:flex;align-items:center;justify-content:space-between;min-height:38px}.brandRow{display:flex;align-items:center;gap:10px;min-width:0}.brand{width:36px;height:36px;border-radius:13px;overflow:hidden;border:1px solid var(--line);background:#081d31}.brandRow h1{margin:0;font-size:20px;letter-spacing:-.5px}.iconBtns{display:flex;gap:8px}.iconBtn{width:38px;height:38px;border-radius:15px;background:rgba(7,25,42,.8);border:1px solid var(--line);display:grid;place-items:center}.profile{height:82px;display:grid;grid-template-columns:58px 1fr auto;gap:11px;align-items:center;padding:11px;border-radius:26px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(15,47,74,.84),rgba(4,15,27,.72))}.avatar{width:58px;height:58px;border-radius:20px;overflow:hidden;border:1px solid rgba(85,221,255,.38);background:#0b2034;display:grid;place-items:center}.eyebrow{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#9ec4d8;font-weight:1000}.name{font-size:20px;font-weight:1000;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:#bdd5e4;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}.pill{height:38px;padding:0 13px;border-radius:15px;border:1px solid var(--line);background:rgba(7,25,42,.75);font-weight:1000;font-size:12px;white-space:nowrap}.chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;height:42px}.chip{border:1px solid var(--line);background:rgba(6,20,35,.72);border-radius:17px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:1000;white-space:nowrap;overflow:hidden}.stats{height:118px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{border:1px solid var(--line);background:linear-gradient(180deg,rgba(12,42,66,.78),rgba(2,11,21,.78));border-radius:21px;padding:10px 12px;overflow:hidden}.stat small{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#a7c1d1;font-weight:1000;white-space:nowrap}.stat b{display:block;margin-top:6px;font-size:24px;line-height:1;font-weight:1100;letter-spacing:-.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stat span{display:block;margin-top:4px;font-size:11px;color:#8eabba;font-weight:800;white-space:nowrap}main{flex:1;min-height:0;overflow:hidden;border-radius:26px}.view{display:none;height:100%}.view.active{display:block}.scroll{height:100%;overflow:auto;scrollbar-width:none;padding-right:1px}.scroll::-webkit-scrollbar{display:none}.game{height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:10px;padding:14px;border-radius:26px;border:1px solid var(--line);overflow:hidden;background:linear-gradient(180deg,rgba(2,11,21,.32),rgba(0,5,11,.82)),url("public/assets/backgrounds/home-hero.jpg") center/cover no-repeat}.hero{display:flex;justify-content:space-between;gap:10px}.badge{display:inline-flex;height:30px;align-items:center;padding:0 12px;border-radius:999px;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.1);font-size:11px;font-weight:1000;letter-spacing:1.5px}.hero h2{font-size:27px;line-height:.98;margin:7px 0 6px;letter-spacing:-1px}.hero p{margin:0;color:#c8ddea;font-size:13px;line-height:1.35;font-weight:800;max-width:250px}.char{width:92px;height:108px;object-fit:contain;filter:drop-shadow(0 20px 30px rgba(0,0,0,.5))}.tapArea{display:grid;place-items:center;position:relative;min-height:0}.coinBtn{width:min(42vw,174px);height:min(42vw,174px);max-width:174px;max-height:174px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b6,#f5be47 58%,#87500c);border:5px solid rgba(255,239,152,.68);box-shadow:0 22px 50px rgba(0,0,0,.45),inset 0 9px 24px rgba(255,255,255,.4),inset 0 -12px 22px rgba(80,35,0,.34);display:grid;place-items:center;transition:.1s}.coinBtn:active{transform:scale(.94)}.coinBtn img{width:100%;height:100%;object-fit:contain}.coinFallback{font-size:52px;font-weight:1100;color:#402508}.plus{position:absolute;top:48%;left:50%;font-weight:1100;color:#fff2a0;text-shadow:0 5px 15px #000;animation:up .8s ease forwards;pointer-events:none}@keyframes up{from{opacity:0;transform:translate(-50%,0) scale(.8)}20%{opacity:1}to{opacity:0;transform:translate(-50%,-70px) scale(1.15)}}.energy{padding:10px 12px;border-radius:18px;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.1)}.energyHead{display:flex;justify-content:space-between;font-size:12px;font-weight:1000;margin-bottom:8px}.bar{height:12px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--cyan),var(--blue));border-radius:99px;transition:.25s}.quick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:9px}.actBtn{height:47px;border-radius:18px;background:rgba(7,26,43,.82);border:1px solid var(--line);font-weight:1000;font-size:12px}.actBtn.gold{background:linear-gradient(135deg,#ffe577,#ff9e2d);color:#160f06}.actBtn.blue{background:linear-gradient(135deg,#5fe4ff,#2e8cff);color:#03111e}.title{display:flex;justify-content:space-between;gap:10px;margin:0 0 10px;padding:0 2px}.title h2{margin:0;font-size:22px;letter-spacing:-.5px}.title p{margin:3px 0 0;color:#9eb8ca;font-size:12px;font-weight:800}.list{display:grid;gap:10px}.row{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:11px;padding:12px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(12,40,65,.84),rgba(3,14,25,.78))}.ico{width:48px;height:48px;border-radius:17px;border:1px solid var(--line);display:grid;place-items:center;background:rgba(85,221,255,.1);font-size:24px;overflow:hidden}.ico img{width:100%;height:100%;object-fit:contain}.row b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row span{display:block;font-size:12px;color:#aac3d2;font-weight:800;margin-top:3px}.smallBtn{height:38px;border-radius:15px;padding:0 13px;font-size:12px;font-weight:1100;background:linear-gradient(135deg,#5bdfff,#2e8cff);color:#04111e;white-space:nowrap}.smallBtn.gold{background:linear-gradient(135deg,#ffe477,#ff9d2d);color:#1a1005}.smallBtn.ghost{background:rgba(8,25,42,.8);border:1px solid var(--line);color:#fff}.smallBtn:disabled{opacity:.5}.reward{padding:14px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(13,43,67,.86),rgba(3,14,25,.82));display:grid;gap:11px}.price{height:30px;padding:0 10px;border-radius:99px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.09);display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:1000;margin-right:6px}.rankTabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.tab{height:42px;border-radius:16px;background:rgba(8,25,42,.78);border:1px solid var(--line);font-weight:1000;font-size:13px}.tab.active{background:linear-gradient(135deg,rgba(85,221,255,.28),rgba(46,140,255,.17));border-color:rgba(85,221,255,.55)}.rank{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;padding:12px;border-radius:20px;border:1px solid var(--line);background:rgba(6,22,37,.75)}.rankNo{width:36px;height:36px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.08);font-weight:1100}.rankScore{text-align:right;font-size:12px;font-weight:1000}.guide{padding:14px;border-radius:24px;border:1px solid var(--line);background:rgba(5,20,36,.78);margin-bottom:10px}.guide h3{margin:0 0 7px;font-size:16px}.guide p,.guide li{font-size:13px;line-height:1.5;color:#c7dcea;font-weight:750}.guide ul{margin:0;padding-left:18px}.secure{border-color:rgba(77,240,164,.34);background:linear-gradient(135deg,rgba(17,74,53,.34),rgba(5,20,36,.82))}.official{font-size:18px;color:#91ffc8;font-weight:1100}.nav{position:absolute;left:14px;right:14px;bottom:calc(10px + var(--safeB));height:72px;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px;border-radius:27px;background:rgba(1,10,18,.91);border:1px solid var(--line);backdrop-filter:blur(18px)}.nav button{border-radius:20px;background:transparent;color:#bed4df;font-size:11px;font-weight:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.nav i{font-style:normal;font-size:21px}.nav button.active{color:#fff;background:linear-gradient(135deg,rgba(85,221,255,.18),rgba(46,140,255,.18));border:1px solid rgba(85,221,255,.18)}.sheet{position:absolute;left:14px;right:14px;bottom:calc(var(--nav) + 17px + var(--safeB));z-index:35;max-height:min(72dvh,540px);border-radius:28px;border:1px solid rgba(85,221,255,.38);background:rgba(2,12,23,.96);box-shadow:0 24px 80px rgba(0,0,0,.55);backdrop-filter:blur(18px);overflow:hidden;opacity:0;transform:translateY(18px);pointer-events:none;transition:.2s}.sheet.show{opacity:1;transform:translateY(0);pointer-events:auto}.sheetHead{height:58px;padding:0 16px;display:flex;align-items:center;justify-content:space-between}.sheetHead h3{margin:0;font-size:18px}.sheetBody{max-height:calc(min(72dvh,540px) - 58px);overflow:auto;padding:0 16px 16px;scrollbar-width:none}.x{width:34px;height:34px;border-radius:14px;background:rgba(255,255,255,.08);font-weight:1000}.setRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08)}.setRow label{font-size:13px;font-weight:900}.switch{width:54px;height:30px;border-radius:99px;background:rgba(255,255,255,.14);padding:3px;border:1px solid rgba(255,255,255,.1)}.switch i{display:block;width:22px;height:22px;border-radius:50%;background:#fff;transition:.18s}.switch.on{background:rgba(77,240,164,.34)}.switch.on i{transform:translateX(24px);background:#aaffd3}select{height:40px;border-radius:14px;background:#061625;border:1px solid var(--line);padding:0 10px;outline:0}.toast{position:absolute;left:18px;right:18px;bottom:calc(var(--nav) + 27px + var(--safeB));z-index:60;min-height:48px;border-radius:18px;border:1px solid rgba(85,221,255,.36);background:rgba(1,10,18,.94);display:grid;place-items:center;text-align:center;padding:12px;font-weight:1000;font-size:13px;opacity:0;transform:translateY(12px);transition:.18s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}@media(max-height:720px){#app{gap:8px}.profile{height:74px}.avatar{width:52px;height:52px}.stats{height:108px}.stat b{font-size:22px}.hero h2{font-size:24px}.hero p{display:none}.char{width:80px;height:94px}.coinBtn{width:min(36vw,148px);height:min(36vw,148px)}}@media(max-height:650px){.chips{display:none}.profile{height:70px}.stats{height:102px}.nav{height:66px}.game{padding:12px}.hero h2{font-size:22px}}
+:root{
+  --cyan:#55ddff;--blue:#2e8cff;--gold:#f7bf4c;--green:#4df0a4;
+  --txt:#f4fbff;--muted:#abc8d8;--line:rgba(101,210,255,.25);
+  --panel:rgba(5,18,33,.78);--safeB:env(safe-area-inset-bottom,0px);--nav:78px
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  height:100%;margin:0;overflow:hidden;background:#020812;color:var(--txt);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif
+}
+button,select{font:inherit;color:inherit}
+button{border:0;cursor:pointer}
+#app{
+  position:relative;width:100%;max-width:480px;height:100svh;min-height:100svh;margin:auto;
+  overflow:hidden;padding:12px 14px calc(var(--nav) + 12px + var(--safeB));
+  display:flex;flex-direction:column;gap:9px;
+  background:linear-gradient(180deg,rgba(4,16,29,.34),rgba(1,7,14,.88)),url("public/assets/backgrounds/home-hero.jpg") center/cover no-repeat,#03111f;
+  box-shadow:0 0 80px rgba(0,0,0,.65)
+}
+#app:before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:radial-gradient(circle at 50% 0,rgba(85,221,255,.22),transparent 35%),
+             linear-gradient(rgba(100,200,255,.06) 1px,transparent 1px),
+             linear-gradient(90deg,rgba(100,200,255,.06) 1px,transparent 1px);
+  background-size:auto,34px 34px,34px 34px;pointer-events:none
+}
+#app>*{position:relative;z-index:1}
+.splash{position:absolute;inset:0;z-index:50;background:linear-gradient(180deg,#061f39,#020812);display:grid;place-items:center;transition:.35s}
+.splash.hide{opacity:0;pointer-events:none;transform:scale(1.03)}
+.splash-card{width:86%;max-width:330px;text-align:center;padding:28px 20px;border-radius:30px;border:1px solid var(--line);background:rgba(5,20,36,.82);box-shadow:0 25px 80px rgba(0,0,0,.5)}
+.logoBox{width:82px;height:82px;border-radius:25px;margin:0 auto 14px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);background:#081d31}
+.logoBox img,.brand img,.avatar img{width:100%;height:100%;object-fit:cover}
+.loader{width:50px;height:50px;border:4px solid rgba(255,255,255,.14);border-top-color:var(--cyan);border-radius:50%;margin:16px auto 0;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:38px}
+.brandRow{display:flex;align-items:center;gap:10px;min-width:0}
+.brand{width:36px;height:36px;border-radius:13px;overflow:hidden;border:1px solid var(--line);background:#081d31}
+.brandRow h1{margin:0;font-size:20px;letter-spacing:-.5px}
+.iconBtns{display:flex;gap:8px}
+.iconBtn{width:38px;height:38px;border-radius:15px;background:rgba(7,25,42,.8);border:1px solid var(--line);display:grid;place-items:center}
+.profile{height:82px;display:grid;grid-template-columns:58px 1fr auto;gap:11px;align-items:center;padding:11px;border-radius:26px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(15,47,74,.84),rgba(4,15,27,.72))}
+.avatar{width:58px;height:58px;border-radius:20px;overflow:hidden;border:1px solid rgba(85,221,255,.38);background:#0b2034;display:grid;place-items:center}
+.eyebrow{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#9ec4d8;font-weight:1000}
+.name{font-size:20px;font-weight:1000;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:12px;color:#bdd5e4;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.pill{height:38px;padding:0 13px;border-radius:15px;border:1px solid var(--line);background:rgba(7,25,42,.75);font-weight:1000;font-size:12px;white-space:nowrap}
+.chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;height:42px}
+.chip{border:1px solid var(--line);background:rgba(6,20,35,.72);border-radius:17px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:1000;white-space:nowrap;overflow:hidden}
+.stats{height:118px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{border:1px solid var(--line);background:linear-gradient(180deg,rgba(12,42,66,.78),rgba(2,11,21,.78));border-radius:21px;padding:10px 12px;overflow:hidden}
+.stat small{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#a7c1d1;font-weight:1000;white-space:nowrap}
+.stat b{display:block;margin-top:6px;font-size:24px;line-height:1;font-weight:1100;letter-spacing:-.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat span{display:block;margin-top:4px;font-size:11px;color:#8eabba;font-weight:800;white-space:nowrap}
+main{flex:1;min-height:0;overflow:hidden;border-radius:26px}
+.view{display:none;height:100%}
+.view.active{display:block}
+.scroll{height:100%;overflow:auto;scrollbar-width:none;padding-right:1px}
+.scroll::-webkit-scrollbar{display:none}
+.game{height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:10px;padding:14px;border-radius:26px;border:1px solid var(--line);overflow:hidden;background:linear-gradient(180deg,rgba(2,11,21,.32),rgba(0,5,11,.82)),url("public/assets/backgrounds/home-hero.jpg") center/cover no-repeat}
+.hero{display:flex;justify-content:space-between;gap:10px}
+.badge{display:inline-flex;height:30px;align-items:center;padding:0 12px;border-radius:999px;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.1);font-size:11px;font-weight:1000;letter-spacing:1.5px}
+.hero h2{font-size:27px;line-height:.98;margin:7px 0 6px;letter-spacing:-1px}
+.hero p{margin:0;color:#c8ddea;font-size:13px;line-height:1.35;font-weight:800;max-width:250px}
+.char{width:92px;height:108px;object-fit:contain;filter:drop-shadow(0 20px 30px rgba(0,0,0,.5))}
+.tapArea{display:grid;place-items:center;position:relative;min-height:0}
+.coinBtn{width:min(42vw,174px);height:min(42vw,174px);max-width:174px;max-height:174px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b6,#f5be47 58%,#87500c);border:5px solid rgba(255,239,152,.68);box-shadow:0 22px 50px rgba(0,0,0,.45),inset 0 9px 24px rgba(255,255,255,.4),inset 0 -12px 22px rgba(80,35,0,.34);display:grid;place-items:center;transition:.1s}
+.coinBtn:active{transform:scale(.94)}
+.coinBtn img{width:100%;height:100%;object-fit:contain}
+.coinFallback{font-size:52px;font-weight:1100;color:#402508}
+.plus{position:absolute;top:48%;left:50%;font-weight:1100;color:#fff2a0;text-shadow:0 5px 15px #000;animation:up .8s ease forwards;pointer-events:none}
+@keyframes up{from{opacity:0;transform:translate(-50%,0) scale(.8)}20%{opacity:1}to{opacity:0;transform:translate(-50%,-70px) scale(1.15)}}
+.energy{padding:10px 12px;border-radius:18px;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.1)}
+.energyHead{display:flex;justify-content:space-between;font-size:12px;font-weight:1000;margin-bottom:8px}
+.bar{height:12px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--cyan),var(--blue));border-radius:99px;transition:.25s}
+.quick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:9px}
+.actBtn{height:47px;border-radius:18px;background:rgba(7,26,43,.82);border:1px solid var(--line);font-weight:1000;font-size:12px}
+.actBtn.gold{background:linear-gradient(135deg,#ffe577,#ff9e2d);color:#160f06}
+.actBtn.blue{background:linear-gradient(135deg,#5fe4ff,#2e8cff);color:#03111e}
+.title{display:flex;justify-content:space-between;gap:10px;margin:0 0 10px;padding:0 2px}
+.title h2{margin:0;font-size:22px;letter-spacing:-.5px}
+.title p{margin:3px 0 0;color:#9eb8ca;font-size:12px;font-weight:800}
+.list{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:11px;padding:12px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(12,40,65,.84),rgba(3,14,25,.78))}
+.ico{width:48px;height:48px;border-radius:17px;border:1px solid var(--line);display:grid;place-items:center;background:rgba(85,221,255,.1);font-size:24px;overflow:hidden}
+.ico img{width:100%;height:100%;object-fit:contain}
+.row b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row span{display:block;font-size:12px;color:#aac3d2;font-weight:800;margin-top:3px}
+.smallBtn{height:38px;border-radius:15px;padding:0 13px;font-size:12px;font-weight:1100;background:linear-gradient(135deg,#5bdfff,#2e8cff);color:#04111e;white-space:nowrap}
+.smallBtn.gold{background:linear-gradient(135deg,#ffe477,#ff9d2d);color:#1a1005}
+.smallBtn.ghost{background:rgba(8,25,42,.8);border:1px solid var(--line);color:#fff}
+.smallBtn:disabled{opacity:.5}
+.reward{padding:14px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(13,43,67,.86),rgba(3,14,25,.82));display:grid;gap:11px}
+.price{height:30px;padding:0 10px;border-radius:99px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.09);display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:1000;margin-right:6px}
+.rankTabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.tab{height:42px;border-radius:16px;background:rgba(8,25,42,.78);border:1px solid var(--line);font-weight:1000;font-size:13px}
+.tab.active{background:linear-gradient(135deg,rgba(85,221,255,.28),rgba(46,140,255,.17));border-color:rgba(85,221,255,.55)}
+.rank{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;padding:12px;border-radius:20px;border:1px solid var(--line);background:rgba(6,22,37,.75)}
+.rankNo{width:36px;height:36px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.08);font-weight:1100}
+.rankScore{text-align:right;font-size:12px;font-weight:1000}
+.guide{padding:14px;border-radius:24px;border:1px solid var(--line);background:rgba(5,20,36,.78);margin-bottom:10px}
+.guide h3{margin:0 0 7px;font-size:16px}
+.guide p,.guide li{font-size:13px;line-height:1.5;color:#c7dcea;font-weight:750}
+.guide ul{margin:0;padding-left:18px}
+.secure{border-color:rgba(77,240,164,.34);background:linear-gradient(135deg,rgba(17,74,53,.34),rgba(5,20,36,.82))}
+.official{font-size:18px;color:#91ffc8;font-weight:1100}
+.nav{position:absolute;left:14px;right:14px;bottom:calc(10px + var(--safeB));height:72px;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px;border-radius:27px;background:rgba(1,10,18,.91);border:1px solid var(--line);backdrop-filter:blur(18px)}
+.nav button{border-radius:20px;background:transparent;color:#bed4df;font-size:11px;font-weight:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.nav i{font-style:normal;font-size:21px}
+.nav button.active{color:#fff;background:linear-gradient(135deg,rgba(85,221,255,.18),rgba(46,140,255,.18));border:1px solid rgba(85,221,255,.18)}
+.sheet{position:absolute;left:14px;right:14px;bottom:calc(var(--nav) + 17px + var(--safeB));z-index:35;max-height:min(72svh,540px);border-radius:28px;border:1px solid rgba(85,221,255,.38);background:rgba(2,12,23,.96);box-shadow:0 24px 80px rgba(0,0,0,.55);backdrop-filter:blur(18px);overflow:hidden;opacity:0;transform:translateY(18px);pointer-events:none;transition:.2s}
+.sheet.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.sheetHead{height:58px;padding:0 16px;display:flex;align-items:center;justify-content:space-between}
+.sheetHead h3{margin:0;font-size:18px}
+.sheetBody{max-height:calc(min(72svh,540px) - 58px);overflow:auto;padding:0 16px 16px;scrollbar-width:none}
+.x{width:34px;height:34px;border-radius:14px;background:rgba(255,255,255,.08);font-weight:1000}
+.setRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.setRow label{font-size:13px;font-weight:900}
+.switch{width:54px;height:30px;border-radius:99px;background:rgba(255,255,255,.14);padding:3px;border:1px solid rgba(255,255,255,.1)}
+.switch i{display:block;width:22px;height:22px;border-radius:50%;background:#fff;transition:.18s}
+.switch.on{background:rgba(77,240,164,.34)}
+.switch.on i{transform:translateX(24px);background:#aaffd3}
+select{height:40px;border-radius:14px;background:#061625;border:1px solid var(--line);padding:0 10px;outline:0}
+.toast{position:absolute;left:18px;right:18px;bottom:calc(var(--nav) + 27px + var(--safeB));z-index:60;min-height:48px;border-radius:18px;border:1px solid rgba(85,221,255,.36);background:rgba(1,10,18,.94);display:grid;place-items:center;text-align:center;padding:12px;font-weight:1000;font-size:13px;opacity:0;transform:translateY(12px);transition:.18s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+@media(max-height:720px){#app{gap:8px}.profile{height:74px}.avatar{width:52px;height:52px}.stats{height:108px}.stat b{font-size:22px}.hero h2{font-size:24px}.hero p{display:none}.char{width:80px;height:94px}.coinBtn{width:min(36vw,148px);height:min(36vw,148px)}}
+@media(max-height:650px){.chips{display:none}.profile{height:70px}.stats{height:102px}.nav{height:66px}.game{padding:12px}.hero h2{font-size:22px}}
 </style>
 </head>
 <body>
 <div id="app">
-  <div id="splash" class="splash"><div class="splash-card"><div class="logoBox"><img src="public/assets/brand/logo.png" alt=""></div><h2 style="margin:0;font-size:25px">Marino Empire</h2><p style="margin:8px 0 0;color:#b7d3e5;font-weight:800">İmparatorluk yükleniyor...</p><div class="loader"></div></div></div>
-  <div class="top"><div class="brandRow"><div class="brand"><img src="public/assets/brand/logo.png" alt=""></div><h1>Marino Empire</h1></div><div class="iconBtns"><button id="soundQuick" class="iconBtn">🔊</button><button id="settingsOpen" class="iconBtn">⚙️</button></div></div>
-  <section class="profile"><div class="avatar"><img src="public/assets/illustrations/marino-avatar.png" alt=""></div><div style="min-width:0"><div class="eyebrow">İmparatorluk Durumu</div><div id="name" class="name">Oyuncu</div><div id="sub" class="sub">Hazırlanıyor...</div></div><button id="refreshBtn" class="pill">● Güncel</button></section>
+  <div id="splash" class="splash">
+    <div class="splash-card">
+      <div class="logoBox"><img src="public/assets/brand/logo.png" alt=""></div>
+      <h2 style="margin:0;font-size:25px">Marino Empire</h2>
+      <p style="margin:8px 0 0;color:#b7d3e5;font-weight:800">İmparatorluk yükleniyor...</p>
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <div class="top">
+    <div class="brandRow"><div class="brand"><img src="public/assets/brand/logo.png" alt=""></div><h1>Marino Empire</h1></div>
+    <div class="iconBtns"><button id="soundQuick" class="iconBtn">🔊</button><button id="settingsOpen" class="iconBtn">⚙️</button></div>
+  </div>
+
+  <section class="profile">
+    <div class="avatar"><img src="public/assets/illustrations/marino-avatar.png" alt=""></div>
+    <div style="min-width:0"><div class="eyebrow">İmparatorluk Durumu</div><div id="name" class="name">Oyuncu</div><div id="sub" class="sub">Hazırlanıyor...</div></div>
+    <button id="refreshBtn" class="pill">● Güncel</button>
+  </section>
+
   <div class="chips"><div class="chip">🟢 Canlı sistem</div><div id="rankChip" class="chip">🏆 Sv. —</div><div class="chip">🛡️ Güvenli</div></div>
-  <section class="stats"><div class="stat"><small>🟡 Marino Coin</small><b id="coin">0</b><span>Ana oyun bakiyesi</span></div><div class="stat"><small>⚡ Enerji</small><b id="energy">0/0</b><span>Dokunma gücü</span></div><div class="stat"><small>🏦 Saatlik Gelir</small><b id="income">0/saat</b><span>Pasif üretim</span></div><div class="stat"><small>🎟️ Ödül Bileti</small><b id="ticket">0</b><span>Mağaza ve mini oyun</span></div></section>
+
+  <section class="stats">
+    <div class="stat"><small>🟡 Marino Coin</small><b id="coin">0</b><span>Ana oyun bakiyesi</span></div>
+    <div class="stat"><small>⚡ Enerji</small><b id="energy">0/0</b><span>Dokunma gücü</span></div>
+    <div class="stat"><small>🏦 Saatlik Gelir</small><b id="income">0/saat</b><span>Pasif üretim</span></div>
+    <div class="stat"><small>🎟️ Ödül Bileti</small><b id="ticket">0</b><span>Mağaza ve mini oyun</span></div>
+  </section>
+
   <main>
-    <section id="view-game" class="view active"><div class="game"><div class="hero"><div><span class="badge">Marino Empire</span><h2>Coin kas,<br>kasayı büyüt.</h2><p>Dokunarak coin üret, görevleri tamamla, binanı büyüt ve sıralamada yukarı çık.</p></div><img class="char" src="public/assets/illustrations/marino-character.png" alt=""></div><div class="tapArea"><button id="tapBtn" class="coinBtn"><img src="public/assets/currency/marino-coin.png" alt="" onerror="this.remove();this.parentElement.innerHTML='<span class=coinFallback>M</span>'"></button></div><div><div class="energy"><div class="energyHead"><span>Enerji Durumu</span><span id="energyPct">0%</span></div><div class="bar"><i id="energyBar"></i></div></div><div class="quick"><button id="collectBtn" class="actBtn gold">Kasayı Topla</button><button id="tasksOpen" class="actBtn">Görevler</button><button id="miniOpen" class="actBtn blue">Mini Oyun</button></div></div></div></section>
-    <section id="view-buildings" class="view"><div class="scroll"><div class="title"><div><h2>Yükseltmeler</h2><p>Gelir ve dokunma gücünü büyüt.</p></div></div><div id="buildings" class="list"></div></div></section>
-    <section id="view-store" class="view"><div class="scroll"><div class="title"><div><h2>Ödül Mağazası</h2><p>Free Spin ve Freebet talepleri admin onayına düşer.</p></div></div><div id="store" class="list"></div></div></section>
-    <section id="view-rank" class="view"><div class="scroll"><div class="title"><div><h2>Sıralama</h2><p>Dünya ve ülke rekabeti.</p></div></div><div class="rankTabs"><button id="rGlobal" class="tab active">Dünya</button><button id="rCountry" class="tab">Ülke</button></div><div id="leader" class="list"></div></div></section>
-    <section id="view-guide" class="view"><div class="scroll"><div class="title"><div><h2>Kılavuz</h2><p>Oyunun mantığı ve güvenli kullanım.</p></div></div><div class="guide"><h3>Nasıl oynanır?</h3><ul><li>Ortadaki Marino Coin’e dokunarak coin kazanırsın.</li><li>Dokunma Gücü yükseldikçe tek dokunuş kazancı artar.</li><li>Binalar saatlik pasif gelir üretir; kasayı düzenli toplarsın.</li><li>Görevler az ama düzenli coin verir; ekonomi şişmesin diye ödül ölçülüdür.</li><li>Mini oyunlar Ödül Bileti ister; kazanç anında coin bakiyene geçer.</li></ul></div><div class="guide secure"><h3>Güvenlik Politikası</h3><p>Resmî ve güvenli giriş için her zaman <span class="official">marino.bet</span> adresini kullan. Benzer harflerle yazılmış sahte adreslere, sahte desteklere ve şüpheli IBAN yönlendirmelerine güvenme.</p><ul><li>Adres çubuğunu kontrol et.</li><li>Ödül talepleri yalnızca sistem içinde ve admin onayıyla ilerler.</li><li>Şüpheli bağlantı görürsen canlı desteğe bildir.</li></ul></div><div class="guide"><h3>Neden Marino?</h3><p>Marino Empire, Betmarino deneyimini rekabet, görev, seviye, ödül talebi ve güvenli yönlendirme ile tek ekranda toplar. Oyuncuya hızlı, anlaşılır ve güven veren bir akış sunar.</p></div></div></section>
+    <section id="view-game" class="view active">
+      <div class="game">
+        <div class="hero">
+          <div>
+            <span class="badge">Marino Empire</span>
+            <h2>Coin kas,<br>kasayı büyüt.</h2>
+            <p>Dokunarak coin üret, görevleri tamamla, binanı büyüt ve sıralamada yukarı çık.</p>
+          </div>
+          <img class="char" src="public/assets/illustrations/marino-character.png" alt="">
+        </div>
+
+        <div class="tapArea">
+          <button id="tapBtn" class="coinBtn">
+            <img src="public/assets/currency/marino-coin.png" alt="" onerror="this.remove();this.parentElement.innerHTML='<span class=&quot;coinFallback&quot;>M</span>'">
+          </button>
+        </div>
+
+        <div>
+          <div class="energy">
+            <div class="energyHead"><span>Enerji</span><span id="energyPct">0%</span></div>
+            <div class="bar"><i id="energyBar"></i></div>
+          </div>
+          <div class="quick">
+            <button id="collectBtn" class="actBtn gold">Kasayı Topla</button>
+            <button id="tasksOpen" class="actBtn blue">Görevler</button>
+            <button id="miniOpen" class="actBtn">Mini Oyun</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-buildings" class="view">
+      <div class="scroll"><div class="title"><div><h2>Yükseltmeler</h2><p>Gelir ve dokunma gücünü büyüt.</p></div></div><div id="buildings" class="list"></div></div>
+    </section>
+
+    <section id="view-store" class="view">
+      <div class="scroll"><div class="title"><div><h2>Ödül Mağazası</h2><p>Free Spin ve Freebet talepleri admin onayına düşer.</p></div></div><div id="store" class="list"></div></div>
+    </section>
+
+    <section id="view-rank" class="view">
+      <div class="scroll"><div class="title"><div><h2>Sıralama</h2><p>Dünya ve ülke rekabeti.</p></div></div><div class="rankTabs"><button id="rGlobal" class="tab active">Dünya</button><button id="rCountry" class="tab">Ülke</button></div><div id="leader" class="list"></div></div>
+    </section>
+
+    <section id="view-guide" class="view">
+      <div class="scroll">
+        <div class="title"><div><h2>Kılavuz</h2><p>Oyunun mantığı ve güvenli kullanım.</p></div></div>
+        <div class="guide">
+          <h3>Nasıl oynanır?</h3>
+          <ul>
+            <li>Ortadaki Marino Coin’e dokunarak coin kazanırsın.</li>
+            <li>Dokunma Gücü yükseldikçe tek dokunuş kazancı artar.</li>
+            <li>Binalar saatlik pasif gelir üretir; kasayı düzenli toplarsın.</li>
+            <li>Görevler az ama düzenli coin verir; ekonomi şişmesin diye ödül ölçülüdür.</li>
+            <li>Mini oyunlar Ödül Bileti ister; kazanç şansa bağlıdır.</li>
+          </ul>
+        </div>
+        <div class="guide secure">
+          <h3>Güvenlik</h3>
+          <p class="official">Marino Casino</p>
+          <p>Ödül talepleri doğrudan admin paneline düşer. Gerçek ödül teslimi site kurallarına göre yönetilir.</p>
+        </div>
+      </div>
+    </section>
   </main>
-  <nav id="nav" class="nav"><button class="active" data-tab="game"><i>🎰</i><span>Oyun</span></button><button data-tab="buildings"><i>🏗️</i><span>Binalar</span></button><button data-tab="store"><i>🎁</i><span>Mağaza</span></button><button data-tab="rank"><i>🏆</i><span>Sıralama</span></button><button data-tab="guide"><i>📘</i><span>Kılavuz</span></button></nav>
+
+  <nav id="nav" class="nav">
+    <button class="active" data-tab="game"><i>🎰</i><span>Oyun</span></button>
+    <button data-tab="buildings"><i>🏗️</i><span>Binalar</span></button>
+    <button data-tab="store"><i>🎁</i><span>Mağaza</span></button>
+    <button data-tab="rank"><i>🏆</i><span>Sıralama</span></button>
+    <button data-tab="guide"><i>📘</i><span>Kılavuz</span></button>
+  </nav>
+
   <div id="tasksSheet" class="sheet"><div class="sheetHead"><h3>Seviye Görevleri</h3><button class="x" data-close="tasksSheet">✕</button></div><div id="tasks" class="sheetBody"></div></div>
   <div id="miniSheet" class="sheet"><div class="sheetHead"><h3>Mini Oyunlar</h3><button class="x" data-close="miniSheet">✕</button></div><div id="mini" class="sheetBody"></div></div>
-  <div id="settingsSheet" class="sheet"><div class="sheetHead"><h3>Ayarlar</h3><button class="x" data-close="settingsSheet">✕</button></div><div class="sheetBody"><div class="setRow"><label>Ülke sıralaması</label><select id="country"><option value="TR|Türkiye">Türkiye</option><option value="CY|Kıbrıs">Kıbrıs</option><option value="KG|Kırgızistan">Kırgızistan</option><option value="AZ|Azerbaycan">Azerbaycan</option><option value="DE|Almanya">Almanya</option><option value="NL|Hollanda">Hollanda</option></select></div><div class="setRow"><label>Efekt sesi</label><button id="sfx" class="switch"><i></i></button></div><div class="setRow"><label>Fon müziği</label><button id="music" class="switch"><i></i></button></div><button id="saveSettings" class="actBtn blue" style="width:100%;margin-top:14px">Ayarları Kaydet</button></div></div>
+
+  <div id="settingsSheet" class="sheet">
+    <div class="sheetHead"><h3>Ayarlar</h3><button class="x" data-close="settingsSheet">✕</button></div>
+    <div class="sheetBody">
+      <div class="setRow"><label>Ülke sıralaması</label><select id="country"><option value="TR|Türkiye">Türkiye</option><option value="CY|Kıbrıs">Kıbrıs</option><option value="KG|Kırgızistan">Kırgızistan</option><option value="AZ|Azerbaycan">Azerbaycan</option><option value="DE|Almanya">Almanya</option><option value="NL|Hollanda">Hollanda</option></select></div>
+      <div class="setRow"><label>Ses Efektleri</label><button id="sfx" class="switch on"><i></i></button></div>
+      <div class="setRow"><label>Fon Müziği</label><button id="music" class="switch"><i></i></button></div>
+      <button id="saveSettings" class="smallBtn gold" style="width:100%;margin-top:14px">Ayarları Kaydet</button>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
 </div>
+
 <script>
 const SUPABASE_URL='https://vxfjprvahjtfhvtuvsoy.supabase.co';
 const SUPABASE_KEY='sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU';
@@ -40,34 +267,194 @@ const fmt=n=>{n=Number(n||0); if(n>=1e9)return(n/1e9).toFixed(1)+'B'; if(n>=1e6)
 const uid=()=>Date.now()+'_'+Math.random().toString(16).slice(2);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 let S={user:null,game:null,busy:false,rank:'global',settings:loadSet()};
-function loadSet(){try{return Object.assign({countryCode:'TR',countryName:'Türkiye',sfx:true,music:false},JSON.parse(localStorage.marino_settings||'{}'))}catch{return{countryCode:'TR',countryName:'Türkiye',sfx:true,music:false}}}
+
+function loadSet(){
+  try{return Object.assign({countryCode:'TR',countryName:'Türkiye',sfx:true,music:false},JSON.parse(localStorage.marino_settings||'{}'))}
+  catch{return{countryCode:'TR',countryName:'Türkiye',sfx:true,music:false}}
+}
 function saveSet(){localStorage.marino_settings=JSON.stringify(S.settings);applySet()}
 function toast(m){const e=q('#toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2500)}
-const audio={ctx:null,nodes:[],init(){if(this.ctx)return;let A=window.AudioContext||window.webkitAudioContext;if(A)this.ctx=new A()},tone(f=500,d=.07,type='sine',g=.035){if(!S.settings.sfx)return;this.init();if(!this.ctx)return;let o=this.ctx.createOscillator(),v=this.ctx.createGain();o.type=type;o.frequency.value=f;v.gain.value=g;o.connect(v);v.connect(this.ctx.destination);o.start();v.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+d);o.stop(this.ctx.currentTime+d+.03)},click(){this.tone(520,.05,'triangle',.025)},tap(){this.tone(760,.06);setTimeout(()=>this.tone(1040,.05),45)},win(){this.tone(620,.08,'triangle');setTimeout(()=>this.tone(900,.09,'triangle'),90);setTimeout(()=>this.tone(1180,.12,'triangle'),180)},bad(){this.tone(180,.12,'sawtooth',.025)},start(){this.init();if(!this.ctx||this.nodes.length)return;let g=this.ctx.createGain();g.gain.value=.018;g.connect(this.ctx.destination);let a=this.ctx.createOscillator(),b=this.ctx.createOscillator();a.type='sine';b.type='triangle';a.frequency.value=110;b.frequency.value=220;a.connect(g);b.connect(g);a.start();b.start();this.nodes=[a,b,g]},stop(){this.nodes.forEach(n=>{try{n.stop?.();n.disconnect?.()}catch(e){}});this.nodes=[]}};
-function applySet(){q('#sfx').classList.toggle('on',S.settings.sfx);q('#music').classList.toggle('on',S.settings.music);q('#soundQuick').textContent=S.settings.sfx?'🔊':'🔇';q('#country').value=S.settings.countryCode+'|'+S.settings.countryName;S.settings.music?audio.start():audio.stop()}
+
+const audio={
+  ctx:null,nodes:[],unlocked:false,
+  init(){
+    if(!this.ctx){let A=window.AudioContext||window.webkitAudioContext;if(A)this.ctx=new A()}
+    this.unlocked=true;
+    if(this.ctx?.state==='suspended')this.ctx.resume().catch(()=>{})
+  },
+  tone(f=500,d=.07,type='sine',g=.035){
+    if(!S.settings.sfx)return;
+    this.init(); if(!this.ctx)return;
+    let o=this.ctx.createOscillator(),v=this.ctx.createGain();
+    o.type=type;o.frequency.value=f;v.gain.value=g;o.connect(v);v.connect(this.ctx.destination);
+    o.start();v.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+d);o.stop(this.ctx.currentTime+d+.03)
+  },
+  click(){this.tone(520,.05,'triangle',.025)},
+  tap(){this.tone(760,.06);setTimeout(()=>this.tone(1040,.05),45)},
+  win(){this.tone(620,.08,'triangle');setTimeout(()=>this.tone(900,.09,'triangle'),90);setTimeout(()=>this.tone(1180,.12,'triangle'),180)},
+  bad(){this.tone(180,.12,'sawtooth',.025)},
+  start(){
+    this.init(); if(!this.ctx||this.nodes.length)return;
+    let g=this.ctx.createGain();g.gain.value=.018;g.connect(this.ctx.destination);
+    let a=this.ctx.createOscillator(),b=this.ctx.createOscillator();
+    a.type='sine';b.type='triangle';a.frequency.value=110;b.frequency.value=220;
+    a.connect(g);b.connect(g);a.start();b.start();this.nodes=[a,b,g]
+  },
+  stop(){this.nodes.forEach(n=>{try{n.stop?.();n.disconnect?.()}catch(e){}});this.nodes=[]}
+};
+
+function applySet(){
+  q('#sfx').classList.toggle('on',S.settings.sfx);
+  q('#music').classList.toggle('on',S.settings.music);
+  q('#soundQuick').textContent=S.settings.sfx?'🔊':'🔇';
+  q('#country').value=S.settings.countryCode+'|'+S.settings.countryName;
+  if(!S.settings.music)audio.stop()
+}
 async function rpc(n,a){let r=await db.rpc(n,a); if(r.error)throw r.error; return r.data}
-function tgUser(){let u=tg?.initDataUnsafe?.user;if(u)return{telegram_id:String(u.id),telegram_username:u.username||'',first_name:u.first_name||'Oyuncu',last_name:u.last_name||'',language_code:u.language_code||'tr'};let x=JSON.parse(localStorage.marino_local_user||'null')||{telegram_id:'999001',telegram_username:'test_oyuncu',first_name:'Test Oyuncu',last_name:'',language_code:'tr'};localStorage.marino_local_user=JSON.stringify(x);return x}
+
+function tgUser(){
+  let u=tg?.initDataUnsafe?.user;
+  if(u)return{telegram_id:String(u.id),telegram_username:u.username||'',first_name:u.first_name||'Oyuncu',last_name:u.last_name||'',language_code:u.language_code||'tr'};
+  let x=JSON.parse(localStorage.marino_local_user||'null')||{telegram_id:'999001',telegram_username:'test_oyuncu',first_name:'Test Oyuncu',last_name:'',language_code:'tr'};
+  localStorage.marino_local_user=JSON.stringify(x);return x
+}
 function st(){return S.game?.state||{marino_coin:0,reward_token:0,energy:0,max_energy:500,tap_power:1,passive_income_per_hour:0,casino_level:1,reputation:0,claimable_coin:0}}
 function usr(){return S.game?.user||S.user||{}}
-async function start(){try{tg?.ready();tg?.expand();tg?.disableVerticalSwipes?.();tg?.setHeaderColor?.('#071827');tg?.setBottomBarColor?.('#020812')}catch(e){}applySet();document.addEventListener('pointerdown',()=>{audio.init();if(S.settings.music)audio.start()},{once:true});S.user=tgUser();await loadGame();bind();setTimeout(()=>q('#splash').classList.add('hide'),350)}
-async function loadGame(){try{let site=S.user.telegram_username||S.user.first_name||('user_'+S.user.telegram_id);S.game=await rpc('start_game',{p_telegram_id:S.user.telegram_id,p_site_username:site,p_telegram_username:S.user.telegram_username||'',p_first_name:S.user.first_name||'',p_last_name:S.user.last_name||'',p_language_code:S.user.language_code||'tr',p_referred_by:''});await saveRemote(false);render()}catch(e){console.error(e);toast(e.message||'Oyun verisi alınamadı')}}
+
+async function start(){
+  try{tg?.ready();tg?.expand();tg?.disableVerticalSwipes?.();tg?.setHeaderColor?.('#071827');tg?.setBottomBarColor?.('#020812')}catch(e){}
+  applySet();
+  document.addEventListener('pointerdown',()=>{audio.init();if(S.settings.music)audio.start()},{once:true});
+  S.user=tgUser();
+  await loadGame();
+  bind();
+  setTimeout(()=>q('#splash').classList.add('hide'),350)
+}
+async function loadGame(){
+  try{
+    let site=S.user.telegram_username||S.user.first_name||('user_'+S.user.telegram_id);
+    S.game=await rpc('start_game',{p_telegram_id:S.user.telegram_id,p_site_username:site,p_telegram_username:S.user.telegram_username||'',p_first_name:S.user.first_name||'',p_last_name:S.user.last_name||'',p_language_code:S.user.language_code||'tr',p_referred_by:''});
+    await saveRemote(false);
+    render()
+  }catch(e){console.error(e);toast(e.message||'Oyun verisi alınamadı')}
+}
 function render(){renderTop();renderBuildings();renderStore();renderTasks();renderMini();renderLeader()}
-function renderTop(){let s=st(),u=usr();q('#name').textContent=u.first_name||u.telegram_username||u.site_username||'Oyuncu';q('#sub').textContent=(u.site_username||u.telegram_username||'oyuncu')+' • Sv. '+(s.casino_level||1)+' • XP '+fmt(s.reputation);q('#coin').textContent=fmt(s.marino_coin);q('#energy').textContent=fmt(s.energy)+'/'+fmt(s.max_energy);q('#income').textContent=fmt(s.passive_income_per_hour)+'/saat';q('#ticket').textContent=fmt(s.reward_token);q('#rankChip').textContent='🏆 Sv. '+(s.casino_level||1);let p=Math.max(0,Math.min(100,Math.round(Number(s.energy||0)/Math.max(1,Number(s.max_energy||1))*100)));q('#energyPct').textContent=p+'%';q('#energyBar').style.width=p+'%'}
-function renderBuildings(){let s=st(),c=500+Math.pow(Number(s.tap_power||1),2)*350;let out=[`<div class="row"><div class="ico">👆</div><div><b>Dokunma Gücü</b><span>Seviye ${s.tap_power||1} • Maliyet ${fmt(c)} coin</span></div><button class="smallBtn gold" data-act="tapUp">Yükselt</button></div>`];(S.game?.upgrades||[]).forEach(b=>out.push(`<div class="row"><div class="ico">${ico(b.building_key)}</div><div><b>${esc(b.building_name)}</b><span>Seviye ${b.level} • ${fmt(b.current_income_per_hour)}/saat • Maliyet ${fmt(b.next_cost_coin)}</span></div><button class="smallBtn" data-act="building" data-key="${esc(b.building_key)}">Yükselt</button></div>`));q('#buildings').innerHTML=out.join('')}
+function renderTop(){
+  let s=st(),u=usr();
+  q('#name').textContent=u.first_name||u.telegram_username||u.site_username||'Oyuncu';
+  q('#sub').textContent=(u.site_username||u.telegram_username||'oyuncu')+' • Sv. '+(s.casino_level||1)+' • XP '+fmt(s.reputation);
+  q('#coin').textContent=fmt(s.marino_coin);
+  q('#energy').textContent=fmt(s.energy)+'/'+fmt(s.max_energy);
+  q('#income').textContent=fmt(s.passive_income_per_hour)+'/saat';
+  q('#ticket').textContent=fmt(s.reward_token);
+  q('#rankChip').textContent='🏆 Sv. '+(s.casino_level||1);
+  let p=Math.max(0,Math.min(100,Math.round(Number(s.energy||0)/Math.max(1,Number(s.max_energy||1))*100)));
+  q('#energyPct').textContent=p+'%';
+  q('#energyBar').style.width=p+'%'
+}
+function renderBuildings(){
+  let s=st(),c=500+Math.pow(Number(s.tap_power||1),2)*350;
+  let out=[`<div class="row"><div class="ico">👆</div><div><b>Dokunma Gücü</b><span>Seviye ${s.tap_power||1} • Maliyet ${fmt(c)} coin</span></div><button class="smallBtn gold" data-act="tapUp">Yükselt</button></div>`];
+  (S.game?.upgrades||[]).forEach(b=>out.push(`<div class="row"><div class="ico">${ico(b.building_key)}</div><div><b>${esc(b.building_name)}</b><span>Seviye ${b.level} • ${fmt(b.current_income_per_hour)}/saat • Maliyet ${fmt(b.next_cost_coin)}</span></div><button class="smallBtn" data-act="building" data-key="${esc(b.building_key)}">Yükselt</button></div>`));
+  q('#buildings').innerHTML=out.join('')
+}
 function ico(k){return{casino_lobby:'🎰',slot_area:'🎲',sportsbook_area:'⚽',vip_casino:'💎',rewards_office:'🎁',admin_control:'🛡️'}[k]||'🏦'}
-function renderStore(){let items=S.game?.store||[];q('#store').innerHTML=items.map(i=>`<div class="reward"><div class="row" style="padding:0;border:0;background:transparent"><div class="ico"><img src="public/assets/currency/reward-token.png" alt="" onerror="this.remove();this.parentElement.textContent='🎟️'"></div><div><b>${esc(i.item_name)}</b><span>${esc(i.description||'Admin onayına talep gönderir.')}</span></div></div><div><span class="price">🟡 ${fmt(i.cost_coin)} coin</span><span class="price">🎟️ ${fmt(i.cost_token)} ödül bileti</span></div><button class="smallBtn" data-act="reward" data-code="${esc(i.item_code)}">Talep Oluştur</button></div>`).join('')||'<div class="guide">Mağaza verisi bulunamadı.</div>'}
+function renderStore(){
+  let items=S.game?.store||[];
+  q('#store').innerHTML=items.map(i=>`<div class="reward"><div class="row" style="padding:0;border:0;background:transparent"><div class="ico"><img src="public/assets/currency/reward-token.png" alt="" onerror="this.remove();this.parentElement.textContent='🎟️'"></div><div><b>${esc(i.item_name)}</b><span>${esc(i.description||'Admin onayına talep gönderir.')}</span></div></div><div><span class="price">🟡 ${fmt(i.cost_coin)} coin</span><span class="price">🎟️ ${fmt(i.cost_token)} ödül bileti</span></div><button class="smallBtn" data-act="reward" data-code="${esc(i.item_code)}">Talep Oluştur</button></div>`).join('')||'<div class="guide">Mağaza verisi bulunamadı.</div>'
+}
 function reward(l,t){let b=Math.min(2500,120+l*20);return Math.round(b*(t==1?1:t==2?1.25:1.5))}
-function renderTasks(){let level=Math.max(1,Number(st().casino_level||1)),max=Math.min(100,Math.max(8,level+3));let names=[['Coin üret','Ana ekranda coin butonuna dokun.'],['Kasayı büyüt','Bina veya dokunma gücü yükselt.'],['Rekabet puanı','Oyuna girip seviyeni canlı tut.']];let rows=[];for(let l=1;l<=max;l++){names.forEach((n,i)=>{let lock=l>level,id=`L${l}_G${i+1}`;rows.push(`<div class="row"><div class="ico">${lock?'🔒':'✅'}</div><div><b>Sv. ${l} • ${n[0]}</b><span>${n[1]} • Ödül ${fmt(reward(l,i+1))} coin</span></div><button class="smallBtn ${lock?'ghost':''}" ${lock?'disabled':''} data-act="task" data-task="${id}" data-level="${l}">${lock?'Kilitli':'Al'}</button></div>`)})}q('#tasks').innerHTML='<div class="guide"><b>100 seviyelik görev sistemi</b><p>Ödüller ölçülü: oyuncuyu umutlandırır ama ekonomiyi bozmaz.</p></div><div class="list">'+rows.join('')+'</div>'}
-function renderMini(){let gs=[['card','🃏','Kart Çevir',25,'Hızlı ve düşük maliyetli.'],['wheel','🎡','Şans Çarkı',35,'Orta maliyet, orta ödül.'],['vault','🔐','Kasa Aç',50,'Pahalı ama daha güçlü.']];q('#mini').innerHTML='<div class="guide"><b>Mini oyun kuralı</b><p>Her oyun Ödül Bileti harcar. Kazanç coin olarak anında eklenir.</p></div><div class="list">'+gs.map(g=>`<div class="row"><div class="ico">${g[1]}</div><div><b>${g[2]}</b><span>${g[4]} • Giriş ${g[3]} Ödül Bileti</span></div><button class="smallBtn gold" data-act="mini" data-game="${g[0]}">Oyna</button></div>`).join('')+'</div><div class="guide"><h3>Reklamla coin kazan</h3><p>Reklam sağlayıcısı bağlanınca tamamlanan reklam başına +250 coin verilir.</p><button class="smallBtn" style="width:100%" data-act="ad">Reklam İzle +250 Coin</button></div>'}
-async function renderLeader(){let list=S.game?.leaderboard||[];try{list=await rpc('marino_get_leaderboard',{p_scope:S.rank,p_country_code:S.settings.countryCode})}catch(e){}q('#leader').innerHTML=(list||[]).map((r,i)=>`<div class="rank"><div class="rankNo">${r.rank_no||i+1}</div><div><b>${esc(r.display_name||r.site_username||'Oyuncu')}</b><span>${esc(r.site_username||'')} • ${esc(r.country_name||'Dünya')}</span></div><div class="rankScore">Sv. ${r.casino_level||1}<br>XP ${fmt(r.reputation)}</div></div>`).join('')||'<div class="guide"><b>Henüz kayıt yok.</b><p>Ülke seçimini ayarlardan yap.</p></div>'}
-function bind(){q('#nav').onclick=e=>{let b=e.target.closest('button[data-tab]');if(!b)return;audio.click();switchTab(b.dataset.tab)};document.body.onclick=e=>{let c=e.target.closest('[data-close]');if(c){q('#'+c.dataset.close).classList.remove('show');audio.click();return}let a=e.target.closest('[data-act]');if(a)handle(a)};q('#refreshBtn').onclick=()=>{audio.click();loadGame()};q('#tapBtn').onclick=tap;q('#collectBtn').onclick=collect;q('#tasksOpen').onclick=()=>{q('#tasksSheet').classList.add('show');audio.click()};q('#miniOpen').onclick=()=>{q('#miniSheet').classList.add('show');audio.click()};q('#settingsOpen').onclick=()=>{q('#settingsSheet').classList.add('show');audio.click()};q('#soundQuick').onclick=()=>{S.settings.sfx=!S.settings.sfx;saveSet();audio.click()};q('#rGlobal').onclick=()=>{S.rank='global';q('#rGlobal').classList.add('active');q('#rCountry').classList.remove('active');renderLeader();audio.click()};q('#rCountry').onclick=()=>{S.rank='country';q('#rCountry').classList.add('active');q('#rGlobal').classList.remove('active');renderLeader();audio.click()};q('#sfx').onclick=()=>{S.settings.sfx=!S.settings.sfx;saveSet();audio.click()};q('#music').onclick=()=>{S.settings.music=!S.settings.music;saveSet();audio.click()};q('#saveSettings').onclick=async()=>{let [cc,cn]=q('#country').value.split('|');S.settings.countryCode=cc;S.settings.countryName=cn;saveSet();await saveRemote(true);renderLeader()}}
-function switchTab(t){qa('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));qa('.view').forEach(v=>v.classList.remove('active'));q('#view-'+t).classList.add('active');let m={game:'home-hero.jpg',buildings:'buildings.jpg',store:'store.jpg',rank:'leaderboard.jpg',guide:'guide.jpg'};q('#app').style.backgroundImage=`linear-gradient(180deg,rgba(4,16,29,.38),rgba(1,7,14,.9)),url("public/assets/backgrounds/${m[t]||'home-hero.jpg'}") center/cover no-repeat`}
-async function tap(){if(S.busy)return;let s=st();if(Number(s.energy)<=0){toast('Enerji bitti. Biraz bekle.');audio.bad();return}S.busy=true;try{let d=await rpc('tap_coin',{p_telegram_id:S.user.telegram_id,p_taps:1});if(d?.state)S.game.state=d.state;else if(d?.marino_coin!==undefined)S.game.state=d;plus('+'+fmt(st().tap_power||1));audio.tap();render()}catch(e){toast(e.message||'Dokunma işlemi başarısız.');audio.bad()}finally{S.busy=false}}
+function renderTasks(){
+  let level=Math.max(1,Number(st().casino_level||1)),max=Math.min(100,Math.max(8,level+3));
+  let names=[['Coin üret','Ana ekranda coin butonuna dokun.'],['Kasayı büyüt','Bina veya dokunma gücü yükselt.'],['Rekabet puanı','Oyuna girip seviyeni canlı tut.']];
+  let rows=[];
+  for(let l=1;l<=max;l++){
+    names.forEach((n,i)=>{
+      let lock=l>level,id=`L${l}_G${i+1}`;
+      rows.push(`<div class="row"><div class="ico">${lock?'🔒':'✅'}</div><div><b>Sv. ${l} • ${n[0]}</b><span>${n[1]} • Ödül ${fmt(reward(l,i+1))} coin</span></div><button class="smallBtn ${lock?'ghost':''}" ${lock?'disabled':''} data-act="task" data-task="${id}" data-level="${l}">${lock?'Kilitli':'Al'}</button></div>`)
+    })
+  }
+  q('#tasks').innerHTML='<div class="guide"><b>100 seviyelik görev sistemi</b><p>Ödüller ölçülü: oyuncuyu umutlandırır ama ekonomiyi bozmaz.</p></div><div class="list">'+rows.join('')+'</div>'
+}
+function renderMini(){
+  let gs=[['card','🃏','Kart Çevir',25,'Hızlı ve düşük maliyetli.'],['wheel','🎡','Şans Çarkı',35,'Orta maliyet, orta ödül.'],['vault','🔐','Kasa Aç',50,'Pahalı ama daha güçlü.']];
+  q('#mini').innerHTML='<div class="guide"><b>Mini oyun kuralı</b><p>Her oyun Ödül Bileti harcar. Kazanç coin olarak anında eklenir.</p></div><div class="list">'+gs.map(g=>`<div class="row"><div class="ico">${g[1]}</div><div><b>${g[2]}</b><span>${g[4]} • Giriş ${g[3]} Ödül Bileti</span></div><button class="smallBtn gold" data-act="mini" data-game="${g[0]}">Oyna</button></div>`).join('')+'</div><div class="guide"><h3>Reklamla coin kazan</h3><p>Reklam sağlayıcısı bağlanınca tamamlanan reklam başına +250 coin verilir.</p><button class="smallBtn" style="width:100%" data-act="ad">Reklam İzle +250 Coin</button></div>'
+}
+async function renderLeader(){
+  let list=S.game?.leaderboard||[];
+  try{list=await rpc('marino_get_leaderboard',{p_scope:S.rank,p_country_code:S.settings.countryCode})}catch(e){}
+  q('#leader').innerHTML=(list||[]).map((r,i)=>`<div class="rank"><div class="rankNo">${r.rank_no||i+1}</div><div><b>${esc(r.display_name||r.site_username||'Oyuncu')}</b><span>${esc(r.site_username||'')} • ${esc(r.country_name||'Dünya')}</span></div><div class="rankScore">Sv. ${r.casino_level||1}<br>XP ${fmt(r.reputation)}</div></div>`).join('')||'<div class="guide"><b>Henüz kayıt yok.</b><p>Ülke seçimini ayarlardan yap.</p></div>'
+}
+
+function bind(){
+  q('#nav').onclick=e=>{let b=e.target.closest('button[data-tab]');if(!b)return;switchTab(b.dataset.tab)};
+  document.body.onclick=e=>{let c=e.target.closest('[data-close]');if(c){q('#'+c.dataset.close).classList.remove('show');audio.click();return}let a=e.target.closest('[data-act]');if(a)handle(a)};
+  q('#refreshBtn').onclick=()=>{audio.click();loadGame()};
+  q('#tapBtn').onclick=tap;
+  q('#collectBtn').onclick=collect;
+  q('#tasksOpen').onclick=()=>{q('#tasksSheet').classList.add('show');audio.click()};
+  q('#miniOpen').onclick=()=>{q('#miniSheet').classList.add('show');audio.click()};
+  q('#settingsOpen').onclick=()=>{q('#settingsSheet').classList.add('show');audio.click()};
+  q('#soundQuick').onclick=()=>{S.settings.sfx=!S.settings.sfx;saveSet();audio.click()};
+  q('#rGlobal').onclick=()=>{S.rank='global';q('#rGlobal').classList.add('active');q('#rCountry').classList.remove('active');renderLeader();audio.click()};
+  q('#rCountry').onclick=()=>{S.rank='country';q('#rCountry').classList.add('active');q('#rGlobal').classList.remove('active');renderLeader();audio.click()};
+  q('#sfx').onclick=()=>{S.settings.sfx=!S.settings.sfx;saveSet();audio.click()};
+  q('#music').onclick=()=>{S.settings.music=!S.settings.music;saveSet();S.settings.music?audio.start():audio.stop();audio.click()};
+  q('#saveSettings').onclick=async()=>{let [cc,cn]=q('#country').value.split('|');S.settings.countryCode=cc;S.settings.countryName=cn;saveSet();await saveRemote(true);renderLeader()}
+}
+function switchTab(t){
+  audio.click();
+  qa('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  qa('.view').forEach(v=>v.classList.remove('active'));
+  q('#view-'+t).classList.add('active');
+  let m={game:'home-hero.jpg',buildings:'buildings.jpg',store:'store.jpg',rank:'leaderboard.jpg',guide:'guide.jpg'};
+  let img=`public/assets/backgrounds/${m[t]||'home-hero.jpg'}`;
+  q('#app').style.background=`linear-gradient(180deg,rgba(4,16,29,.38),rgba(1,7,14,.9)),url("${img}") center/cover no-repeat,#03111f`
+}
+async function tap(){
+  if(S.busy)return;
+  let s=st();
+  if(Number(s.energy)<=0){toast('Enerji bitti. Biraz bekle.');audio.bad();return}
+  S.busy=true;
+  try{
+    let d=await rpc('tap_coin',{p_telegram_id:S.user.telegram_id,p_taps:1});
+    if(d?.state)S.game.state=d.state;else if(d?.marino_coin!==undefined)S.game.state=d;
+    plus('+'+fmt(st().tap_power||1));audio.tap();render()
+  }catch(e){toast(e.message||'Dokunma işlemi başarısız.');audio.bad()}finally{S.busy=false}
+}
 function plus(t){let e=document.createElement('div');e.className='plus';e.textContent=t;q('.tapArea').appendChild(e);setTimeout(()=>e.remove(),850)}
-async function collect(){if(S.busy)return;S.busy=true;try{let d=await rpc('collect_income',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d?.state)S.game.state=d.state;toast('Kasa toplandı.');audio.win();render()}catch(e){toast(e.message||'Kasa toplanamadı.');audio.bad()}finally{S.busy=false}}
-async function handle(a){if(S.busy)return;S.busy=true;audio.click();try{let d,act=a.dataset.act;if(act==='building'){d=await rpc('upgrade_building',{p_telegram_id:S.user.telegram_id,p_building_key:a.dataset.key,p_request_id:uid()});if(d.state)S.game.state=d.state;if(d.upgrades)S.game.upgrades=d.upgrades;toast('Bina yükseltildi.');audio.win()}if(act==='tapUp'){d=await rpc('marino_upgrade_tap',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=d.state;toast('Dokunma gücü yükseltildi.');audio.win()}if(act==='reward'){d=await rpc('request_reward',{p_telegram_id:S.user.telegram_id,p_item_code:a.dataset.code,p_request_id:uid()});if(d.state)S.game.state=d.state;toast('Ödül talebi admin paneline gönderildi.');audio.win()}if(act==='task'){d=await rpc('marino_claim_task',{p_telegram_id:S.user.telegram_id,p_task_id:a.dataset.task,p_level_no:Number(a.dataset.level)});if(d.state)S.game.state=d.state;toast(d.message||'Görev ödülü alındı.');audio.win()}if(act==='mini'){d=await rpc('marino_play_mini_game',{p_telegram_id:S.user.telegram_id,p_game_key:a.dataset.game,p_request_id:uid()});if(d.state)S.game.state=d.state;toast(d.message||'Mini oyun tamamlandı.');d.reward_coin?audio.win():audio.bad()}if(act==='ad')await watchAd();render()}catch(e){console.error(e);toast(e.message||'İşlem tamamlanamadı. SQL güncellemesini çalıştır.');audio.bad()}finally{S.busy=false}}
-async function watchAd(){let dev=location.search.includes('devads=1')||location.hostname==='localhost'||location.hostname==='127.0.0.1';if(window.MarinoAdProvider?.showRewarded)await window.MarinoAdProvider.showRewarded();else if(dev){toast('Test reklamı gösteriliyor...');await new Promise(r=>setTimeout(r,2200))}else{toast('Reklam sağlayıcısı henüz bağlanmadı. Test için URL sonuna ?devads=1 ekle.');return}let d=await rpc('marino_claim_ad_reward',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=d.state;toast(d.message||'Reklam ödülü eklendi.');audio.win()}
-async function saveRemote(show){try{await rpc('marino_save_settings',{p_telegram_id:S.user.telegram_id,p_country_code:S.settings.countryCode,p_country_name:S.settings.countryName,p_sound_enabled:!!S.settings.sfx,p_music_enabled:!!S.settings.music});if(show)toast('Ayarlar kaydedildi.')}catch(e){if(show)toast('Ayarlar yerel kaydedildi. SQL ayar fonksiyonu yok.')}}
+async function collect(){
+  if(S.busy)return;
+  S.busy=true;
+  try{let d=await rpc('collect_income',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d?.state)S.game.state=d.state;toast('Kasa toplandı.');audio.win();render()}
+  catch(e){toast(e.message||'Kasa toplanamadı.');audio.bad()}finally{S.busy=false}
+}
+async function handle(a){
+  if(S.busy)return;
+  S.busy=true;audio.click();
+  try{
+    let d,act=a.dataset.act;
+    if(act==='building'){d=await rpc('upgrade_building',{p_telegram_id:S.user.telegram_id,p_building_key:a.dataset.key,p_request_id:uid()});if(d.state)S.game.state=d.state;if(d.upgrades)S.game.upgrades=d.upgrades;toast('Bina yükseltildi.');audio.win()}
+    if(act==='tapUp'){d=await rpc('marino_upgrade_tap',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});if(d.state)S.game.state=d.state;toast('Dokunma gücü yükseltildi.');audio.win()}
+    if(act==='reward'){d=await rpc('request_reward',{p_telegram_id:S.user.telegram_id,p_item_code:a.dataset.code,p_request_id:uid()});if(d.state)S.game.state=d.state;toast('Ödül talebi admin paneline gönderildi.');audio.win()}
+    if(act==='task'){d=await rpc('marino_claim_task',{p_telegram_id:S.user.telegram_id,p_task_id:a.dataset.task,p_level_no:Number(a.dataset.level)});if(d.state)S.game.state=d.state;toast(d.message||'Görev ödülü alındı.');audio.win()}
+    if(act==='mini'){d=await rpc('marino_play_mini_game',{p_telegram_id:S.user.telegram_id,p_game_key:a.dataset.game,p_request_id:uid()});if(d.state)S.game.state=d.state;toast(d.message||'Mini oyun tamamlandı.');d.reward_coin?audio.win():audio.bad()}
+    if(act==='ad')await watchAd();
+    render()
+  }catch(e){console.error(e);toast(e.message||'İşlem tamamlanamadı. SQL güncellemesini çalıştır.');audio.bad()}finally{S.busy=false}
+}
+async function watchAd(){
+  let dev=location.search.includes('devads=1')||location.hostname==='localhost'||location.hostname==='127.0.0.1';
+  if(window.MarinoAdProvider?.showRewarded)await window.MarinoAdProvider.showRewarded();
+  else if(dev){toast('Test reklamı gösteriliyor...');await new Promise(r=>setTimeout(r,2200))}
+  else{toast('Reklam sağlayıcısı henüz bağlanmadı. Test için URL sonuna ?devads=1 ekle.');return}
+  let d=await rpc('marino_claim_ad_reward',{p_telegram_id:S.user.telegram_id,p_request_id:uid()});
+  if(d.state)S.game.state=d.state;toast(d.message||'Reklam ödülü eklendi.');audio.win()
+}
+async function saveRemote(show){
+  try{await rpc('marino_save_settings',{p_telegram_id:S.user.telegram_id,p_country_code:S.settings.countryCode,p_country_name:S.settings.countryName,p_sound_enabled:!!S.settings.sfx,p_music_enabled:!!S.settings.music});if(show)toast('Ayarlar kaydedildi.')}
+  catch(e){if(show)toast('Ayarlar yerel kaydedildi. SQL ayar fonksiyonu yok.')}
+}
 start();
 </script>
 </body>
