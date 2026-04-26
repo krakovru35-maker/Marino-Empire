@@ -2,1147 +2,597 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
-  <meta name="theme-color" content="#071828" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#061625" />
   <title>Marino Empire</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{
-      --bg0:#020812;
-      --bg1:#071827;
-      --bg2:#0d2740;
-      --card:rgba(8,23,37,.84);
-      --card2:rgba(14,37,57,.74);
-      --line:rgba(113,206,255,.22);
-      --line2:rgba(113,206,255,.36);
+      --bg:#020912;
+      --panel:#071727;
+      --panel2:#0b2033;
+      --panel3:#0e2c42;
+      --line:rgba(105,218,255,.24);
+      --line2:rgba(255,255,255,.09);
       --text:#f4fbff;
-      --muted:#9db8cc;
-      --soft:#cbefff;
-      --cyan:#56dfff;
-      --blue:#278bff;
-      --green:#52f5a8;
-      --gold:#ffd66d;
-      --orange:#ffb141;
-      --red:#ff6d8b;
-      --shadow:0 22px 70px rgba(0,0,0,.42);
+      --muted:#9cb6c8;
+      --soft:#c8e6f5;
+      --cyan:#58ddff;
+      --blue:#2d92ff;
+      --green:#4df4a8;
+      --gold:#ffd36a;
+      --pink:#ff6f9b;
+      --shadow:0 18px 50px rgba(0,0,0,.42);
       --radius:24px;
-      --safe-bottom:env(safe-area-inset-bottom, 0px);
+      --app-top-pad:14px;
+      --app-bottom-pad:10px;
+      --nav-h:78px;
     }
 
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#020812;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-    body{position:fixed;inset:0;touch-action:manipulation;overscroll-behavior:none}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#020912;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+    body{display:flex;align-items:stretch;justify-content:center}
     button,input{font:inherit}
-    button{border:0;cursor:pointer;color:inherit;user-select:none}
-    img{display:block;max-width:100%}
+    button{border:0;color:inherit;cursor:pointer}
 
     .app{
       position:relative;
-      width:100vw;
+      width:min(100vw,430px);
       height:100dvh;
-      max-width:520px;
-      margin:0 auto;
+      min-height:560px;
       overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      padding:var(--app-top-pad) 12px calc(var(--app-bottom-pad) + env(safe-area-inset-bottom));
+      isolation:isolate;
       background:
-        linear-gradient(180deg,rgba(4,15,26,.48),rgba(2,8,18,.96)),
-        radial-gradient(circle at 20% 0%,rgba(86,223,255,.22),transparent 32%),
-        radial-gradient(circle at 80% 20%,rgba(39,139,255,.18),transparent 34%),
-        #020812;
-      box-shadow:0 0 0 1px rgba(255,255,255,.04),0 30px 90px rgba(0,0,0,.65);
+        radial-gradient(circle at 18% 12%, rgba(74,213,255,.20), transparent 30%),
+        radial-gradient(circle at 82% 18%, rgba(58,126,255,.16), transparent 35%),
+        linear-gradient(180deg,#092033 0%,#061321 42%,#030912 100%);
     }
-
     .app::before{
       content:"";
-      position:absolute;
-      inset:0;
-      background-image:
-        linear-gradient(180deg,rgba(2,8,18,.16),rgba(2,8,18,.82)),
-        url('public/assets/backgrounds/home-hero.jpg');
-      background-size:cover;
-      background-position:center top;
-      opacity:.42;
-      pointer-events:none;
+      position:absolute;inset:0;z-index:-3;
+      background:
+        linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+      background-size:38px 38px;
+      mask-image:linear-gradient(to bottom, rgba(0,0,0,.9), rgba(0,0,0,.38));
     }
-
     .app::after{
       content:"";
-      position:absolute;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
-      background-size:42px 42px;
-      mask-image:linear-gradient(180deg,rgba(0,0,0,.9),rgba(0,0,0,.25));
+      position:absolute;inset:0;z-index:-2;
+      background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.35));
       pointer-events:none;
     }
 
-    .shell{
-      position:relative;
-      z-index:2;
-      width:100%;
-      height:100%;
+    .top-card{
+      flex:0 0 auto;
       display:grid;
-      grid-template-rows:auto auto minmax(0,1fr) auto;
-      gap:10px;
-      padding:14px 14px calc(10px + var(--safe-bottom));
-    }
-
-    .topbar{
-      height:76px;
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 54px;
-      gap:10px;
-      align-items:stretch;
-    }
-
-    .profile-card{
-      min-width:0;
-      display:flex;
-      align-items:center;
+      grid-template-columns:58px minmax(0,1fr) auto;
       gap:12px;
-      padding:12px;
+      align-items:center;
+      padding:10px 12px;
       border:1px solid var(--line);
       border-radius:22px;
-      background:linear-gradient(135deg,rgba(19,48,74,.78),rgba(8,18,30,.72));
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 14px 42px rgba(0,0,0,.22);
-      overflow:hidden;
+      background:linear-gradient(145deg,rgba(18,45,68,.90),rgba(5,17,29,.82));
+      box-shadow:0 16px 32px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.06);
+      min-height:78px;
     }
+    .avatar-wrap{width:58px;height:58px;border-radius:22px;padding:3px;background:linear-gradient(145deg,rgba(72,221,255,.28),rgba(255,211,106,.14));border:1px solid rgba(117,224,255,.25);overflow:hidden;display:grid;place-items:center}
+    .avatar-wrap img{width:100%;height:100%;object-fit:cover;border-radius:18px;display:block}
+    .avatar-fallback{width:100%;height:100%;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#0b253a,#06111d);color:#66e6ff;font-size:26px;font-weight:1000;text-shadow:0 0 16px rgba(76,221,255,.8)}
+    .status-copy{min-width:0;overflow:hidden}
+    .eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#9ac4d6;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .player-name{margin-top:2px;font-size:22px;line-height:1.05;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+    .player-meta{margin-top:6px;font-size:13px;line-height:1.25;color:#c7e5f6;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mini-btn{width:48px;height:48px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(22,55,80,.94),rgba(7,17,30,.92));display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    .mini-btn:active{transform:scale(.96)}
+    .mini-btn span{font-size:20px}
 
-    .avatar-wrap{
-      width:52px;
-      height:52px;
-      flex:0 0 auto;
-      border-radius:18px;
-      border:1px solid rgba(86,223,255,.38);
-      background:linear-gradient(180deg,rgba(86,223,255,.16),rgba(4,12,22,.94));
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-      box-shadow:0 0 28px rgba(86,223,255,.18);
-    }
-    .avatar-wrap img{width:100%;height:100%;object-fit:cover}
-    .avatar-fallback{font-weight:1000;color:var(--cyan);font-size:22px;text-shadow:0 0 18px rgba(86,223,255,.8)}
-    .avatar-wrap .avatar-fallback,.login-logo .avatar-fallback,.splash-logo .avatar-fallback{display:none}
+    .chip-row{flex:0 0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+    .chip{height:44px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(18,45,68,.86),rgba(6,17,28,.80));display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:950;color:#effaff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px}
+    .dot{width:13px;height:13px;border-radius:50%;background:var(--green);box-shadow:0 0 16px rgba(77,244,168,.75)}
 
-    .profile-text{min-width:0}
-    .eyebrow{letter-spacing:.18em;text-transform:uppercase;color:#8fb7cf;font-weight:900;font-size:12px;line-height:1.1;margin-bottom:4px}
-    .name{font-size:19px;font-weight:1000;line-height:1.06;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .meta{margin-top:4px;color:#cce8fb;font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .stats-grid{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .stat-card{height:82px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(160deg,rgba(17,50,75,.92),rgba(3,12,23,.90) 65%);padding:12px 13px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+    .stat-label{display:flex;align-items:center;gap:6px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:#a8c3d4;font-weight:1000;white-space:nowrap}
+    .stat-value{margin-top:8px;font-size:25px;line-height:1;font-weight:1000;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .stat-note{margin-top:5px;color:#9eb5c5;font-size:11.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    .sound-btn{
-      border-radius:20px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(25,57,84,.84),rgba(8,18,30,.88));
-      display:grid;
-      place-items:center;
-      font-size:22px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 14px 40px rgba(0,0,0,.22);
-    }
-
-    .status-row{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:8px;
-      height:42px;
-    }
-    .pill{
-      min-width:0;
-      height:42px;
-      padding:0 10px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(18,45,68,.74),rgba(7,17,29,.82));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:7px;
-      color:#dff7ff;
-      font-weight:950;
-      font-size:12px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .dot{width:9px;height:9px;border-radius:999px;background:var(--green);box-shadow:0 0 16px rgba(82,245,168,.8);flex:0 0 auto}
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:8px;
-      height:100px;
-    }
-    .stat{
-      min-width:0;
+    .main{
       position:relative;
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:12px 10px;
-      overflow:hidden;
-      background:linear-gradient(180deg,rgba(15,39,62,.86),rgba(3,12,23,.95));
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 35px rgba(0,0,0,.18);
-    }
-    .stat::after{content:"";position:absolute;inset:auto -35% -55% auto;width:100%;height:100%;background:radial-gradient(circle,rgba(86,223,255,.18),transparent 65%);pointer-events:none}
-    .stat-title{display:flex;align-items:center;gap:5px;color:#a8c4d9;letter-spacing:.08em;text-transform:uppercase;font-size:10px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .stat-value{margin-top:8px;font-size:21px;font-weight:1000;letter-spacing:-.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .stat-sub{margin-top:2px;color:#8fb0c7;font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-    .stage{
-      position:relative;
+      flex:1 1 auto;
       min-height:0;
+      margin-top:10px;
+      margin-bottom:10px;
       overflow:hidden;
       border-radius:26px;
     }
-    .tab-screen{
-      position:absolute;
-      inset:0;
-      opacity:0;
-      transform:translateY(10px) scale(.99);
-      pointer-events:none;
-      transition:.22s ease;
-      overflow:hidden;
-    }
-    .tab-screen.active{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-    .tab-scroll{height:100%;overflow-y:auto;overflow-x:hidden;padding-right:2px;overscroll-behavior:contain;scrollbar-width:none}
-    .tab-scroll::-webkit-scrollbar{display:none}
+    .screen{height:100%;display:none;overflow:hidden}
+    .screen.active{display:block}
+    .scroll-screen{height:100%;overflow:auto;padding:2px 2px 8px;scrollbar-width:none}
+    .scroll-screen::-webkit-scrollbar{display:none}
 
-    .home-grid{
+    .home-card{
+      position:relative;
       height:100%;
-      display:grid;
-      grid-template-rows:minmax(130px,.42fr) minmax(250px,.58fr);
-      gap:10px;
+      min-height:250px;
+      border-radius:26px;
+      overflow:hidden;
+      border:1px solid rgba(85,211,255,.34);
+      background:
+        linear-gradient(180deg,rgba(2,10,18,.18),rgba(2,10,18,.72) 60%,rgba(2,10,18,.95)),
+        url("public/assets/backgrounds/home-hero.jpg") center/cover no-repeat,
+        radial-gradient(circle at 50% 42%,rgba(65,218,255,.28),transparent 40%),
+        linear-gradient(145deg,#0c2a40,#04111e);
+      box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.08);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      padding:16px;
     }
+    .home-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 22%,rgba(255,211,106,.18),transparent 25%),linear-gradient(90deg,rgba(4,13,23,.70),rgba(4,13,23,.22),rgba(4,13,23,.80));pointer-events:none}
+    .hero-top,.tap-zone,.energy-area{position:relative;z-index:2}
+    .badge{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 15px;border-radius:999px;border:1px solid rgba(255,211,106,.35);background:rgba(2,10,18,.68);font-size:12px;letter-spacing:1.9px;text-transform:uppercase;font-weight:1000;color:#ffe8a7;box-shadow:0 8px 28px rgba(0,0,0,.25)}
+    .hero-title{margin:14px 0 6px;max-width:260px;font-size:35px;line-height:.96;font-weight:1000;letter-spacing:-1.4px;text-shadow:0 7px 28px rgba(0,0,0,.42)}
+    .hero-sub{max-width:260px;margin:0;color:#dcf2ff;font-size:14px;line-height:1.45;font-weight:850;text-shadow:0 5px 18px rgba(0,0,0,.5)}
+    .character{position:absolute;right:4px;bottom:115px;width:132px;max-height:178px;object-fit:contain;filter:drop-shadow(0 20px 35px rgba(0,0,0,.55));z-index:2;pointer-events:none}
+    .character-fade{position:absolute;right:-26px;bottom:82px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(83,220,255,.26),transparent 63%);z-index:1;pointer-events:none}
 
-    .hero-card,.tap-card,.panel-card{
-      position:relative;
+    .tap-zone{display:grid;place-items:center;margin-top:auto;margin-bottom:10px;min-height:128px}
+    .tap-coin-btn{position:relative;width:132px;height:132px;border-radius:50%;background:transparent;display:grid;place-items:center;filter:drop-shadow(0 19px 28px rgba(0,0,0,.42));transition:transform .08s ease}
+    .tap-coin-btn:active{transform:scale(.93)}
+    .tap-coin-btn::before{content:"";position:absolute;inset:7px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,170,.35),transparent 56%);filter:blur(8px)}
+    .tap-coin-btn img{position:relative;width:120px;height:120px;object-fit:contain;display:block}
+    .tap-coin-fallback{position:relative;width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 34% 25%,#fff0b7,#ffc84d 52%,#b56b12 100%);border:4px solid rgba(255,245,190,.55);font-size:50px;font-weight:1000;color:#5a2d07;box-shadow:inset 0 7px 14px rgba(255,255,255,.34),inset 0 -12px 20px rgba(88,48,7,.30)}
+    .tap-float{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:1000;color:#fff7c8;text-shadow:0 2px 10px rgba(0,0,0,.75);pointer-events:none;animation:floatUp .75s ease forwards;z-index:10}
+    @keyframes floatUp{0%{opacity:0;transform:translate(-50%,-30%) scale(.7)}18%{opacity:1}100%{opacity:0;transform:translate(-50%,-128%) scale(1.15)}}
+
+    .energy-area{border-radius:20px;border:1px solid rgba(91,216,255,.23);background:rgba(0,8,15,.64);padding:11px 12px;backdrop-filter:blur(10px)}
+    .energy-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#d8f1ff;font-size:12px;font-weight:1000}
+    .bar{height:13px;margin-top:9px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;padding:2px}
+    .bar-fill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#4df4a8,#55e8ff,#318dff);box-shadow:0 0 16px rgba(79,226,255,.38);transition:width .25s ease}
+    .home-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+    .primary,.secondary{height:46px;border-radius:18px;font-weight:1000;text-transform:uppercase;letter-spacing:.4px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+    .primary{background:linear-gradient(135deg,#ffe176,#ffad35);color:#171005}
+    .secondary{background:linear-gradient(145deg,rgba(23,52,74,.94),rgba(8,18,29,.92));border:1px solid var(--line);color:#eaffff}
+    .primary:active,.secondary:active{transform:scale(.98)}
+
+    .section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:2px 0 10px;padding:0 4px}
+    .section-title h2{margin:0;font-size:23px;line-height:1;font-weight:1000;letter-spacing:-.6px}
+    .section-title p{margin:6px 0 0;color:#9eb5c5;font-size:12px;font-weight:800}
+    .list{display:grid;gap:9px}
+    .item-card{border:1px solid var(--line);border-radius:21px;background:linear-gradient(145deg,rgba(16,43,65,.94),rgba(4,14,24,.92));padding:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+    .item-row{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center}
+    .item-icon{width:46px;height:46px;border-radius:17px;background:linear-gradient(145deg,rgba(74,220,255,.18),rgba(10,24,40,.9));border:1px solid rgba(91,216,255,.22);display:grid;place-items:center;font-size:23px;overflow:hidden}
+    .item-icon img{width:34px;height:34px;object-fit:contain}
+    .item-name{font-size:15px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .item-desc{margin-top:4px;color:#9fb9ca;font-size:12px;font-weight:800;line-height:1.3}
+    .item-price{font-size:13px;font-weight:1000;color:#ffe49b;white-space:nowrap;text-align:right}
+    .small-action{height:38px;padding:0 13px;border-radius:15px;background:linear-gradient(135deg,#5be3ff,#2d91ff);color:#04111e;font-weight:1000;white-space:nowrap}
+    .small-action:disabled{opacity:.45;filter:grayscale(1);cursor:not-allowed}
+
+    .leader-card{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(18,45,68,.90),rgba(4,14,24,.88));padding:10px 12px}
+    .rank{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;background:rgba(255,211,106,.12);border:1px solid rgba(255,211,106,.28);font-weight:1000;color:#ffe49b}
+    .guide-card{border:1px solid var(--line);border-radius:21px;background:linear-gradient(145deg,rgba(16,43,65,.94),rgba(4,14,24,.92));padding:14px;color:#cde7f6;font-size:13px;line-height:1.55;font-weight:780}
+    .guide-card b{color:#fff}
+
+    .bottom-nav{
+      flex:0 0 var(--nav-h);
+      height:var(--nav-h);
       border:1px solid var(--line);
       border-radius:26px;
-      background:linear-gradient(160deg,rgba(12,34,52,.88),rgba(3,12,23,.94));
-      box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.06);
-      overflow:hidden;
-    }
-    .hero-card::before,.tap-card::before,.panel-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:radial-gradient(circle at 20% 22%,rgba(86,223,255,.17),transparent 36%),radial-gradient(circle at 84% 28%,rgba(255,214,109,.12),transparent 30%);
-      pointer-events:none;
-    }
-
-    .hero-card{
+      background:linear-gradient(145deg,rgba(10,28,43,.96),rgba(2,10,18,.96));
       display:grid;
-      grid-template-columns:minmax(0,1fr) 135px;
-      gap:6px;
-      padding:18px 18px 16px;
-      min-height:0;
-    }
-    .hero-copy{position:relative;z-index:1;min-width:0;align-self:center}
-    .badge{
-      display:inline-flex;
-      max-width:100%;
-      align-items:center;
-      gap:8px;
-      height:34px;
-      padding:0 14px;
-      border-radius:999px;
-      border:1px solid rgba(255,214,109,.26);
-      background:rgba(2,8,18,.58);
-      color:#ffedb0;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      font-size:11px;
-      font-weight:1000;
-      white-space:nowrap;
-    }
-    .hero-title{margin:12px 0 6px;font-size:34px;line-height:.92;font-weight:1000;letter-spacing:-.06em}
-    .hero-desc{margin:0;color:#d7efff;font-size:14px;font-weight:800;line-height:1.4;max-width:270px}
-    .level-strip{margin-top:12px;display:flex;align-items:center;gap:9px;min-width:0}
-    .level-chip{height:34px;padding:0 13px;border-radius:999px;border:1px solid var(--line);background:rgba(2,8,18,.58);display:flex;align-items:center;font-size:12px;font-weight:1000;color:#e9fbff;white-space:nowrap}
-    .xp-line{height:9px;flex:1;min-width:70px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
-    .xp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--cyan),var(--blue));border-radius:999px;transition:width .35s ease}
-
-    .hero-visual{position:relative;z-index:1;display:grid;place-items:center;min-width:0}
-    .character-orbit{position:relative;width:min(130px,100%);aspect-ratio:1;border-radius:36px;background:radial-gradient(circle,rgba(86,223,255,.15),rgba(0,0,0,.18) 62%,transparent 64%);display:grid;place-items:center}
-    .character-orbit::before{content:"";position:absolute;inset:12%;border:1px solid rgba(86,223,255,.24);border-radius:32px;box-shadow:0 0 30px rgba(86,223,255,.12) inset}
-    .character-img{position:relative;z-index:1;max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 22px 24px rgba(0,0,0,.36))}
-
-    .tap-card{
-      padding:16px;
-      min-height:0;
-      display:grid;
-      grid-template-rows:auto minmax(0,1fr) auto auto;
-      gap:10px;
-    }
-    .section-head{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0}
-    .section-kicker{letter-spacing:.18em;text-transform:uppercase;color:#94bdd4;font-weight:1000;font-size:12px}
-    .section-title{margin:4px 0 0;font-size:27px;line-height:1;font-weight:1000;letter-spacing:-.05em}
-    .section-text{margin:7px 0 0;color:#cce6f8;font-weight:800;font-size:13px;line-height:1.35;max-width:300px}
-    .earn-chip{height:38px;padding:0 14px;border-radius:999px;background:rgba(2,8,18,.62);border:1px solid var(--line);display:flex;align-items:center;color:#eafaff;font-size:12px;font-weight:1000;white-space:nowrap}
-
-    .coin-zone{position:relative;z-index:1;min-height:0;display:grid;place-items:center;padding:0 0 2px}
-    .coin-btn{
-      width:min(210px,54vw,32vh);
-      aspect-ratio:1;
-      border-radius:999px;
-      background:transparent;
-      position:relative;
-      display:grid;
-      place-items:center;
-      filter:drop-shadow(0 20px 34px rgba(0,0,0,.5));
-      transition:transform .08s ease,filter .15s ease;
-    }
-    .coin-btn::before{content:"";position:absolute;inset:-12%;border-radius:999px;background:radial-gradient(circle,rgba(255,214,109,.24),rgba(86,223,255,.12) 45%,transparent 70%);animation:pulse 2.6s ease-in-out infinite}
-    .coin-btn img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain}
-    .coin-fallback{position:relative;z-index:1;width:100%;height:100%;border-radius:999px;background:linear-gradient(145deg,#fff0a5,#ffc145 48%,#b77416);display:grid;place-items:center;color:#4b2305;font-size:58px;font-weight:1000;box-shadow:inset 0 0 0 12px rgba(255,255,255,.18),inset 0 -18px 22px rgba(120,57,3,.22)}
-    .coin-btn:active,.coin-btn.pressed{transform:scale(.93);filter:drop-shadow(0 12px 20px rgba(0,0,0,.45)) brightness(1.08)}
-    .coin-pop{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff4b8;font-weight:1000;font-size:22px;text-shadow:0 3px 10px #000;pointer-events:none;animation:floatUp .7s ease forwards}
-
-    .energy-box{position:relative;z-index:1;border:1px solid rgba(255,255,255,.08);background:rgba(2,8,18,.42);border-radius:18px;padding:10px 12px}
-    .energy-head{display:flex;align-items:center;justify-content:space-between;color:#d7f6ff;font-size:12px;font-weight:1000;margin-bottom:7px}
-    .bar{height:13px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
-    .bar-fill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan),var(--blue));transition:width .35s ease}
-    .actions{position:relative;z-index:1;display:grid;grid-template-columns:1.25fr 1fr;gap:10px}
-
-    .btn{
-      min-height:48px;
-      border-radius:18px;
-      padding:0 16px;
-      font-weight:1000;
-      letter-spacing:.01em;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      transition:transform .08s ease,filter .15s ease,box-shadow .15s ease;
-      box-shadow:0 12px 26px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.17);
-      overflow:hidden;
-      position:relative;
-    }
-    .btn:active{transform:translateY(2px) scale(.985);filter:brightness(1.08)}
-    .btn.primary{background:linear-gradient(135deg,#ffe17b,#ff9d38);color:#10141a}
-    .btn.blue{background:linear-gradient(135deg,#59e3ff,#258cff);color:#06111d}
-    .btn.dark{background:linear-gradient(180deg,rgba(22,46,67,.86),rgba(7,17,29,.92));border:1px solid var(--line);color:#e6f7ff}
-    .btn.red{background:linear-gradient(135deg,#ff6d8b,#ffc3d2);color:#12151a}
-    .btn.small{min-height:38px;border-radius:14px;font-size:12px;padding:0 12px}
-    .btn[disabled]{opacity:.54;filter:grayscale(.2);cursor:not-allowed}
-
-    .panel-card{height:100%;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:0}
-    .panel-top{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-    .panel-title{font-size:23px;font-weight:1000;letter-spacing:-.04em;line-height:1;margin:0}
-    .panel-desc{margin:6px 0 0;color:#aecaDD;font-size:13px;font-weight:800;line-height:1.35}
-    .list{position:relative;z-index:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px;scrollbar-width:none}
-    .list::-webkit-scrollbar{display:none}
-
-    .building-card,.store-card,.rank-card,.guide-card{
-      border:1px solid rgba(113,206,255,.18);
-      background:linear-gradient(180deg,rgba(9,28,45,.84),rgba(3,12,23,.88));
-      border-radius:20px;
-      padding:12px;
-      display:grid;
-      gap:10px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
-    }
-    .building-card{grid-template-columns:70px minmax(0,1fr);align-items:center}
-    .room-img{width:70px;height:70px;border-radius:18px;object-fit:cover;background:rgba(86,223,255,.08);border:1px solid rgba(86,223,255,.2)}
-    .item-name{font-size:15px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .item-meta{margin-top:3px;color:#a7c1d4;font-size:12px;font-weight:800;line-height:1.35}
-    .item-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px}
-    .price{color:#ffedb0;font-size:12px;font-weight:1000;white-space:nowrap}
-
-    .store-card{grid-template-columns:minmax(0,1fr) auto;align-items:center}
-    .token-mini{width:44px;height:44px;border-radius:14px;object-fit:contain;background:rgba(86,223,255,.06);border:1px solid rgba(86,223,255,.16);padding:5px}
-
-    .rank-card{grid-template-columns:42px minmax(0,1fr) auto;align-items:center}
-    .rank-no{width:42px;height:42px;border-radius:15px;background:linear-gradient(180deg,rgba(255,214,109,.18),rgba(86,223,255,.08));border:1px solid rgba(255,214,109,.24);display:grid;place-items:center;font-weight:1000;color:#ffedb0}
-    .rank-score{text-align:right;color:#d9f5ff;font-size:12px;font-weight:1000;white-space:nowrap}
-
-    .guide-grid{position:relative;z-index:1;height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px;scrollbar-width:none}
-    .guide-grid::-webkit-scrollbar{display:none}
-    .guide-card{display:block}
-    .guide-card h3{margin:0 0 8px;font-size:17px;letter-spacing:-.03em}
-    .guide-card p,.guide-card li{color:#c8e5f6;font-weight:800;font-size:13px;line-height:1.45}
-    .guide-card ul{margin:0;padding-left:18px;display:grid;gap:6px}
-    .guide-good{color:#80ffc0!important}.guide-bad{color:#ffbcc9!important}
-
-    .nav{
-      height:70px;
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:6px;
+      grid-template-columns:repeat(5,1fr);
+      gap:4px;
       padding:8px;
-      border-radius:24px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(3,14,25,.86),rgba(1,7,14,.96));
-      box-shadow:0 16px 44px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05);
+      box-shadow:0 -16px 38px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.07);
     }
-    .nav-btn{
-      min-width:0;
-      border-radius:18px;
-      background:transparent;
-      display:grid;
-      place-items:center;
-      gap:2px;
-      padding:5px 2px;
-      color:#a8c1d4;
-      font-size:10px;
-      font-weight:1000;
-      transition:.16s ease;
-    }
-    .nav-ico{font-size:21px;line-height:1}
-    .nav-btn.active{background:linear-gradient(180deg,rgba(86,223,255,.18),rgba(39,139,255,.08));color:#fff;border:1px solid rgba(86,223,255,.22);box-shadow:0 0 22px rgba(86,223,255,.12)}
-    .nav-btn:active{transform:scale(.95)}
+    .nav-btn{height:100%;border-radius:20px;background:transparent;color:#bdd2df;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:1000;min-width:0}
+    .nav-btn .ico{font-size:23px;line-height:1;filter:drop-shadow(0 7px 10px rgba(0,0,0,.35))}
+    .nav-btn.active{color:#fff;background:linear-gradient(145deg,rgba(73,219,255,.20),rgba(24,86,120,.28));border:1px solid rgba(94,224,255,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 
-    .login-screen,.splash{
-      position:absolute;
-      inset:0;
-      z-index:20;
-      display:grid;
-      place-items:center;
-      padding:22px;
-      background:
-        linear-gradient(180deg,rgba(4,15,26,.36),rgba(2,8,18,.96)),
-        radial-gradient(circle at 50% 22%,rgba(86,223,255,.24),transparent 34%),
-        #020812;
-    }
-    .splash{z-index:30;transition:opacity .28s ease,visibility .28s ease}
-    .splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-    .splash-inner{display:grid;place-items:center;text-align:center;gap:16px}
-    .splash-logo{width:104px;height:104px;border-radius:32px;border:1px solid rgba(86,223,255,.34);background:linear-gradient(180deg,rgba(86,223,255,.16),rgba(2,8,18,.94));display:grid;place-items:center;box-shadow:0 0 55px rgba(86,223,255,.2)}
-    .splash-logo img{width:100%;height:100%;object-fit:contain;border-radius:32px}
-    .loader{width:58px;height:58px;border-radius:999px;border:5px solid rgba(255,255,255,.16);border-top-color:var(--cyan);animation:spin .85s linear infinite}
-    .loading-text{font-size:18px;font-weight:1000;color:#fff;text-shadow:0 2px 10px #000}
+    .toast{position:absolute;left:12px;right:12px;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));z-index:50;min-height:48px;display:none;place-items:center;text-align:center;padding:10px 14px;border-radius:18px;border:1px solid rgba(89,216,255,.34);background:rgba(1,10,18,.92);box-shadow:0 18px 34px rgba(0,0,0,.45);font-size:13px;font-weight:950;color:#fff;backdrop-filter:blur(16px)}
+    .toast.show{display:grid;animation:toastIn .18s ease both}
+    @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-    .login-card{
-      width:min(100%,420px);
-      border:1px solid var(--line);
-      border-radius:28px;
-      background:linear-gradient(160deg,rgba(12,34,52,.9),rgba(2,8,18,.96));
-      box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.07);
-      padding:24px 20px;
-      text-align:center;
-    }
-    .login-logo{width:112px;height:112px;margin:0 auto 16px;border-radius:34px;border:1px solid rgba(86,223,255,.34);background:linear-gradient(180deg,rgba(86,223,255,.16),rgba(2,8,18,.94));display:grid;place-items:center;box-shadow:0 0 45px rgba(86,223,255,.18);overflow:hidden}
-    .login-logo img{width:100%;height:100%;object-fit:contain}
-    .login-title{font-size:29px;font-weight:1000;margin:0 0 8px;letter-spacing:-.05em}
-    .login-text{margin:0 auto 18px;max-width:320px;color:#c7e5f7;font-weight:800;line-height:1.45}
-    .input{width:100%;height:54px;border-radius:18px;border:1px solid var(--line2);background:rgba(0,8,16,.74);color:#fff;padding:0 16px;outline:none;font-weight:900;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-    .input:focus{border-color:rgba(86,223,255,.78);box-shadow:0 0 0 4px rgba(86,223,255,.12)}
-    .login-actions{display:grid;gap:10px;margin-top:12px}
-    .login-note{margin-top:13px;color:#86a7bd;font-size:11px;font-weight:800;line-height:1.35}
-
-    .toast{
-      position:absolute;
-      left:14px;
-      right:14px;
-      bottom:calc(92px + var(--safe-bottom));
-      z-index:50;
-      min-height:48px;
-      border-radius:18px;
-      border:1px solid var(--line2);
-      background:rgba(2,8,18,.92);
-      box-shadow:0 18px 42px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      color:#f1fbff;
-      font-weight:1000;
-      padding:10px 14px;
-      transform:translateY(24px);
-      opacity:0;
-      pointer-events:none;
-      transition:.22s ease;
-    }
-    .toast.show{opacity:1;transform:translateY(0)}
-
-    .empty{height:100%;display:grid;place-items:center;text-align:center;color:#9ab5c8;font-weight:900;padding:18px}
-    .muted{color:#97b5ca}
-
+    .loader{position:absolute;inset:0;z-index:80;display:grid;place-items:center;background:rgba(1,8,15,.82);backdrop-filter:blur(14px)}
+    .loader-box{text-align:center}
+    .spinner{width:58px;height:58px;border-radius:50%;border:5px solid rgba(255,255,255,.18);border-top-color:#5be3ff;animation:spin .85s linear infinite;margin:auto}
+    .loader-text{margin-top:14px;font-weight:1000;color:#eaf9ff}
     @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes pulse{0%,100%{transform:scale(.98);opacity:.55}50%{transform:scale(1.08);opacity:1}}
-    @keyframes floatUp{0%{opacity:0;transform:translate(-50%,-35%) scale(.88)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-135%) scale(1.15)}}
 
-    @media (max-width:430px){
-      .shell{padding:12px 10px calc(9px + var(--safe-bottom));gap:8px}
-      .topbar{height:72px;grid-template-columns:minmax(0,1fr) 50px}
-      .avatar-wrap{width:48px;height:48px;border-radius:16px}
-      .name{font-size:18px}.meta{font-size:11px}.eyebrow{font-size:11px}
-      .status-row{height:38px;gap:7px}.pill{height:38px;font-size:11px;padding:0 8px}
-      .stats{height:92px;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-      .stat{padding:10px 12px;border-radius:18px}.stat-value{font-size:22px;margin-top:6px}.stat-sub{display:none}
-      .home-grid{grid-template-rows:minmax(122px,.36fr) minmax(286px,.64fr)}
-      .hero-card{grid-template-columns:minmax(0,1fr) 108px;padding:15px 15px 13px;border-radius:24px}
-      .hero-title{font-size:31px}.hero-desc{font-size:13px}.badge{height:30px;font-size:10px;padding:0 12px}
-      .character-orbit{width:108px}.level-strip{margin-top:9px}
-      .tap-card{padding:14px;border-radius:24px}.section-title{font-size:26px}.section-text{font-size:12px}.earn-chip{height:34px;font-size:11px;padding:0 10px}
-      .nav{height:68px;border-radius:23px}.nav-ico{font-size:20px}.nav-btn{font-size:9.5px}
+    @media (max-height:680px){
+      .top-card{min-height:66px;padding:8px 10px}.avatar-wrap{width:50px;height:50px;border-radius:18px}.avatar-wrap img,.avatar-fallback{border-radius:15px}.eyebrow{font-size:10px}.player-name{font-size:19px}.player-meta{font-size:12px}.mini-btn{width:42px;height:42px;border-radius:16px}
+      .chip-row{margin-top:8px}.chip{height:38px;font-size:12px;border-radius:15px}
+      .stats-grid{margin-top:8px}.stat-card{height:68px;padding:9px 11px;border-radius:18px}.stat-label{font-size:10px}.stat-value{font-size:21px;margin-top:5px}.stat-note{display:none}
+      .main{margin-top:8px;margin-bottom:8px}.hero-title{font-size:29px}.hero-sub{font-size:13px}.character{width:110px;bottom:104px}.tap-zone{min-height:112px}.tap-coin-btn{width:112px;height:112px}.tap-coin-btn img{width:102px;height:102px}.tap-coin-fallback{width:102px;height:102px;font-size:42px}.energy-area{padding:9px 10px}.home-actions{margin-top:7px}.primary,.secondary{height:40px;border-radius:15px}.bottom-nav{--nav-h:70px;border-radius:23px;padding:7px}.nav-btn{border-radius:17px;font-size:10px}.nav-btn .ico{font-size:21px}
     }
-
-    @media (max-height:720px){
-      .shell{gap:7px;padding-top:9px}
-      .topbar{height:66px}.avatar-wrap{width:44px;height:44px}.profile-card{padding:10px;border-radius:20px}.sound-btn{border-radius:18px}
-      .status-row{display:none}
-      .stats{height:86px}.stat{padding:9px 10px}.stat-value{font-size:20px;margin-top:5px}
-      .home-grid{grid-template-rows:minmax(100px,.32fr) minmax(300px,.68fr);gap:8px}
-      .hero-card{padding:13px;grid-template-columns:minmax(0,1fr) 88px}
-      .hero-title{font-size:26px;margin:8px 0 4px}.hero-desc{font-size:12px;line-height:1.28}.badge{height:28px;font-size:9px}.level-strip{margin-top:7px}.level-chip{height:30px;font-size:11px}
-      .character-orbit{width:88px}
-      .tap-card{padding:12px;gap:8px}.section-title{font-size:23px}.section-text{font-size:12px;line-height:1.25}.coin-btn{width:min(170px,45vw,26vh)}
-      .energy-box{padding:8px 10px}.actions .btn{min-height:42px}.nav{height:64px;padding:7px}.toast{bottom:calc(84px + var(--safe-bottom))}
-    }
-
-    @media (max-height:650px){
-      .topbar{height:60px}.stats{height:74px}.stat-title{font-size:9px}.stat-value{font-size:18px}.stat-sub{display:none}
-      .home-grid{grid-template-rows:0 minmax(0,1fr)}
-      .hero-card{display:none}.coin-btn{width:min(160px,43vw,25vh)}
-      .section-text{display:none}.tap-card{grid-template-rows:auto minmax(0,1fr) auto auto}
-      .nav{height:58px}.nav-ico{font-size:18px}.nav-btn span:last-child{font-size:8.8px}
-    }
+    @media (max-width:370px){.app{padding-left:9px;padding-right:9px}.hero-title{font-size:29px}.stat-value{font-size:22px}.chip{font-size:12px}.bottom-nav{gap:2px;padding:7px}.nav-btn .ico{font-size:20px}.nav-btn{font-size:10px}}
   </style>
 </head>
 <body>
-  <main class="app" id="app">
-    <section class="splash" id="splash">
-      <div class="splash-inner">
-        <div class="splash-logo"><img id="splashLogo" src="public/assets/brand/logo.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="avatar-fallback">M</span></div>
-        <div class="loader"></div>
-        <div class="loading-text">Loading</div>
+  <div class="app" id="app">
+    <div class="loader" id="loader">
+      <div class="loader-box">
+        <div class="spinner"></div>
+        <div class="loader-text">Marino Empire yükleniyor...</div>
       </div>
-    </section>
-
-    <section class="login-screen" id="loginScreen" style="display:none">
-      <div class="login-card">
-        <div class="login-logo"><img src="public/assets/brand/logo.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="avatar-fallback">M</span></div>
-        <h1 class="login-title">Marino Empire</h1>
-        <p class="login-text">Casino imparatorluğunu büyüt, coin kas, binaları geliştir ve ödül mağazasından Free Spin / Freebet talebi oluştur.</p>
-        <input class="input" id="siteUsernameInput" placeholder="Site kullanıcı adın" autocomplete="off" inputmode="text" />
-        <div class="login-actions">
-          <button class="btn blue" id="startBtn">OYUNA BAŞLA</button>
-          <button class="btn red" id="resetBtn" type="button">TEST HESABINI SIFIRLA</button>
-        </div>
-        <div class="login-note">Telegram içinden açarsan ID otomatik gelir. Tarayıcı testinde kayıtlı kullanıcı adı kullanılır.</div>
-      </div>
-    </section>
-
-    <div class="shell" id="gameShell" style="display:none">
-      <header class="topbar">
-        <div class="profile-card">
-          <div class="avatar-wrap">
-            <img id="avatarImg" src="public/assets/illustrations/marino-avatar.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-            <span class="avatar-fallback">M</span>
-          </div>
-          <div class="profile-text">
-            <div class="eyebrow">Empire Status</div>
-            <div class="name" id="playerName">Marino Empire</div>
-            <div class="meta" id="playerMeta">Oyuncu yükleniyor...</div>
-          </div>
-        </div>
-        <button class="sound-btn" id="soundBtn" aria-label="Ses">🔊</button>
-      </header>
-
-      <div class="status-row">
-        <div class="pill"><span class="dot"></span><span>Güncel</span></div>
-        <div class="pill" id="scorePill">Skor sistemi açık</div>
-        <div class="pill" id="adminPill">Oyuncu modu</div>
-      </div>
-
-      <section class="stats">
-        <article class="stat">
-          <div class="stat-title">🪙 Marino Coin</div>
-          <div class="stat-value" id="statCoin">0</div>
-          <div class="stat-sub">Ana oyun parası</div>
-        </article>
-        <article class="stat">
-          <div class="stat-title">⚡ Enerji</div>
-          <div class="stat-value" id="statEnergy">0/0</div>
-          <div class="stat-sub">Tap için gerekli</div>
-        </article>
-        <article class="stat">
-          <div class="stat-title">🏦 Saatlik Gelir</div>
-          <div class="stat-value" id="statIncome">0/saat</div>
-          <div class="stat-sub">Pasif üretim</div>
-        </article>
-        <article class="stat">
-          <div class="stat-title">🎟️ Reward Token</div>
-          <div class="stat-value" id="statToken">0</div>
-          <div class="stat-sub">Ödül marketi</div>
-        </article>
-      </section>
-
-      <section class="stage">
-        <div class="tab-screen active" data-screen="home">
-          <div class="home-grid">
-            <article class="hero-card">
-              <div class="hero-copy">
-                <div class="badge">Marino Empire</div>
-                <h2 class="hero-title">Empire<br>Dashboard</h2>
-                <p class="hero-desc">Karakterinle coin topla, pasif gelirini büyüt, levelini yükselt ve sıralamada görün.</p>
-                <div class="level-strip">
-                  <div class="level-chip" id="levelChip">Lv. 1</div>
-                  <div class="xp-line"><div class="xp-fill" id="xpFill"></div></div>
-                </div>
-              </div>
-              <div class="hero-visual">
-                <div class="character-orbit">
-                  <img class="character-img" id="characterImg" src="public/assets/illustrations/marino-character.png" alt="" onerror="this.style.display='none'">
-                </div>
-              </div>
-            </article>
-
-            <article class="tap-card">
-              <div class="section-head">
-                <div>
-                  <div class="section-kicker">Tap Zone</div>
-                  <h2 class="section-title">Tap ile coin kas</h2>
-                  <p class="section-text">Ana coin butonuna dokun. Enerji harcar, anlık coin üretir ve kasanı büyütür.</p>
-                </div>
-                <div class="earn-chip" id="tapPowerChip">+1 / tap</div>
-              </div>
-
-              <div class="coin-zone" id="coinZone">
-                <button class="coin-btn" id="tapBtn" aria-label="Tap to earn">
-                  <img id="coinImg" src="public/assets/currency/marino-coin.png" alt="" onerror="this.remove();document.getElementById('coinFallback').style.display='grid'">
-                  <span class="coin-fallback" id="coinFallback" style="display:none">M</span>
-                </button>
-              </div>
-
-              <div class="energy-box">
-                <div class="energy-head"><span>Enerji Durumu</span><span id="energyPercent">0%</span></div>
-                <div class="bar"><div class="bar-fill" id="energyFill"></div></div>
-              </div>
-
-              <div class="actions">
-                <button class="btn primary" id="collectBtn">KASAYI TOPLA</button>
-                <button class="btn dark" id="refreshBtn">YENİLE</button>
-              </div>
-            </article>
-          </div>
-        </div>
-
-        <div class="tab-screen" data-screen="buildings">
-          <article class="panel-card">
-            <div class="panel-top">
-              <div>
-                <h2 class="panel-title">Binalar</h2>
-                <p class="panel-desc">Geliri artır, EXP kazan, levelini sıralamada büyüt.</p>
-              </div>
-              <button class="btn dark small" id="refreshBuildingsBtn">Güncelle</button>
-            </div>
-            <div class="list" id="buildingsList"></div>
-          </article>
-        </div>
-
-        <div class="tab-screen" data-screen="store">
-          <article class="panel-card">
-            <div class="panel-top">
-              <div>
-                <h2 class="panel-title">Ödül Mağazası</h2>
-                <p class="panel-desc">Token ve coin ile admin onaylı Free Spin / Freebet talebi aç.</p>
-              </div>
-            </div>
-            <div class="list" id="storeList"></div>
-          </article>
-        </div>
-
-        <div class="tab-screen" data-screen="leaderboard">
-          <article class="panel-card">
-            <div class="panel-top">
-              <div>
-                <h2 class="panel-title">Sıralama</h2>
-                <p class="panel-desc">Level, sezon puanı ve EXP rekabeti burada görünür.</p>
-              </div>
-              <button class="btn dark small" id="refreshLeaderboardBtn">Yenile</button>
-            </div>
-            <div class="list" id="leaderboardList"></div>
-          </article>
-        </div>
-
-        <div class="tab-screen" data-screen="guide">
-          <article class="panel-card">
-            <div class="panel-top">
-              <div>
-                <h2 class="panel-title">Kılavuz & Kurallar</h2>
-                <p class="panel-desc">Oyunun mantığı, güçlü tarafları ve sınırlar.</p>
-              </div>
-            </div>
-            <div class="guide-grid">
-              <div class="guide-card">
-                <h3>🎮 Oynayış Kılavuzu</h3>
-                <ul>
-                  <li>Coin kazanmak için ana ekrandaki büyük coine dokun.</li>
-                  <li>Enerji biterse kısa süre sonra tekrar dolar; gelir kasanı da düzenli topla.</li>
-                  <li>Binaları yükselttikçe saatlik gelir ve gelişim puanın artar.</li>
-                  <li>Level ve EXP sıralamada görünür; amaç sadece coin değil, rekabette yukarı çıkmaktır.</li>
-                </ul>
-              </div>
-              <div class="guide-card">
-                <h3 class="guide-good">✅ Artıları</h3>
-                <ul>
-                  <li>Tek ekranda hızlı oyun döngüsü: tap, topla, yükselt.</li>
-                  <li>Sıralama sistemi oyuncuyu tekrar girişe iter.</li>
-                  <li>Ödül talepleri admin onayından geçtiği için operasyon kontrolü korunur.</li>
-                </ul>
-              </div>
-              <div class="guide-card">
-                <h3 class="guide-bad">⚠️ Eksileri / Riskler</h3>
-                <ul>
-                  <li>Ödül ekonomisi kontrolsüz bırakılırsa maliyet şişer.</li>
-                  <li>Çok kolay ödül verilirse oyun hızlı tüketilir; oranlar dikkatli ayarlanmalı.</li>
-                  <li>Bot/fraud davranışı için Telegram ID ve site kullanıcı adı kontrolü şart.</li>
-                </ul>
-              </div>
-              <div class="guide-card">
-                <h3>📌 Kurallar</h3>
-                <ul>
-                  <li>Her Telegram hesabı tek oyun profiliyle ilerler.</li>
-                  <li>Ödül talepleri otomatik hak değil, admin onaylı taleptir.</li>
-                  <li>Kötüye kullanım, sahte hesap veya çoklu hesap tespitinde talepler reddedilebilir.</li>
-                  <li>Final ödül kuralları marka bonus şartlarına göre ayrıca netleştirilmelidir.</li>
-                </ul>
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <nav class="nav" aria-label="Alt menü">
-        <button class="nav-btn active" data-tab="home"><span class="nav-ico">🎰</span><span>Oyun</span></button>
-        <button class="nav-btn" data-tab="buildings"><span class="nav-ico">🏗️</span><span>Binalar</span></button>
-        <button class="nav-btn" data-tab="store"><span class="nav-ico">🎁</span><span>Mağaza</span></button>
-        <button class="nav-btn" data-tab="leaderboard"><span class="nav-ico">🏆</span><span>Sıralama</span></button>
-        <button class="nav-btn" data-tab="guide"><span class="nav-ico">📘</span><span>Kılavuz</span></button>
-      </nav>
     </div>
 
-    <div id="toast" class="toast"></div>
-  </main>
+    <header class="top-card">
+      <div class="avatar-wrap">
+        <img id="avatarImg" src="public/assets/illustrations/marino-avatar.png" alt="Marino Avatar" onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='grid'" />
+        <div id="avatarFallback" class="avatar-fallback" style="display:none">M</div>
+      </div>
+      <div class="status-copy">
+        <div class="eyebrow">Empire Status</div>
+        <div class="player-name" id="playerName">Marino Empire</div>
+        <div class="player-meta" id="playerMeta">Oyuncu hazırlanıyor...</div>
+      </div>
+      <button class="mini-btn" id="soundBtn" type="button" aria-label="Ses"><span id="soundIcon">🔊</span></button>
+    </header>
+
+    <div class="chip-row">
+      <div class="chip"><span class="dot"></span><span id="statusText">Güncel</span></div>
+      <div class="chip">🏆 <span id="rankText">Sıralama: -</span></div>
+      <div class="chip">⭐ <span id="levelText">Lv. -</span></div>
+    </div>
+
+    <section class="stats-grid" aria-label="Oyuncu istatistikleri">
+      <div class="stat-card">
+        <div class="stat-label">🪙 Marino Coin</div>
+        <div class="stat-value" id="coinValue">0</div>
+        <div class="stat-note">Ana oyun para birimi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">⚡ Enerji</div>
+        <div class="stat-value" id="energyValue">0/0</div>
+        <div class="stat-note">Tap için gerekli</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🏦 Saatlik Gelir</div>
+        <div class="stat-value" id="incomeValue">0/saat</div>
+        <div class="stat-note">Pasif üretim</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🎟️ Reward Token</div>
+        <div class="stat-value" id="tokenValue">0</div>
+        <div class="stat-note">Ödül marketi için</div>
+      </div>
+    </section>
+
+    <main class="main">
+      <section class="screen active" id="screen-game">
+        <div class="home-card">
+          <div class="hero-top">
+            <span class="badge">Marino Empire</span>
+            <h1 class="hero-title">Casino imparatorluğunu büyüt</h1>
+            <p class="hero-sub">Karakterinle coin topla, binaları yükselt, XP kazan ve sıralamada yukarı çık.</p>
+          </div>
+          <div class="character-fade"></div>
+          <img class="character" src="public/assets/illustrations/marino-character.png" alt="Marino Character" onerror="this.style.display='none'" />
+          <div class="tap-zone" id="tapZone">
+            <button class="tap-coin-btn" id="tapBtn" type="button" aria-label="Tap ile coin kazan">
+              <img src="public/assets/currency/marino-coin.png" alt="Marino Coin" onerror="this.style.display='none';document.getElementById('coinFallback').style.display='grid'" />
+              <span id="coinFallback" class="tap-coin-fallback" style="display:none">M</span>
+            </button>
+          </div>
+          <div class="energy-area">
+            <div class="energy-head"><span>Enerji Durumu</span><span id="energyPct">0%</span></div>
+            <div class="bar"><div class="bar-fill" id="energyBar"></div></div>
+            <div class="home-actions">
+              <button class="primary" id="collectBtn" type="button">Kasayı Topla</button>
+              <button class="secondary" id="refreshBtn" type="button">Yenile</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-buildings">
+        <div class="scroll-screen">
+          <div class="section-title">
+            <div><h2>Binalar</h2><p>Yükseltme yaptıkça gelir, XP ve seviye artar.</p></div>
+          </div>
+          <div class="list" id="buildingsList"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-store">
+        <div class="scroll-screen">
+          <div class="section-title">
+            <div><h2>Mağaza</h2><p>Coin + token ile admin onaylı ödül talebi oluştur.</p></div>
+          </div>
+          <div class="list" id="storeList"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-leaderboard">
+        <div class="scroll-screen">
+          <div class="section-title">
+            <div><h2>Sıralama</h2><p>Seviye ve XP rekabeti burada görünür.</p></div>
+          </div>
+          <div class="list" id="leaderboardList"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-guide">
+        <div class="scroll-screen">
+          <div class="section-title">
+            <div><h2>Kılavuz</h2><p>Oyuncuya basit ve net oynayış rehberi.</p></div>
+          </div>
+          <div class="guide-card">
+            <p><b>1.</b> Ortadaki coin butonuna dokunarak Marino Coin kazan.</p>
+            <p><b>2.</b> Enerjin azalır; enerji doldukça tekrar coin kasarsın.</p>
+            <p><b>3.</b> Binaları yükselttikçe saatlik pasif gelir ve XP artar.</p>
+            <p><b>4.</b> XP arttıkça seviyen yükselir. Seviye, sıralamada rekabet için görünür.</p>
+            <p><b>5.</b> Mağazadan Free Spin / Freebet talebi oluşturulur. Talepler admin panelinde onay bekler.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Alt menü">
+      <button class="nav-btn active" type="button" data-tab="game"><span class="ico">🎰</span><span>Oyun</span></button>
+      <button class="nav-btn" type="button" data-tab="buildings"><span class="ico">🏗️</span><span>Binalar</span></button>
+      <button class="nav-btn" type="button" data-tab="store"><span class="ico">🎁</span><span>Mağaza</span></button>
+      <button class="nav-btn" type="button" data-tab="leaderboard"><span class="ico">🏆</span><span>Sıralama</span></button>
+      <button class="nav-btn" type="button" data-tab="guide"><span class="ico">📘</span><span>Kılavuz</span></button>
+    </nav>
+
+    <div class="toast" id="toast"></div>
+  </div>
 
   <script>
     const SUPABASE_URL = "https://vxfjprvahjtfhvtuvsoy.supabase.co";
     const SUPABASE_KEY = "sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU";
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
 
-    const ASSETS = {
-      logo: "public/assets/brand/logo.png",
-      avatar: "public/assets/illustrations/marino-avatar.png",
-      character: "public/assets/illustrations/marino-character.png",
-      coin: "public/assets/currency/marino-coin.png",
-      token: "public/assets/currency/reward-token.png",
-      rooms: {
-        casino_lobby: "public/assets/rooms/room_casino_lobby.png",
-        slot_area: "public/assets/rooms/room_slot_area.png",
-        sportsbook_area: "public/assets/rooms/room_sportsbook_area.png",
-        vip_casino: "public/assets/rooms/room_vip_casino.png",
-        rewards_office: "public/assets/rooms/room_rewards_office.png",
-        admin_control: "public/assets/rooms/room_admin_control.png"
-      }
-    };
+    const el = (id) => document.getElementById(id);
+    const state = { data:null, muted:false, busy:false, tapLock:false };
 
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      tg.setHeaderColor && tg.setHeaderColor("#071827");
-      tg.setBackgroundColor && tg.setBackgroundColor("#020812");
-      tg.setBottomBarColor && tg.setBottomBarColor("#020812");
-      tg.requestFullscreen && tg.requestFullscreen();
-      tg.disableVerticalSwipes && tg.disableVerticalSwipes();
+    function initTelegram(){
+      if(!tg) return;
+      try{
+        tg.ready();
+        tg.expand();
+        tg.setHeaderColor("#061625");
+        tg.setBottomBarColor("#020912");
+        document.documentElement.style.setProperty("--app-top-pad", "66px");
+        document.documentElement.style.setProperty("--app-bottom-pad", "8px");
+      }catch(e){}
     }
-
-    const $ = (id) => document.getElementById(id);
-    const state = {
-      payload: null,
-      game: null,
-      user: null,
-      upgrades: [],
-      store: [],
-      leaderboard: [],
-      sound: true,
-      activeTab: "home",
-      busy: false,
-      pendingTaps: 0,
-      tapTimer: null
-    };
-
-    const tgUser = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : {};
 
     function tgId(){
-      return String(tgUser.id || localStorage.getItem("marino_test_telegram_id") || "999001");
+      return String((tgUser && tgUser.id) || localStorage.getItem("marino_test_telegram_id") || "999001");
     }
-
-    function tgFirstName(){ return String(tgUser.first_name || "Kaan"); }
-    function tgLastName(){ return String(tgUser.last_name || ""); }
-    function tgUsername(){ return String(tgUser.username || localStorage.getItem("marino_test_tg_username") || "kaan_test"); }
-    function tgLang(){ return String(tgUser.language_code || "tr"); }
-
-    function uuid(){
-      if (crypto && crypto.randomUUID) return crypto.randomUUID();
-      return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
-    }
-
+    function firstName(){ return String((tgUser && tgUser.first_name) || localStorage.getItem("marino_test_first_name") || "Kaan"); }
+    function lastName(){ return String((tgUser && tgUser.last_name) || ""); }
+    function username(){ return String((tgUser && tgUser.username) || localStorage.getItem("marino_test_username") || "kaan_test"); }
+    function siteUsername(){ return String(localStorage.getItem("marino_site_username") || username() || tgId()); }
+    function uuid(){ return (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + "_" + Math.random().toString(16).slice(2); }
     function fmt(n){
       const num = Number(n || 0);
-      if (num >= 1000000000) return (num / 1000000000).toFixed(num % 1000000000 ? 1 : 0) + "B";
-      if (num >= 1000000) return (num / 1000000).toFixed(num % 1000000 ? 1 : 0).replace(".0","") + "M";
-      if (num >= 1000) return num.toLocaleString("tr-TR");
-      return String(num);
+      if(num >= 1000000000) return Math.floor(num / 100000000) / 10 + "B";
+      if(num >= 1000000) return Math.floor(num / 100000) / 10 + "M";
+      if(num >= 1000) return Math.floor(num / 100) / 10 + "K";
+      return String(Math.floor(num));
     }
+    function safeText(v, fallback="-"){ return (v === null || v === undefined || String(v).trim() === "") ? fallback : String(v); }
 
-    function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
-
-    let toastTimer = null;
-    function toast(message){
-      const el = $("toast");
-      el.textContent = message || "İşlem tamamlandı";
-      el.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+    function showToast(msg, ms=2600){
+      const t = el("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(()=>t.classList.remove("show"), ms);
     }
-
-    function showSplash(show){
-      $("splash").classList.toggle("hide", !show);
-    }
-
-    function showLogin(show){
-      $("loginScreen").style.display = show ? "grid" : "none";
-      $("gameShell").style.display = show ? "none" : "grid";
-    }
-
-    function readPayload(data){
-      const payload = data || {};
-      state.payload = payload;
-      state.game = payload.state || payload.game_state || payload.player_state || (payload.marino_coin !== undefined ? payload : state.game) || state.game || {};
-      state.user = payload.user || state.user || {};
-      state.upgrades = payload.upgrades || payload.buildings || state.upgrades || [];
-      state.store = payload.store || payload.store_items || state.store || [];
-      state.leaderboard = payload.leaderboard || state.leaderboard || [];
-      renderAll();
-    }
+    function setLoading(on){ el("loader").style.display = on ? "grid" : "none"; }
 
     async function rpc(name, args){
       const { data, error } = await db.rpc(name, args);
-      if (error) throw error;
+      if(error) throw error;
       return data;
     }
 
-    async function startGame(siteUsername, silent=false){
-      const clean = String(siteUsername || "").trim();
-      if (!clean) {
-        toast("Site kullanıcı adını yazman lazım.");
-        return;
-      }
-
-      localStorage.setItem("marino_site_username", clean);
-      showSplash(true);
-
-      try {
-        const data = await rpc("start_game", {
-          p_telegram_id: tgId(),
-          p_site_username: clean,
-          p_telegram_username: tgUsername(),
-          p_first_name: tgFirstName(),
-          p_last_name: tgLastName(),
-          p_language_code: tgLang(),
-          p_referred_by: ""
-        });
-        readPayload(data);
-        showLogin(false);
-        if (!silent) toast("Oyun hazır. Coin kasmaya başla.");
-      } catch (err) {
-        showLogin(true);
-        toast(err.message || "Oyun başlatılamadı.");
-      } finally {
-        setTimeout(() => showSplash(false), 450);
-      }
+    async function registerPlayer(){
+      return rpc("register_player", {
+        p_telegram_id: tgId(),
+        p_site_username: siteUsername(),
+        p_telegram_username: username(),
+        p_first_name: firstName(),
+        p_last_name: lastName(),
+        p_language_code: (tgUser && tgUser.language_code) || "tr",
+        p_referred_by: ""
+      });
     }
 
-    async function loadGame(silent=true){
-      try {
+    async function loadGame(silent=false){
+      try{
+        if(!silent) setLoading(true);
+        await registerPlayer().catch(()=>null);
         const data = await rpc("get_game_state", { p_telegram_id: tgId() });
-        readPayload(data);
-        showLogin(false);
-        if (!silent) toast("Güncellendi.");
-      } catch (err) {
-        const saved = localStorage.getItem("marino_site_username");
-        if (saved) return startGame(saved, true);
-        showLogin(true);
-        if (!silent) toast(err.message || "Veri alınamadı.");
-      } finally {
-        setTimeout(() => showSplash(false), 450);
+        state.data = data;
+        render(data);
+      }catch(err){
+        console.error(err);
+        showToast(err.message || "Oyun verisi alınamadı.", 4200);
+      }finally{
+        setLoading(false);
       }
     }
 
-    function tapCoin(){
-      const g = state.game || {};
-      const energy = Number(g.energy || 0);
-      if (energy <= 0) {
-        toast("Enerji bitti. Biraz bekle veya kasayı topla.");
+    function rankOfMe(data){
+      const me = String((data && data.state && data.state.telegram_id) || tgId());
+      const list = Array.isArray(data && data.leaderboard) ? data.leaderboard : [];
+      const found = list.find(x => String(x.telegram_id || "") === me || String(x.site_username || "") === String(data?.state?.site_username || ""));
+      return found && found.rank_no ? found.rank_no : (list.length ? "-" : "-");
+    }
+
+    function render(data){
+      const s = data && data.state ? data.state : {};
+      const u = data && data.user ? data.user : {};
+      const display = safeText(u.first_name, safeText(s.first_name, safeText(u.site_username, "Oyuncu")));
+      const site = safeText(u.site_username || s.site_username, siteUsername());
+      const tele = safeText(u.telegram_username || s.telegram_username, username());
+      const level = Number(s.casino_level || 1);
+      const xp = Number(s.reputation || s.season_points || 0);
+      const rank = rankOfMe(data);
+
+      el("playerName").textContent = display;
+      el("playerMeta").textContent = `${tele} • ${site} • Lv. ${level} • XP ${xp}`;
+      el("rankText").textContent = `Sıralama: ${rank === "-" ? "Lv. " + level : "#" + rank}`;
+      el("levelText").textContent = `Lv. ${level} / XP ${xp}`;
+      el("coinValue").textContent = fmt(s.marino_coin);
+      el("energyValue").textContent = `${fmt(s.energy)}/${fmt(s.max_energy || 500)}`;
+      el("incomeValue").textContent = `${fmt(s.passive_income_per_hour)}/saat`;
+      el("tokenValue").textContent = fmt(s.reward_token);
+
+      const maxEnergy = Number(s.max_energy || 500) || 500;
+      const pct = Math.max(0, Math.min(100, Math.round((Number(s.energy || 0) / maxEnergy) * 100)));
+      el("energyPct").textContent = pct + "%";
+      el("energyBar").style.width = pct + "%";
+
+      renderBuildings(Array.isArray(data.upgrades) ? data.upgrades : []);
+      renderStore(Array.isArray(data.store) ? data.store : []);
+      renderLeaderboard(Array.isArray(data.leaderboard) ? data.leaderboard : []);
+    }
+
+    function renderBuildings(items){
+      const box = el("buildingsList");
+      if(!items.length){ box.innerHTML = `<div class="guide-card">Bina verisi bulunamadı.</div>`; return; }
+      box.innerHTML = items.map(b => `
+        <div class="item-card">
+          <div class="item-row">
+            <div class="item-icon">${iconForBuilding(b.building_key)}</div>
+            <div>
+              <div class="item-name">${safeText(b.building_name, b.building_key)} • Lv. ${Number(b.level || 1)}</div>
+              <div class="item-desc">Gelir: ${fmt(b.current_income_per_hour)}/saat • Sonraki maliyet: ${fmt(b.next_cost_coin || b.base_cost_coin)} coin</div>
+            </div>
+            <button class="small-action" type="button" data-upgrade="${String(b.building_key || "")}">Yükselt</button>
+          </div>
+        </div>
+      `).join("");
+      box.querySelectorAll("[data-upgrade]").forEach(btn => btn.addEventListener("click", () => upgradeBuilding(btn.dataset.upgrade)));
+    }
+    function iconForBuilding(key){
+      const map = { casino_lobby:"🎰", slot_area:"🎲", sportsbook_area:"⚽", vip_casino:"💎", rewards_office:"🎁", admin_control:"🏦" };
+      return map[key] || "🏗️";
+    }
+
+    function renderStore(items){
+      const box = el("storeList");
+      if(!items.length){ box.innerHTML = `<div class="guide-card">Mağaza ürünü bulunamadı.</div>`; return; }
+      box.innerHTML = items.map(item => `
+        <div class="item-card">
+          <div class="item-row">
+            <div class="item-icon"><img src="public/assets/currency/reward-token.png" alt="" onerror="this.remove();this.parentElement.textContent='🎟️'"></div>
+            <div>
+              <div class="item-name">${safeText(item.item_name, item.item_code)}</div>
+              <div class="item-desc">${safeText(item.description, "Admin onaylı ödül talebi oluşturur.")}</div>
+            </div>
+            <div>
+              <div class="item-price">${fmt(item.cost_coin)} coin<br>${fmt(item.cost_token)} token</div>
+              <button class="small-action" style="margin-top:7px" type="button" data-reward="${String(item.item_code || "")}">Talep Et</button>
+            </div>
+          </div>
+        </div>
+      `).join("");
+      box.querySelectorAll("[data-reward]").forEach(btn => btn.addEventListener("click", () => requestReward(btn.dataset.reward)));
+    }
+
+    function renderLeaderboard(list){
+      const box = el("leaderboardList");
+      if(!list.length){ box.innerHTML = `<div class="guide-card">Sıralama verisi henüz oluşmadı.</div>`; return; }
+      box.innerHTML = list.slice(0,50).map((p,idx) => `
+        <div class="leader-card">
+          <div class="rank">#${p.rank_no || idx + 1}</div>
+          <div>
+            <div class="item-name">${safeText(p.display_name || p.site_username, "Oyuncu")}</div>
+            <div class="item-desc">Lv. ${Number(p.casino_level || 1)} • XP ${fmt(p.reputation || p.season_points || 0)}</div>
+          </div>
+          <div class="item-price">${fmt(p.season_points || p.reputation || 0)} puan</div>
+        </div>
+      `).join("");
+    }
+
+    async function tapCoin(){
+      if(state.tapLock) return;
+      state.tapLock = true;
+      const s = state.data && state.data.state ? state.data.state : {};
+      if(Number(s.energy || 0) <= 0){
+        showToast("Enerji bitti. Biraz bekleyip tekrar dene.");
+        state.tapLock = false;
         return;
       }
-
-      const gain = Number(g.tap_power || 1);
-      g.marino_coin = Number(g.marino_coin || 0) + gain;
-      g.energy = Math.max(0, Number(g.energy || 0) - 1);
-      state.pendingTaps += 1;
-
-      pressCoin();
-      floatingText("+" + fmt(gain));
-      renderStats();
-
-      clearTimeout(state.tapTimer);
-      state.tapTimer = setTimeout(flushTaps, 330);
+      floatText("+" + fmt(s.tap_power || 1));
+      try{
+        const data = await rpc("tap_coin", { p_telegram_id: tgId(), p_taps: 1 });
+        if(data) { state.data = data; render(data); }
+      }catch(err){ showToast(err.message || "Tap işlemi başarısız."); }
+      finally{ setTimeout(()=> state.tapLock = false, 110); }
     }
-
-    async function flushTaps(){
-      if (!state.pendingTaps) return;
-      const taps = Math.min(state.pendingTaps, 50);
-      state.pendingTaps -= taps;
-
-      try {
-        const data = await rpc("tap_coin", { p_telegram_id: tgId(), p_taps: taps });
-        readPayload(data);
-        if (state.pendingTaps > 0) {
-          state.tapTimer = setTimeout(flushTaps, 160);
-        }
-      } catch (err) {
-        toast(err.message || "Tap işlemi başarısız.");
-        state.pendingTaps = 0;
-        loadGame(true);
-      }
+    function floatText(text){
+      const zone = el("tapZone");
+      const f = document.createElement("div");
+      f.className = "tap-float";
+      f.textContent = text;
+      zone.appendChild(f);
+      setTimeout(()=>f.remove(), 780);
     }
 
     async function collectIncome(){
-      if (state.pendingTaps) await flushTaps();
-      try {
+      try{
         const data = await rpc("collect_income", { p_telegram_id: tgId(), p_request_id: uuid() });
-        readPayload(data);
-        toast("Kasa toplandı.");
-      } catch (err) {
-        toast(err.message || "Kasa toplanamadı.");
-      }
+        if(data){ state.data = data; render(data); }
+        showToast("Kasa toplandı.");
+      }catch(err){ showToast(err.message || "Kasa toplama başarısız."); }
     }
-
     async function upgradeBuilding(key){
-      if (!key) return;
-      if (state.pendingTaps) await flushTaps();
-      try {
+      if(!key) return;
+      try{
         const data = await rpc("upgrade_building", { p_telegram_id: tgId(), p_building_key: String(key), p_request_id: uuid() });
-        readPayload(data);
-        toast("Bina yükseltildi. EXP ve gelir arttı.");
-      } catch (err) {
-        toast(err.message || "Yükseltme yapılamadı.");
-      }
+        if(data){ state.data = data; render(data); }
+        showToast("Bina yükseltildi. XP işlendi.");
+      }catch(err){ showToast(err.message || "Yükseltme yapılamadı."); }
     }
-
     async function requestReward(code){
-      if (!code) return;
-      if (state.pendingTaps) await flushTaps();
-      try {
+      if(!code) return;
+      try{
         const data = await rpc("request_reward", { p_telegram_id: tgId(), p_item_code: String(code), p_request_id: uuid() });
-        readPayload(data);
-        toast("Ödül talebi admin paneline gönderildi.");
-      } catch (err) {
-        toast(err.message || "Ödül talebi oluşturulamadı.");
-      }
+        if(data){ state.data = data; render(data); }
+        showToast("Ödül talebi oluşturuldu. Admin onayı bekliyor.");
+      }catch(err){ showToast(err.message || "Ödül talebi oluşturulamadı."); }
     }
 
-    async function resetTestAccount(){
-      const id = tgId();
-      try {
-        await Promise.allSettled([
-          db.from("marino_reward_requests").delete().eq("telegram_id", id),
-          db.from("marino_player_buildings").delete().eq("telegram_id", id),
-          db.from("marino_players").delete().eq("telegram_id", id)
-        ]);
-        localStorage.removeItem("marino_site_username");
-        toast("Test hesabı temizlendi. Yeniden giriş yap.");
-        setTimeout(() => location.reload(), 650);
-      } catch (err) {
-        localStorage.removeItem("marino_site_username");
-        toast("Yerel kayıt temizlendi. Sayfa yenileniyor.");
-        setTimeout(() => location.reload(), 650);
-      }
+    function switchTab(tab){
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+      document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === "screen-" + tab));
     }
 
-    function renderAll(){
-      renderHeader();
-      renderStats();
-      renderBuildings();
-      renderStore();
-      renderLeaderboard();
+    function bindEvents(){
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+      });
+      el("tapBtn").addEventListener("click", tapCoin);
+      el("collectBtn").addEventListener("click", collectIncome);
+      el("refreshBtn").addEventListener("click", () => loadGame(true));
+      el("soundBtn").addEventListener("click", () => {
+        state.muted = !state.muted;
+        el("soundIcon").textContent = state.muted ? "🔇" : "🔊";
+        showToast(state.muted ? "Ses kapatıldı." : "Ses açıldı.");
+      });
     }
 
-    function renderHeader(){
-      const g = state.game || {};
-      const u = state.user || {};
-      const site = u.site_username || g.site_username || localStorage.getItem("marino_site_username") || "Oyuncu";
-      const tgName = u.telegram_username || g.telegram_username || tgUsername() || "telegram";
-      const display = u.first_name || g.first_name || site || "Marino Empire";
-      const level = Number(g.casino_level || 1);
-      const rep = Number(g.reputation || 0);
-      const xp = clamp(rep % 100, 0, 100);
-
-      $("playerName").textContent = display === site ? "Marino Empire" : display;
-      $("playerMeta").textContent = `${site} • ${tgName} • Lv. ${level} • XP ${rep}`;
-      $("levelChip").textContent = `Lv. ${level}`;
-      $("xpFill").style.width = xp + "%";
-      $("scorePill").textContent = `Sıralama: Lv. ${level}`;
-      $("adminPill").textContent = g.is_admin || u.is_admin ? "Admin onaylı" : "Oyuncu modu";
-      $("tapPowerChip").textContent = `+${fmt(g.tap_power || 1)} / tap`;
-    }
-
-    function renderStats(){
-      const g = state.game || {};
-      const energy = Number(g.energy || 0);
-      const maxEnergy = Number(g.max_energy || 500) || 500;
-      const percent = clamp(Math.round((energy / maxEnergy) * 100), 0, 100);
-
-      $("statCoin").textContent = fmt(g.marino_coin || 0);
-      $("statEnergy").textContent = `${fmt(energy)}/${fmt(maxEnergy)}`;
-      $("statIncome").textContent = `${fmt(g.passive_income_per_hour || 0)}/saat`;
-      $("statToken").textContent = fmt(g.reward_token || 0);
-      $("energyPercent").textContent = percent + "%";
-      $("energyFill").style.width = percent + "%";
-    }
-
-    function renderBuildings(){
-      const list = $("buildingsList");
-      const buildings = Array.isArray(state.upgrades) ? state.upgrades.slice().sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)) : [];
-      if (!buildings.length) {
-        list.innerHTML = '<div class="empty">Bina verisi henüz yok.</div>';
-        return;
-      }
-      list.innerHTML = buildings.map(b => {
-        const key = b.building_key || "casino_lobby";
-        const img = ASSETS.rooms[key] || ASSETS.rooms.casino_lobby;
-        const level = Number(b.level || 1);
-        const nextCost = Number(b.next_cost_coin || b.base_cost_coin || 0);
-        const income = Number(b.current_income_per_hour || 0);
-        return `
-          <div class="building-card">
-            <img class="room-img" src="${img}" alt="" onerror="this.style.display='none'">
-            <div>
-              <div class="item-name">${escapeHtml(b.building_name || key)}</div>
-              <div class="item-meta">Lv. ${level} • Gelir: ${fmt(income)}/saat • EXP kazandırır</div>
-              <div class="item-row">
-                <span class="price">${fmt(nextCost)} coin</span>
-                <button class="btn blue small" onclick="upgradeBuilding('${escapeAttr(key)}')">YÜKSELT</button>
-              </div>
-            </div>
-          </div>`;
-      }).join("");
-    }
-
-    function renderStore(){
-      const list = $("storeList");
-      const items = Array.isArray(state.store) ? state.store.slice().sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)) : [];
-      if (!items.length) {
-        list.innerHTML = '<div class="empty">Mağaza verisi henüz yok.</div>';
-        return;
-      }
-      list.innerHTML = items.map(item => {
-        const code = item.item_code || "";
-        const coin = Number(item.cost_coin || 0);
-        const token = Number(item.cost_token || 0);
-        return `
-          <div class="store-card">
-            <div>
-              <div class="item-name">${escapeHtml(item.item_name || code)}</div>
-              <div class="item-meta">${escapeHtml(item.description || "Admin onaylı ödül talebi oluşturur.")}</div>
-              <div class="item-row">
-                <span class="price">${fmt(coin)} coin • ${fmt(token)} token</span>
-                <button class="btn primary small" onclick="requestReward('${escapeAttr(code)}')">TALEP ET</button>
-              </div>
-            </div>
-            <img class="token-mini" src="${ASSETS.token}" alt="" onerror="this.style.display='none'">
-          </div>`;
-      }).join("");
-    }
-
-    function renderLeaderboard(){
-      const list = $("leaderboardList");
-      const rows = Array.isArray(state.leaderboard) ? state.leaderboard : [];
-      if (!rows.length) {
-        list.innerHTML = '<div class="empty">Sıralama henüz oluşmadı. İlk yükseltmeleri yapınca liste canlanır.</div>';
-        return;
-      }
-      list.innerHTML = rows.map((r, index) => {
-        const rank = r.rank_no || index + 1;
-        const name = r.display_name || r.site_username || "Oyuncu";
-        const level = Number(r.casino_level || 1);
-        const rep = Number(r.reputation || 0);
-        const season = Number(r.season_points || 0);
-        return `
-          <div class="rank-card">
-            <div class="rank-no">#${rank}</div>
-            <div>
-              <div class="item-name">${escapeHtml(name)}</div>
-              <div class="item-meta">Lv. ${level} • XP ${fmt(rep)}</div>
-            </div>
-            <div class="rank-score">${fmt(season)}<br><span class="muted">puan</span></div>
-          </div>`;
-      }).join("");
-    }
-
-    function setTab(tab){
-      state.activeTab = tab;
-      document.querySelectorAll(".tab-screen").forEach(el => el.classList.toggle("active", el.dataset.screen === tab));
-      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
-      if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
-    }
-
-    function pressCoin(){
-      const btn = $("tapBtn");
-      btn.classList.add("pressed");
-      setTimeout(() => btn.classList.remove("pressed"), 110);
-      if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
-    }
-
-    function floatingText(text){
-      const zone = $("coinZone");
-      const el = document.createElement("div");
-      el.className = "coin-pop";
-      el.textContent = text;
-      el.style.left = (45 + Math.random()*18) + "%";
-      el.style.top = (42 + Math.random()*16) + "%";
-      zone.appendChild(el);
-      setTimeout(() => el.remove(), 760);
-    }
-
-    function escapeHtml(value){
-      return String(value ?? "").replace(/[&<>"]/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[s]));
-    }
-    function escapeAttr(value){
-      return String(value ?? "").replace(/[\\'\"]/g, "");
-    }
-
-    document.querySelectorAll(".nav-btn").forEach(btn => btn.addEventListener("click", () => setTab(btn.dataset.tab)));
-    $("tapBtn").addEventListener("click", tapCoin);
-    $("collectBtn").addEventListener("click", collectIncome);
-    $("refreshBtn").addEventListener("click", () => loadGame(false));
-    $("refreshBuildingsBtn").addEventListener("click", () => loadGame(false));
-    $("refreshLeaderboardBtn").addEventListener("click", () => loadGame(false));
-    $("startBtn").addEventListener("click", () => startGame($("siteUsernameInput").value));
-    $("resetBtn").addEventListener("click", resetTestAccount);
-    $("siteUsernameInput").addEventListener("keydown", e => { if (e.key === "Enter") startGame($("siteUsernameInput").value); });
-    $("soundBtn").addEventListener("click", () => {
-      state.sound = !state.sound;
-      $("soundBtn").textContent = state.sound ? "🔊" : "🔇";
-      toast(state.sound ? "Ses: Açık" : "Ses: Kapalı");
-    });
-
-    document.addEventListener("contextmenu", e => e.preventDefault());
-
-    window.addEventListener("load", () => {
-      const saved = localStorage.getItem("marino_site_username");
-      if (saved) {
-        $("siteUsernameInput").value = saved;
-        startGame(saved, true);
-      } else {
-        showLogin(true);
-        setTimeout(() => showSplash(false), 450);
-      }
-    });
+    initTelegram();
+    bindEvents();
+    loadGame();
   </script>
 </body>
 </html>
