@@ -1493,7 +1493,7 @@ window.playHorse = async (betAmount) => {
    if(isNaN(bet) || bet <= 0) return toast("Bahis miktarı geçersiz!");
    
    try {
-       S.busy = true; q('#hBtn').disabled = true; horseRaceActive = true;
+       S.busy = true; horseRaceActive = true;
        // Reset positions
        for(let i=1; i<=6; i++) q('#hr_'+i).style.left = '10px';
        
@@ -1522,13 +1522,13 @@ window.playHorse = async (betAmount) => {
                 else if(pos[i] >= trackW) q('#hr_'+i).style.left = (trackW - 20 - Math.random()*20) + 'px'; // ensure only winner crosses finish perfectly
              }
              setTimeout(() => {
-                 horseRaceActive = false; S.busy = false; q('#hBtn').disabled = false;
+                 horseRaceActive = false; S.busy = false;
                  if(d.is_win) { au.win(); toast(`Kazandı! ${d.winner} numara. +${fmt(d.payout)} Çip`); }
                  else { au.fail(); toast(`Kaybettin! Kazanan: ${d.winner} numara.`); }
              }, 800);
           }
        }, 400);
-   } catch(e) { toast(e.message); S.busy = false; horseRaceActive = false; q('#hBtn').disabled = false; }
+   } catch(e) { toast(e.message); S.busy = false; horseRaceActive = false; }
 };
 
 /* ── POKER ENGINE ── */
