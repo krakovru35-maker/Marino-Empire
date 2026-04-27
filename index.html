@@ -150,6 +150,12 @@ main.active { display: flex; animation: slideUp 0.3s ease; }
 .fs-overlay { position: absolute; inset: 0; z-index: 200; background: rgba(0,0,0,0.95); opacity: 0; pointer-events: none; transition: 0.3s; display: flex; flex-direction: column; }
 .fs-overlay.show { opacity: 1; pointer-events: auto; }
 
+/* Keyboard Scroll Fix */
+.fs-body { flex: 1; display: grid; place-items: center; position: relative; overflow-y: auto; padding-bottom: 20vh; }
+@media (max-width: 480px) {
+  .fs-body { align-items: flex-start; padding-top: 20px; }
+}
+
 /* ── Cinematic Intro ── */
 .intro-overlay { 
   position: fixed; inset: 0; background: #040f1c; z-index: 9999; 
@@ -1461,7 +1467,7 @@ function renderHorse() {
                <option value="5">5 Numaralı At</option>
                <option value="6">6 Numaralı At</option>
             </select>
-            <input type="number" id="hBet" placeholder="Çip" style="flex:1; padding:10px; background:#222; border:2px solid #555; color:#fff; border-radius:8px; font-weight:900; outline:none">
+            <input type="number" id="hBet" placeholder="Çip" onblur="window.scrollTo(0, 0);" style="flex:1; padding:10px; background:#222; border:2px solid #555; color:#fff; border-radius:8px; font-weight:900; outline:none">
          </div>
          <button class="action-btn gold" onclick="playHorse()" style="width:100%; height:50px; font-size:18px" id="hBtn">YARIŞI BAŞLAT</button>
       </div>
