@@ -1465,8 +1465,8 @@ function renderHorse() {
    html += `</div></div>
       <div style="background:#111; padding:15px; border-radius:12px; text-align:center; border:2px solid #333">
          <div style="margin-bottom:15px; font-weight:900; color:#fff">BAHİS YAP (Oran: 5x)</div>
-         <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <select id="hSel" style="flex:1; padding:10px; background:#222; border:2px solid #555; color:#fff; border-radius:8px; font-weight:900; outline:none">
+         <div style="margin-bottom:15px;">
+            <select id="hSel" style="width:100%; padding:12px; background:#222; border:2px solid #555; color:#fff; border-radius:8px; font-weight:900; outline:none; text-align:center">
                <option value="1">1 Numaralı At</option>
                <option value="2">2 Numaralı At</option>
                <option value="3">3 Numaralı At</option>
@@ -1474,19 +1474,23 @@ function renderHorse() {
                <option value="5">5 Numaralı At</option>
                <option value="6">6 Numaralı At</option>
             </select>
-            <input type="number" id="hBet" placeholder="Çip" style="flex:1; padding:10px; background:#222; border:2px solid #555; color:#fff; border-radius:8px; font-weight:900; outline:none">
          </div>
-         <button class="action-btn gold" onclick="playHorse()" style="width:100%; height:50px; font-size:18px" id="hBtn">YARIŞI BAŞLAT</button>
+         <div style="display:flex; gap:8px; justify-content:center;">
+             <button class="action-btn" style="flex:1; height:45px; font-size:16px" onclick="playHorse(10)">10 <span style="font-size:12px">Çip</span></button>
+             <button class="action-btn" style="flex:1; height:45px; font-size:16px" onclick="playHorse(50)">50 <span style="font-size:12px">Çip</span></button>
+             <button class="action-btn" style="flex:1; height:45px; font-size:16px" onclick="playHorse(100)">100 <span style="font-size:12px">Çip</span></button>
+             <button class="action-btn gold" style="flex:1; height:45px; font-size:16px" onclick="playHorse(500)">500 <span style="font-size:12px">Çip</span></button>
+         </div>
       </div>
    `;
    b.innerHTML = html;
 }
 
-window.playHorse = async () => {
+window.playHorse = async (betAmount) => {
    if(horseRaceActive || S.busy) return;
-   const bet = parseInt(q('#hBet').value);
+   const bet = betAmount;
    const hid = parseInt(q('#hSel').value);
-   if(isNaN(bet) || bet <= 0) return toast("Bahis miktarı giriniz!");
+   if(isNaN(bet) || bet <= 0) return toast("Bahis miktarı geçersiz!");
    
    try {
        S.busy = true; q('#hBtn').disabled = true; horseRaceActive = true;
