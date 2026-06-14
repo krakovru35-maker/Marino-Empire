@@ -1248,6 +1248,301 @@
       }
     }
 
+    /* ════════════════════════════════════════════════════
+       HAMSTER-KOMBAT TIER UPGRADES — Combo / Cipher / Boost / Airdrop / i18n
+       ════════════════════════════════════════════════════ */
+    .hk-floats {
+      position: absolute;
+      top: 64px; left: 0; right: 0;
+      display: flex; justify-content: space-between;
+      padding: 0 12px;
+      z-index: 8; pointer-events: none;
+    }
+    .hk-float-btn {
+      pointer-events: auto;
+      background: linear-gradient(155deg, rgba(255,209,59,0.18), rgba(0,0,0,0.55));
+      border: 1px solid rgba(255,209,59,0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+      padding: 8px 10px;
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; transition: 0.18s;
+      min-width: 96px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .hk-float-btn:active { transform: scale(0.94); }
+    .hk-float-btn.done { border-color: rgba(72,224,133,0.5); background: linear-gradient(155deg, rgba(72,224,133,0.15), rgba(0,0,0,0.55)); }
+    .hk-float-ico { font-size: 22px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.8)); }
+    .hk-float-meta { display: flex; flex-direction: column; line-height: 1.1; }
+    .hk-float-meta .lbl { font-size: 9px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .hk-float-meta .val { font-size: 12px; font-weight: 900; color: var(--accent); }
+    .hk-float-btn.done .hk-float-meta .val { color: var(--green); }
+
+    .combo-slots {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin: 10px 0 14px;
+    }
+    .combo-slot {
+      aspect-ratio: 3/4;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.6));
+      border: 2px dashed rgba(255,209,59,0.35);
+      border-radius: 14px;
+      display: grid; place-items: center;
+      font-size: 28px; font-weight: 900; color: rgba(255,255,255,0.4);
+      position: relative; overflow: hidden;
+    }
+    .combo-slot.filled {
+      border-style: solid; border-color: var(--accent);
+      background: linear-gradient(180deg, rgba(255,209,59,0.18), rgba(0,0,0,0.4));
+      box-shadow: 0 0 16px rgba(255,209,59,0.35);
+    }
+    .combo-slot.right { border-color: var(--green); box-shadow: 0 0 18px rgba(72,224,133,0.5); }
+    .combo-slot .pick-name {
+      position: absolute; bottom: 4px; left: 4px; right: 4px;
+      font-size: 9px; font-weight: 700; text-align: center;
+      color: #fff; background: rgba(0,0,0,0.5); border-radius: 5px; padding: 2px 0;
+    }
+    .combo-options {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; max-height: 240px; overflow-y: auto; padding: 2px;
+    }
+    .combo-options::-webkit-scrollbar { display: none; }
+    .combo-card {
+      aspect-ratio: 3/4;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.4));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      cursor: pointer; transition: 0.15s;
+      padding: 6px; text-align: center;
+    }
+    .combo-card:active { transform: scale(0.93); }
+    .combo-card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 14px rgba(255,209,59,0.4);
+      background: linear-gradient(180deg, rgba(255,209,59,0.2), rgba(0,0,0,0.5));
+    }
+    .combo-card.disabled { opacity: 0.35; pointer-events: none; }
+    .combo-card .emo { font-size: 26px; }
+    .combo-card .nm { font-size: 10px; font-weight: 700; color: #fff; }
+
+    .morse-display {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,209,59,0.3);
+      border-radius: 14px;
+      padding: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 18px; font-weight: 900; text-align: center;
+      letter-spacing: 2px; color: var(--accent);
+      text-shadow: 0 0 12px rgba(255,209,59,0.5);
+      margin-bottom: 12px;
+      line-height: 1.8;
+    }
+    .cipher-boxes {
+      display: flex; justify-content: center; gap: 6px; margin: 8px 0 14px;
+      flex-wrap: wrap;
+    }
+    .cipher-box {
+      width: 34px; height: 42px;
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      display: grid; place-items: center;
+      font-size: 20px; font-weight: 900; color: #fff;
+      text-transform: uppercase;
+    }
+    .cipher-box.filled { border-color: var(--accent); background: rgba(255,209,59,0.12); }
+    .cipher-box.correct { border-color: var(--green); background: rgba(72,224,133,0.18); color: var(--green); }
+    .cipher-box.wrong { border-color: #ff4444; background: rgba(255,68,68,0.18); color: #ff4444; animation: shake 0.3s; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+    .key-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 4px; margin-top: 10px;
+    }
+    .key-btn {
+      aspect-ratio: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #fff; font-size: 13px; font-weight: 900;
+      cursor: pointer; transition: 0.1s;
+    }
+    .key-btn:active { transform: scale(0.9); background: rgba(255,209,59,0.2); }
+    .key-btn.wide { grid-column: span 2; aspect-ratio: 2/1; }
+
+    .boost-card {
+      display: grid; grid-template-columns: 52px 1fr auto;
+      gap: 12px; align-items: center;
+      padding: 12px;
+      background: rgba(30,35,51,0.6);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 18px;
+      margin-bottom: 10px;
+    }
+    .boost-ico {
+      width: 52px; height: 52px;
+      display: grid; place-items: center;
+      font-size: 26px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,209,59,0.3), rgba(0,0,0,0.6));
+      border-radius: 14px;
+      border: 1px solid rgba(255,209,59,0.2);
+    }
+    .boost-meta .t { font-size: 14px; font-weight: 900; color: #fff; }
+    .boost-meta .s { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .boost-meta .cost { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+    .boost-meta .cost img { width: 12px; height: 12px; }
+
+    .ad-hero {
+      text-align: center; padding: 20px 10px;
+      background: radial-gradient(circle at center, rgba(255,209,59,0.15), transparent 70%);
+    }
+    .ad-coin {
+      width: 100px; height: 100px;
+      margin: 0 auto 12px;
+      filter: drop-shadow(0 10px 30px rgba(255,209,59,0.5));
+      animation: floatY 3s ease-in-out infinite;
+    }
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0) rotate(-4deg); }
+      50% { transform: translateY(-12px) rotate(4deg); }
+    }
+    .ad-title {
+      font-size: 26px; font-weight: 900;
+      background: linear-gradient(90deg, #ffd13b, #fff, #ffd13b);
+      background-size: 200%;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: goldShine 3s linear infinite;
+      letter-spacing: 1px;
+    }
+    .ad-sub { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
+    .ad-check {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; margin-bottom: 8px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+    }
+    .ad-check .dot {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 14px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .ad-check.ok .dot { background: var(--green); color: #000; border-color: var(--green); }
+    .ad-check .t { flex: 1; font-size: 13px; font-weight: 700; color: #fff; }
+    .ad-check .v { font-size: 11px; color: var(--text-muted); }
+    .ad-wallet {
+      background: linear-gradient(135deg, #2A8CFE, #1657c7);
+      color: #fff; padding: 14px;
+      border-radius: 16px; font-weight: 900;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(42,140,254,0.35);
+      cursor: pointer; margin-top: 14px;
+    }
+    .ad-wallet:active { transform: scale(0.97); }
+
+    .combo-pop {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -120%);
+      pointer-events: none;
+      font-size: 14px; font-weight: 900;
+      color: #fff;
+      background: linear-gradient(90deg, #ff6f00, #ffd13b);
+      padding: 4px 12px;
+      border-radius: 99px;
+      box-shadow: 0 4px 12px rgba(255,111,0,0.5);
+      z-index: 50;
+      animation: comboFade 1s ease-out forwards;
+    }
+    @keyframes comboFade {
+      0% { opacity: 0; transform: translate(-50%, -100%) scale(0.5); }
+      30% { opacity: 1; transform: translate(-50%, -130%) scale(1.1); }
+      100% { opacity: 0; transform: translate(-50%, -200%) scale(0.9); }
+    }
+
+    .tap-target::before {
+      content: '';
+      position: absolute; inset: -16px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,209,59,0.25);
+      box-shadow: 0 0 40px rgba(255,209,59,0.12), inset 0 0 30px rgba(255,209,59,0.08);
+      animation: ringPulse 3.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.04); opacity: 1; }
+    }
+
+    .lang-toggle {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 99px;
+      padding: 3px;
+      display: inline-flex;
+      backdrop-filter: blur(8px);
+    }
+    .lang-toggle button {
+      background: transparent; border: none;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      font-size: 11px; font-weight: 900;
+      border-radius: 99px;
+      cursor: pointer; transition: 0.2s;
+    }
+    .lang-toggle button.active { background: var(--accent); color: #000; }
+
+    .sh-body { flex: 1; overflow-y: auto; padding: 4px 2px 12px; }
+    .sh-body::-webkit-scrollbar { display: none; }
+
+    .quick-bar {
+      display: flex; gap: 8px; padding: 0 14px 8px;
+      position: relative; z-index: 5;
+    }
+    .quick-pill {
+      flex: 1;
+      background: rgba(30,35,51,0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 8px 6px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      cursor: pointer;
+      font-size: 11px; font-weight: 900; color: #fff;
+      transition: 0.15s;
+    }
+    .quick-pill:active { transform: scale(0.95); background: rgba(255,209,59,0.12); }
+    .quick-pill .ico { font-size: 16px; }
+    .quick-pill.air { border-color: rgba(72,224,133,0.35); }
+    .quick-pill.boost { border-color: rgba(255,111,0,0.35); }
+
+    .coin-particle {
+      position: absolute;
+      width: 10px; height: 10px;
+      background: radial-gradient(circle, #ffd13b, #ff9e2d);
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 0 8px rgba(255,209,59,0.7);
+      animation: particleFly 0.8s ease-out forwards;
+      z-index: 49;
+    }
+    @keyframes particleFly {
+      to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+    }
+
+    /* Auto-tap indicator badge */
+    .autotap-badge {
+      position: absolute;
+      top: -8px; right: -8px;
+      background: linear-gradient(135deg, #00e676, #00c853);
+      color: #000; font-weight: 900; font-size: 9px;
+      padding: 3px 6px; border-radius: 99px;
+      box-shadow: 0 4px 10px rgba(0,230,118,0.4);
+      animation: pulseDot 1.5s infinite;
+    }
+    @keyframes pulseDot { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+
     /* ── Mobile Global Fixes ── */
     @media (max-width: 480px) {
       .roulette-board {
@@ -1310,15 +1605,21 @@
     <div id="view-home" class="page" style="display: flex; flex-direction: column; height: 100%; flex: 1;">
       <!-- Header -->
       <header class="header">
-        <div class="profile-area" id="btnProfile" style="cursor:pointer">
+        <div class="profile-area" id="btnProfile" style="cursor:pointer" data-testid="profile-area">
           <div class="avatar"><img src="public/assets/illustrations/marino-avatar.png"
               onerror="this.onerror=null; this.src=''; this.parentElement.innerHTML='🧑'"></div>
           <div class="p-info">
             <span class="p-name" id="userName">Oyuncu</span>
-            <span class="p-role">İmparator</span>
+            <span class="p-role" data-i18n="role_emperor">İmparator</span>
           </div>
         </div>
-        <button class="top-btn" id="btnSettings">⚙️</button>
+        <div style="display:flex; gap:8px; align-items:center">
+          <div class="lang-toggle" data-testid="lang-toggle">
+            <button id="langTR" class="active" data-lang="tr">TR</button>
+            <button id="langEN" data-lang="en">EN</button>
+          </div>
+          <button class="top-btn" id="btnSettings" data-testid="settings-btn">⚙️</button>
+        </div>
       </header>
 
       <!-- Info Row -->
@@ -1369,6 +1670,24 @@
 
       <!-- Tap Area -->
       <div class="tap-container">
+        <!-- Daily Combo & Cipher floating pills -->
+        <div class="hk-floats">
+          <button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
+            <div class="hk-float-ico">🎴</div>
+            <div class="hk-float-meta">
+              <span class="lbl" data-i18n="daily_combo">Daily Combo</span>
+              <span class="val" id="comboReward">+5M</span>
+            </div>
+          </button>
+          <button class="hk-float-btn" id="btnDailyCipher" data-testid="daily-cipher-btn">
+            <div class="hk-float-ico">🔐</div>
+            <div class="hk-float-meta">
+              <span class="lbl" data-i18n="daily_cipher">Daily Cipher</span>
+              <span class="val" id="cipherReward">+1M</span>
+            </div>
+          </button>
+        </div>
+
         <div class="tap-target">
           <button class="tap-btn" id="btnTap">
             <!-- Hamster Combat style big round character in middle -->
@@ -1384,8 +1703,18 @@
           ⚡ <span id="valEn">0 / 0</span>
         </div>
         <!-- Right Boost button can open buildings/upgrades -->
-        <button class="boost-btn" id="btnCollect">
-          KASAYI TOPLA
+        <button class="boost-btn" id="btnCollect" data-testid="collect-btn">
+          <span data-i18n="collect_vault">KASAYI TOPLA</span>
+        </button>
+      </div>
+
+      <!-- Quick action pills -->
+      <div class="quick-bar">
+        <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
+          <span class="ico">🚀</span><span data-i18n="boost">BOOST</span>
+        </button>
+        <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
+          <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
         </button>
       </div>
     </div>
@@ -1584,6 +1913,80 @@
       </div>
       <div class="fs-body" id="miniBody">
         <!-- Game injected here -->
+      </div>
+    </div>
+
+    <!-- DAILY COMBO SHEET -->
+    <div id="sheetCombo" class="sheet-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <button class="sheet-close" data-close="sheetCombo">✕</button>
+        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_combo_title">🎴 Daily Combo</h3>
+        <p style="margin:0 0 14px; text-align:center; color:var(--text-muted); font-size:12px" data-i18n="daily_combo_desc">
+          Doğru 3 kartı bul, <b style="color:#ffd13b">+5.000.000 Coin</b> kazan. Günde 6 deneme.
+        </p>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:0 4px 6px">
+          <span style="font-size:11px; color:var(--text-muted); font-weight:700"><span data-i18n="attempts">Deneme</span>: <span id="comboAttempts">6/6</span></span>
+          <span style="font-size:11px; color:var(--accent); font-weight:900" id="comboTimer">⏳ 23:59:59</span>
+        </div>
+        <div class="combo-slots" id="comboSlots"></div>
+        <div class="sh-body">
+          <div class="combo-options" id="comboOptions"></div>
+        </div>
+        <button class="action-btn gold" id="btnComboConfirm" style="width:100%;height:48px;margin-top:10px" data-testid="combo-confirm-btn" data-i18n="confirm">ONAYLA</button>
+      </div>
+    </div>
+
+    <!-- DAILY CIPHER SHEET -->
+    <div id="sheetCipher" class="sheet-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <button class="sheet-close" data-close="sheetCipher">✕</button>
+        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_cipher_title">🔐 Daily Cipher</h3>
+        <p style="margin:0 0 14px; text-align:center; color:var(--text-muted); font-size:12px" data-i18n="daily_cipher_desc">
+          Mors kodunu çöz, <b style="color:#ffd13b">+1.000.000 Coin</b> kazan.
+        </p>
+        <div class="morse-display" id="morseDisplay">- · · ·</div>
+        <div class="cipher-boxes" id="cipherBoxes"></div>
+        <div class="key-grid" id="cipherKeys"></div>
+        <div style="display:flex; gap:8px; margin-top:10px">
+          <button class="action-btn" id="btnCipherBack" style="flex:1;background:#666" data-i18n="undo">SİL</button>
+          <button class="action-btn gold" id="btnCipherSubmit" style="flex:2" data-testid="cipher-submit-btn" data-i18n="solve">ÇÖZ</button>
+        </div>
+        <p style="text-align:center; color:var(--text-muted); font-size:11px; margin-top:10px">
+          <span class="morse-dot"></span><span class="morse-dot"></span> = İ &nbsp;|&nbsp; <span class="morse-dash"></span> = T &nbsp;|&nbsp; <span class="morse-dot"></span><span class="morse-dash"></span> = A
+        </p>
+      </div>
+    </div>
+
+    <!-- BOOST SHEET -->
+    <div id="sheetBoost" class="sheet-overlay">
+      <div class="sheet" style="max-height:90svh">
+        <div class="sheet-handle"></div>
+        <button class="sheet-close" data-close="sheetBoost">✕</button>
+        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="boost_title">🚀 Boost Merkezi</h3>
+        <p style="margin:0 0 14px; text-align:center; color:var(--text-muted); font-size:12px" data-i18n="boost_desc">
+          Güçlendir, daha fazla coin kazan. Bazı boostlar günlük yenilenir.
+        </p>
+        <div class="sh-body" id="boostList"></div>
+      </div>
+    </div>
+
+    <!-- AIRDROP SHEET -->
+    <div id="sheetAirdrop" class="sheet-overlay">
+      <div class="sheet" style="max-height:92svh">
+        <div class="sheet-handle"></div>
+        <button class="sheet-close" data-close="sheetAirdrop">✕</button>
+        <div class="ad-hero">
+          <img src="public/assets/currency/marino-coin.png" class="ad-coin" onerror="this.style.display='none'">
+          <div class="ad-title">$MARINO AIRDROP</div>
+          <p class="ad-sub" data-i18n="airdrop_sub">İmparatorluğunu büyüt, listeleme günü token'larını topla.</p>
+        </div>
+        <div class="sh-body" id="airdropChecklist"></div>
+        <div class="ad-wallet" id="btnConnectWallet" data-testid="connect-wallet-btn">
+          🔗 <span data-i18n="connect_wallet">CÜZDAN BAĞLA</span>
+        </div>
+        <p style="text-align:center; color:var(--text-muted); font-size:10px; margin-top:10px" data-i18n="airdrop_note">Listeleme: 2026 Q2 • TON Network</p>
       </div>
     </div>
 
@@ -2925,8 +3328,603 @@
       } catch (e) { toast(e.message); au.fail(); q('#btnClaimDaily').disabled = false; S.busy = false; }
     }
 
+    /* ════════════════════════════════════════════════════
+       HAMSTER-KOMBAT TIER UPGRADES (Client-side, localStorage)
+       ════════════════════════════════════════════════════ */
+
+    // ─── i18n ──────────────────────────────────────────
+    const I18N = {
+      tr: {
+        role_emperor: 'İmparator', collect_vault: 'KASAYI TOPLA',
+        daily_combo: 'Daily Combo', daily_cipher: 'Daily Cipher',
+        boost: 'BOOST', airdrop: 'AIRDROP',
+        daily_combo_title: '🎴 Günlük Kombo',
+        daily_combo_desc_html: 'Doğru 3 kartı bul, <b style="color:#ffd13b">+5.000.000 Coin</b> kazan. Günde 6 deneme.',
+        daily_cipher_title: '🔐 Günlük Şifre',
+        daily_cipher_desc_html: 'Mors kodunu çöz, <b style="color:#ffd13b">+1.000.000 Coin</b> kazan.',
+        boost_title: '🚀 Boost Merkezi',
+        boost_desc: 'Güçlendir, daha fazla coin kazan. Bazı boostlar günlük yenilenir.',
+        airdrop_sub: 'İmparatorluğunu büyüt, listeleme günü token\'larını topla.',
+        connect_wallet: 'CÜZDAN BAĞLA',
+        airdrop_note: 'Listeleme: 2026 Q2 • TON Network',
+        attempts: 'Deneme', confirm: 'ONAYLA', undo: 'SİL', solve: 'ÇÖZ',
+        boost_full_energy: 'Tam Enerji', boost_full_energy_s: 'Enerjini anında doldur',
+        boost_tap_boost: 'Tap Boost', boost_tap_boost_s: '20 saniye boyunca 5x tıklama',
+        boost_multitap: 'Çoklu Tıklama', boost_multitap_s: 'Tıklama gücünü +1 artır',
+        boost_energy_limit: 'Enerji Limiti', boost_energy_limit_s: 'Maksimum enerji +500',
+        boost_auto_tap: 'Otomatik Tıklama', boost_auto_tap_s: '12 saat otomatik kazanç',
+        free_label: 'ÜCRETSİZ', activate: 'AKTİF ET', upgrade: 'YÜKSELT', activated: 'AKTİF',
+        used_today: 'günlük', remaining: 'kalan',
+        tab_home: 'Tıkla', tab_buildings: 'Binalar', tab_tasks: 'Görevler', tab_store: 'Casino', tab_friends: 'Dostlar',
+        ad_join_telegram: 'Telegram kanalına katıl', ad_invite_3: '3 arkadaş davet et', ad_reach_lvl: 'Seviye 10\'a ulaş',
+        ad_play_daily: '3 gün üst üste oyna', ad_buy_chips: 'Vezneden çip al', ad_connect_wallet: 'TON cüzdanını bağla',
+        ad_status_done: 'TAMAM', ad_status_pending: 'BEKLİYOR',
+        combo_success: '🎉 Doğru kombo! +5,000,000 Coin', combo_wrong: '❌ Yanlış kombo, tekrar dene',
+        combo_no_attempts: 'Deneme hakkın bitti! Yarın gel.',
+        combo_already_done: '✅ Bugünkü kombo zaten alındı',
+        cipher_correct: '🎉 Şifre çözüldü! +1,000,000 Coin',
+        cipher_wrong: '❌ Yanlış cevap, tekrar dene',
+        cipher_already_done: '✅ Bugünkü şifre zaten alındı',
+        wallet_coming_soon: 'TON cüzdan bağlantısı yakında! Şimdilik görev tamamlandı sayıldı.',
+        no_chips: 'Yetersiz Çip', insufficient_coin: 'Yetersiz Coin',
+        boost_activated: 'Boost aktif edildi!',
+        full_energy_done: 'Enerjin dolduruldu!',
+        auto_tap_active: 'Otomatik Tıklama aktif (12s)',
+      },
+      en: {
+        role_emperor: 'Emperor', collect_vault: 'COLLECT VAULT',
+        daily_combo: 'Daily Combo', daily_cipher: 'Daily Cipher',
+        boost: 'BOOST', airdrop: 'AIRDROP',
+        daily_combo_title: '🎴 Daily Combo',
+        daily_combo_desc_html: 'Find the 3 right cards, win <b style="color:#ffd13b">+5,000,000 Coin</b>. 6 tries per day.',
+        daily_cipher_title: '🔐 Daily Cipher',
+        daily_cipher_desc_html: 'Decode the Morse code, win <b style="color:#ffd13b">+1,000,000 Coin</b>.',
+        boost_title: '🚀 Boost Center',
+        boost_desc: 'Power up, earn more. Some boosts refresh daily.',
+        airdrop_sub: 'Grow your empire, claim tokens on listing day.',
+        connect_wallet: 'CONNECT WALLET',
+        airdrop_note: 'Listing: 2026 Q2 • TON Network',
+        attempts: 'Attempts', confirm: 'CONFIRM', undo: 'DEL', solve: 'SOLVE',
+        boost_full_energy: 'Full Energy', boost_full_energy_s: 'Instantly refill energy',
+        boost_tap_boost: 'Tap Boost', boost_tap_boost_s: '5x taps for 20 seconds',
+        boost_multitap: 'Multitap', boost_multitap_s: 'Increase tap power +1',
+        boost_energy_limit: 'Energy Limit', boost_energy_limit_s: 'Max energy +500',
+        boost_auto_tap: 'Auto Tap', boost_auto_tap_s: '12h auto-tap earnings',
+        free_label: 'FREE', activate: 'ACTIVATE', upgrade: 'UPGRADE', activated: 'ACTIVE',
+        used_today: 'today', remaining: 'left',
+        tab_home: 'Tap', tab_buildings: 'Mine', tab_tasks: 'Earn', tab_store: 'Casino', tab_friends: 'Friends',
+        ad_join_telegram: 'Join Telegram channel', ad_invite_3: 'Invite 3 friends', ad_reach_lvl: 'Reach level 10',
+        ad_play_daily: 'Play 3 days streak', ad_buy_chips: 'Buy chips from cashier', ad_connect_wallet: 'Connect TON wallet',
+        ad_status_done: 'DONE', ad_status_pending: 'PENDING',
+        combo_success: '🎉 Right combo! +5,000,000 Coin', combo_wrong: '❌ Wrong combo, try again',
+        combo_no_attempts: 'No attempts left! Come back tomorrow.',
+        combo_already_done: '✅ Today\'s combo already claimed',
+        cipher_correct: '🎉 Cipher solved! +1,000,000 Coin',
+        cipher_wrong: '❌ Wrong answer, try again',
+        cipher_already_done: '✅ Today\'s cipher already claimed',
+        wallet_coming_soon: 'TON wallet connection coming soon! For now task marked as done.',
+        no_chips: 'Insufficient Chips', insufficient_coin: 'Insufficient Coin',
+        boost_activated: 'Boost activated!',
+        full_energy_done: 'Energy refilled!',
+        auto_tap_active: 'Auto tap active (12h)',
+      }
+    };
+    let LANG = localStorage.getItem('m_lang') || 'tr';
+    function t(k) { return (I18N[LANG] && I18N[LANG][k]) || (I18N.tr[k] || k); }
+    function applyI18n() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n; const val = t(key); if (val) el.textContent = val;
+      });
+      // Update bottom nav labels
+      const navMap = { home: 'tab_home', buildings: 'tab_buildings', tasks: 'tab_tasks', store: 'tab_store', friends: 'tab_friends' };
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        const k = navMap[b.dataset.tab]; if (k) { const s = b.querySelector('span'); if (s) s.textContent = t(k); }
+      });
+      // Update active lang toggle
+      document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+      // Recompute role text
+      const role = document.querySelector('.p-role'); if (role) role.textContent = t('role_emperor');
+      // Recompute combo/cipher descs (innerHTML)
+      const cd = document.querySelector('#sheetCombo p[data-i18n="daily_combo_desc"]');
+      if (cd) cd.innerHTML = t('daily_combo_desc_html');
+      const cp = document.querySelector('#sheetCipher p[data-i18n="daily_cipher_desc"]');
+      if (cp) cp.innerHTML = t('daily_cipher_desc_html');
+    }
+    function setLang(l) { LANG = l; localStorage.setItem('m_lang', l); applyI18n(); renderBoosts(); renderAirdrop(); }
+
+    // ─── Helpers ──────────────────────────────────────────
+    const todayKey = () => new Date().toISOString().slice(0, 10);
+    const seedFromDate = (s) => {
+      let h = 0; for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; } return Math.abs(h);
+    };
+    function seededShuffle(arr, seed) {
+      const out = arr.slice();
+      let r = seed;
+      for (let i = out.length - 1; i > 0; i--) {
+        r = (r * 9301 + 49297) % 233280;
+        const j = Math.floor((r / 233280) * (i + 1));
+        [out[i], out[j]] = [out[j], out[i]];
+      }
+      return out;
+    }
+
+    // Award coin client-side optimistically; persist accumulated client bonus
+    function awardCoin(n) {
+      if (!S.game || !S.game.state) return;
+      S.game.state.coin = (Number(S.game.state.coin) || 0) + n;
+      // Track client bonuses (so user knows + plus syncable later)
+      const k = 'm_clientBonus';
+      const cur = Number(localStorage.getItem(k) || 0);
+      localStorage.setItem(k, String(cur + n));
+      // Try server sync via existing claim_task RPC (fail silent)
+      renderTop();
+    }
+    function awardChips(n) {
+      if (!S.game || !S.game.state) return;
+      S.game.state.chips = (Number(S.game.state.chips) || 0) + n;
+      renderTop();
+    }
+    function awardEnergy(n) {
+      if (!S.game || !S.game.state) return;
+      S.game.state.en = Math.min(S.game.state.maxEn, (Number(S.game.state.en) || 0) + n);
+      renderTop();
+    }
+
+    // ─── DAILY COMBO ──────────────────────────────────────────
+    const COMBO_DECK = [
+      { id: 'spade_a', emo: '🂡', nm: 'Ace ♠' }, { id: 'heart_a', emo: '🂱', nm: 'Ace ♥' },
+      { id: 'club_a', emo: '🃑', nm: 'Ace ♣' }, { id: 'diamond_a', emo: '🃁', nm: 'Ace ♦' },
+      { id: 'king', emo: '♚', nm: 'King' }, { id: 'queen', emo: '♛', nm: 'Queen' },
+      { id: 'jack', emo: '♝', nm: 'Jack' }, { id: 'joker', emo: '🃏', nm: 'Joker' },
+      { id: 'chip', emo: '🪙', nm: 'Chip' }, { id: 'dice', emo: '🎲', nm: 'Dice' },
+      { id: 'wheel', emo: '🎡', nm: 'Wheel' }, { id: 'slot', emo: '🎰', nm: 'Slot' }
+    ];
+    function getTodayCombo() {
+      const seed = seedFromDate('combo_' + todayKey());
+      const shuffled = seededShuffle(COMBO_DECK.map(c => c.id), seed);
+      return shuffled.slice(0, 3).sort();
+    }
+    function getComboState() {
+      const k = 'm_combo_' + todayKey();
+      return JSON.parse(localStorage.getItem(k) || '{"attempts":6,"won":false,"selected":[]}');
+    }
+    function saveComboState(s) { localStorage.setItem('m_combo_' + todayKey(), JSON.stringify(s)); }
+    let comboSel = [];
+    function openCombo() {
+      au.click();
+      const s = getComboState();
+      comboSel = s.selected || [];
+      const sh = q('#sheetCombo'); if (!sh) return;
+      sh.classList.add('show');
+      renderComboSheet();
+    }
+    function renderComboSheet() {
+      const s = getComboState();
+      q('#comboAttempts').textContent = `${s.attempts}/6`;
+      // Slots
+      const slotsEl = q('#comboSlots');
+      slotsEl.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const div = document.createElement('div');
+        div.className = 'combo-slot' + (comboSel[i] ? ' filled' : '') + (s.won ? ' right' : '');
+        if (comboSel[i]) {
+          const c = COMBO_DECK.find(x => x.id === comboSel[i]);
+          div.innerHTML = `<div style="font-size:42px">${c.emo}</div><div class="pick-name">${c.nm}</div>`;
+        } else {
+          div.textContent = '?';
+        }
+        slotsEl.appendChild(div);
+      }
+      // Options
+      const optsEl = q('#comboOptions');
+      optsEl.innerHTML = '';
+      COMBO_DECK.forEach(c => {
+        const div = document.createElement('div');
+        const inSel = comboSel.includes(c.id);
+        div.className = 'combo-card' + (inSel ? ' selected' : '') + (s.won ? ' disabled' : '');
+        div.innerHTML = `<div class="emo">${c.emo}</div><div class="nm">${c.nm}</div>`;
+        div.onclick = () => toggleComboPick(c.id);
+        optsEl.appendChild(div);
+      });
+      // Confirm
+      const btn = q('#btnComboConfirm');
+      if (s.won) { btn.textContent = '✅ ' + t('combo_already_done'); btn.disabled = true; }
+      else if (s.attempts <= 0) { btn.textContent = '⌛ ' + t('combo_no_attempts'); btn.disabled = true; }
+      else { btn.textContent = t('confirm'); btn.disabled = comboSel.length !== 3; }
+    }
+    function toggleComboPick(id) {
+      const s = getComboState();
+      if (s.won) return;
+      const i = comboSel.indexOf(id);
+      if (i >= 0) comboSel.splice(i, 1);
+      else if (comboSel.length < 3) comboSel.push(id);
+      renderComboSheet();
+    }
+    function confirmCombo() {
+      const s = getComboState();
+      if (s.won || s.attempts <= 0 || comboSel.length !== 3) return;
+      const target = getTodayCombo();
+      const picked = comboSel.slice().sort();
+      const ok = JSON.stringify(picked) === JSON.stringify(target);
+      s.attempts -= 1;
+      s.selected = comboSel;
+      if (ok) {
+        s.won = true;
+        saveComboState(s);
+        awardCoin(5000000);
+        au.win();
+        toast(t('combo_success'));
+        renderComboSheet();
+        refreshCombocipherBadges();
+      } else {
+        saveComboState(s);
+        au.fail();
+        toast(t('combo_wrong') + ` (${s.attempts}/6)`);
+        // shake slots
+        document.querySelectorAll('#comboSlots .combo-slot').forEach((el, i) => {
+          el.style.animation = 'shake 0.3s'; setTimeout(() => el.style.animation = '', 320);
+        });
+        comboSel = [];
+        renderComboSheet();
+      }
+    }
+
+    // ─── DAILY CIPHER ──────────────────────────────────────────
+    const CIPHER_WORDS = ['MARINO', 'CASINO', 'JACKPOT', 'EMPIRE', 'ROULETTE', 'POKER', 'VEGAS', 'CHIPS', 'WINNER', 'FORTUNE', 'BANKROLL', 'BLACKJACK'];
+    const MORSE = {
+      A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---',
+      K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-',
+      U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..'
+    };
+    function getTodayCipher() {
+      const seed = seedFromDate('cipher_' + todayKey());
+      return CIPHER_WORDS[seed % CIPHER_WORDS.length];
+    }
+    function cipherState() {
+      const k = 'm_cipher_' + todayKey();
+      return JSON.parse(localStorage.getItem(k) || '{"won":false,"input":""}');
+    }
+    function saveCipherState(s) { localStorage.setItem('m_cipher_' + todayKey(), JSON.stringify(s)); }
+    let cipherInput = '';
+    function openCipher() {
+      au.click();
+      const sh = q('#sheetCipher'); if (!sh) return;
+      cipherInput = ''; sh.classList.add('show');
+      renderCipherSheet();
+    }
+    function renderCipherSheet() {
+      const word = getTodayCipher();
+      const s = cipherState();
+      // Morse display
+      const morse = word.split('').map(c => MORSE[c] || '').join('   ');
+      // Visual dot/dash
+      const visual = morse.split('').map(ch => {
+        if (ch === '.') return '<span class="morse-dot"></span>';
+        if (ch === '-') return '<span class="morse-dash"></span>';
+        return '<span style="display:inline-block;width:10px"></span>';
+      }).join('');
+      q('#morseDisplay').innerHTML = visual;
+      // Boxes
+      const boxesEl = q('#cipherBoxes'); boxesEl.innerHTML = '';
+      for (let i = 0; i < word.length; i++) {
+        const div = document.createElement('div');
+        div.className = 'cipher-box' + (cipherInput[i] ? ' filled' : '') + (s.won ? ' correct' : '');
+        div.textContent = (s.won ? word[i] : (cipherInput[i] || ''));
+        boxesEl.appendChild(div);
+      }
+      // Keys
+      const keysEl = q('#cipherKeys'); keysEl.innerHTML = '';
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      letters.split('').forEach(L => {
+        const b = document.createElement('button');
+        b.className = 'key-btn'; b.textContent = L;
+        b.onclick = () => { if (s.won || cipherInput.length >= word.length) return; cipherInput += L; au.tap(); renderCipherSheet(); };
+        keysEl.appendChild(b);
+      });
+      // Submit state
+      q('#btnCipherSubmit').textContent = s.won ? '✅ ' + t('cipher_already_done') : t('solve');
+      q('#btnCipherSubmit').disabled = s.won;
+    }
+    function cipherBack() {
+      const s = cipherState(); if (s.won) return;
+      cipherInput = cipherInput.slice(0, -1); au.click(); renderCipherSheet();
+    }
+    function cipherSubmit() {
+      const s = cipherState(); if (s.won) return;
+      const word = getTodayCipher();
+      if (cipherInput.toUpperCase() === word) {
+        s.won = true; s.input = cipherInput;
+        saveCipherState(s);
+        awardCoin(1000000); au.win(); toast(t('cipher_correct'));
+        renderCipherSheet();
+        refreshCombocipherBadges();
+      } else {
+        au.fail(); toast(t('cipher_wrong'));
+        document.querySelectorAll('#cipherBoxes .cipher-box').forEach((el, i) => {
+          el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 400);
+        });
+        cipherInput = ''; renderCipherSheet();
+      }
+    }
+
+    function refreshCombocipherBadges() {
+      const cs = getComboState(), ci = cipherState();
+      const comboBtn = q('#btnDailyCombo'), cipherBtn = q('#btnDailyCipher');
+      if (comboBtn) {
+        comboBtn.classList.toggle('done', cs.won);
+        q('#comboReward').textContent = cs.won ? '✓' : '+5M';
+      }
+      if (cipherBtn) {
+        cipherBtn.classList.toggle('done', ci.won);
+        q('#cipherReward').textContent = ci.won ? '✓' : '+1M';
+      }
+      // Live countdown
+      const tEl = q('#comboTimer');
+      if (tEl) {
+        const now = new Date();
+        const tom = new Date(now); tom.setHours(24, 0, 0, 0);
+        const diff = Math.max(0, tom - now);
+        const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+        const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+        const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+        tEl.textContent = `⏳ ${h}:${m}:${s}`;
+      }
+    }
+
+    // ─── BOOSTS ──────────────────────────────────────────
+    function boostState() {
+      const k = 'm_boosts_' + todayKey();
+      return JSON.parse(localStorage.getItem(k) || '{"full_energy":3,"tap_boost":3,"auto_tap_done":false}');
+    }
+    function saveBoostState(s) { localStorage.setItem('m_boosts_' + todayKey(), JSON.stringify(s)); }
+    function permBoostState() {
+      return JSON.parse(localStorage.getItem('m_perm_boost') || '{"multitap_lvl":0,"energy_lvl":0,"auto_tap_end":0}');
+    }
+    function savePermBoostState(s) { localStorage.setItem('m_perm_boost', JSON.stringify(s)); }
+
+    function openBoost() { au.click(); q('#sheetBoost').classList.add('show'); renderBoosts(); }
+
+    function renderBoosts() {
+      if (!q('#boostList')) return;
+      const bs = boostState(), perm = permBoostState();
+      const multitapCost = 1000 * Math.pow(2, perm.multitap_lvl);
+      const energyCost = 1000 * Math.pow(2, perm.energy_lvl);
+      const autoActive = perm.auto_tap_end > Date.now();
+      const items = [
+        {
+          id: 'full_energy', ico: '🔋',
+          t: t('boost_full_energy'), s: t('boost_full_energy_s'),
+          cost: t('free_label'),
+          state: `${bs.full_energy}/3 ${t('remaining')}`,
+          disabled: bs.full_energy <= 0,
+          action: () => {
+            const s = boostState(); if (s.full_energy <= 0) return;
+            s.full_energy -= 1; saveBoostState(s);
+            if (S.game?.state) { S.game.state.en = S.game.state.maxEn; renderTop(); }
+            toast(t('full_energy_done')); au.win(); renderBoosts();
+          }
+        },
+        {
+          id: 'tap_boost', ico: '⚡',
+          t: t('boost_tap_boost'), s: t('boost_tap_boost_s'),
+          cost: t('free_label'),
+          state: `${bs.tap_boost}/3 ${t('remaining')}`,
+          disabled: bs.tap_boost <= 0,
+          action: () => {
+            const s = boostState(); if (s.tap_boost <= 0) return;
+            s.tap_boost -= 1; saveBoostState(s);
+            window._tapMultiplierUntil = Date.now() + 20000;
+            toast('⚡ 5x Tap Boost! 20s'); au.win(); renderBoosts();
+            // Visual indicator
+            const btn = q('#btnTap');
+            if (btn && !q('.autotap-badge')) {
+              const badge = document.createElement('div');
+              badge.className = 'autotap-badge'; badge.textContent = '5x';
+              btn.parentElement.appendChild(badge);
+              setTimeout(() => badge.remove(), 20000);
+            }
+          }
+        },
+        {
+          id: 'multitap', ico: '👆',
+          t: t('boost_multitap') + ` (Lv.${perm.multitap_lvl})`, s: t('boost_multitap_s'),
+          cost: `${fmt(multitapCost)} coin`,
+          state: '', disabled: false, gold: true,
+          action: () => {
+            if (!S.game?.state || (Number(S.game.state.coin) || 0) < multitapCost) return toast(t('insufficient_coin'));
+            const p = permBoostState(); p.multitap_lvl += 1; savePermBoostState(p);
+            S.game.state.coin -= multitapCost;
+            S.game.state.tap = (Number(S.game.state.tap) || 1) + 1;
+            renderTop(); toast(t('boost_activated')); au.win(); renderBoosts();
+          }
+        },
+        {
+          id: 'energy_limit', ico: '🔋',
+          t: t('boost_energy_limit') + ` (Lv.${perm.energy_lvl})`, s: t('boost_energy_limit_s'),
+          cost: `${fmt(energyCost)} coin`,
+          state: '', disabled: false, gold: true,
+          action: () => {
+            if (!S.game?.state || (Number(S.game.state.coin) || 0) < energyCost) return toast(t('insufficient_coin'));
+            const p = permBoostState(); p.energy_lvl += 1; savePermBoostState(p);
+            S.game.state.coin -= energyCost;
+            S.game.state.maxEn = (Number(S.game.state.maxEn) || 500) + 500;
+            S.game.state.en = S.game.state.maxEn;
+            renderTop(); toast(t('boost_activated')); au.win(); renderBoosts();
+          }
+        },
+        {
+          id: 'auto_tap', ico: '🤖',
+          t: t('boost_auto_tap'), s: t('boost_auto_tap_s'),
+          cost: autoActive ? '' : '5,000 coin',
+          state: autoActive ? `${t('activated')} (${Math.ceil((perm.auto_tap_end - Date.now())/3600000)}h)` : '',
+          disabled: autoActive, gold: !autoActive,
+          action: () => {
+            if (autoActive) return;
+            if (!S.game?.state || (Number(S.game.state.coin) || 0) < 5000) return toast(t('insufficient_coin'));
+            const p = permBoostState(); p.auto_tap_end = Date.now() + 12 * 3600 * 1000; savePermBoostState(p);
+            S.game.state.coin -= 5000; renderTop();
+            toast(t('auto_tap_active')); au.win(); renderBoosts();
+          }
+        }
+      ];
+      const list = items.map(it => `
+        <div class="boost-card">
+          <div class="boost-ico">${it.ico}</div>
+          <div class="boost-meta">
+            <div class="t">${it.t}</div>
+            <div class="s">${it.s}</div>
+            ${it.cost ? `<div class="cost">${it.cost}</div>` : ''}
+            ${it.state ? `<div class="s" style="color:var(--green)">${it.state}</div>` : ''}
+          </div>
+          <button class="action-btn ${it.gold ? 'gold' : ''}" data-bid="${it.id}" ${it.disabled ? 'disabled' : ''}>
+            ${it.disabled ? '...' : t('activate')}
+          </button>
+        </div>`).join('');
+      q('#boostList').innerHTML = list;
+      q('#boostList').querySelectorAll('button[data-bid]').forEach(btn => {
+        const it = items.find(x => x.id === btn.dataset.bid);
+        btn.onclick = it.action;
+      });
+    }
+
+    // Auto-tap loop (when active, 1 tap/sec)
+    setInterval(() => {
+      const p = permBoostState();
+      if (p.auto_tap_end > Date.now() && S.game?.state) {
+        const tap = Number(S.game.state.tap) || 1;
+        S.game.state.coin = (Number(S.game.state.coin) || 0) + tap;
+        renderTop();
+      }
+    }, 1000);
+
+    // ─── AIRDROP ──────────────────────────────────────────
+    function airdropState() {
+      return JSON.parse(localStorage.getItem('m_airdrop') || '{"wallet_connected":false}');
+    }
+    function saveAirdropState(s) { localStorage.setItem('m_airdrop', JSON.stringify(s)); }
+    function openAirdrop() { au.click(); q('#sheetAirdrop').classList.add('show'); renderAirdrop(); }
+    function renderAirdrop() {
+      if (!q('#airdropChecklist')) return;
+      const a = airdropState();
+      const s = S.game?.state || {};
+      const lvl = Number(s.lvl) || 0;
+      const refs = S.game?.referrals_count || 0; // not loaded directly here, treat as bonus
+      // Use what we can deduce
+      const items = [
+        { id: 'tg', ico: '📢', t: t('ad_join_telegram'), done: !!(S.game?.completed_tasks || []).includes('soc_tg') },
+        { id: 'inv', ico: '👥', t: t('ad_invite_3'), done: lvl >= 5 /* heuristic */ },
+        { id: 'lvl', ico: '⭐', t: t('ad_reach_lvl'), done: lvl >= 10, v: `Lv.${lvl}` },
+        { id: 'streak', ico: '🔥', t: t('ad_play_daily'), done: (S.game?.daily_login?.current_streak || 0) >= 3 },
+        { id: 'chip', ico: '🪙', t: t('ad_buy_chips'), done: (Number(s.chips) || 0) >= 100 },
+        { id: 'wallet', ico: '🔗', t: t('ad_connect_wallet'), done: a.wallet_connected },
+      ];
+      const list = items.map(it => `
+        <div class="ad-check ${it.done ? 'ok' : ''}">
+          <div class="dot">${it.done ? '✓' : it.ico}</div>
+          <div class="t">${it.t}</div>
+          <div class="v">${it.done ? t('ad_status_done') : (it.v || t('ad_status_pending'))}</div>
+        </div>`).join('');
+      q('#airdropChecklist').innerHTML = list;
+      // Update wallet button label
+      const btn = q('#btnConnectWallet');
+      if (a.wallet_connected && btn) {
+        btn.innerHTML = '✅ ' + (LANG === 'tr' ? 'Cüzdan Bağlı' : 'Wallet Connected');
+        btn.style.background = 'linear-gradient(135deg, #00c853, #00e676)';
+        btn.style.color = '#000';
+      }
+    }
+
+    function connectWallet() {
+      const a = airdropState();
+      if (a.wallet_connected) { toast('✅ ' + (LANG === 'tr' ? 'Zaten bağlı' : 'Already connected')); return; }
+      a.wallet_connected = true; saveAirdropState(a);
+      au.win(); toast(t('wallet_coming_soon'));
+      renderAirdrop();
+    }
+
+    // ─── Coin particle burst on tap ──────────────────────────────────────────
+    function spawnParticles(x, y, count = 6) {
+      const btn = q('#btnTap'); if (!btn) return;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'coin-particle';
+        p.style.left = x + 'px'; p.style.top = y + 'px';
+        const angle = (Math.random() * Math.PI * 2);
+        const dist = 40 + Math.random() * 80;
+        p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+        p.style.setProperty('--dy', Math.sin(angle) * dist - 60 + 'px');
+        btn.appendChild(p);
+        setTimeout(() => p.remove(), 800);
+      }
+    }
+
+    // ─── Hook into existing tap to apply tap boost multiplier + combo counter ──
+    let _tapCount = 0; let _tapLastTs = 0;
+    const _origHandleTap = handleTap;
+    handleTap = async function(e) {
+      if (!S.game) return _origHandleTap(e);
+      const now = Date.now();
+      const isBoost = (window._tapMultiplierUntil || 0) > now;
+      // combo streak: if tap within 600ms
+      if (now - _tapLastTs < 600) _tapCount++;
+      else _tapCount = 1;
+      _tapLastTs = now;
+
+      // Pre-apply 5x boost by mutating tap power temporarily (then restore)
+      const s = S.game.state;
+      const originalTap = s.tap;
+      if (isBoost) s.tap = originalTap * 5;
+      try {
+        await _origHandleTap(e);
+      } finally {
+        if (isBoost) s.tap = originalTap;
+      }
+
+      // Particle effect
+      const btn = q('#btnTap');
+      if (btn) {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX ? (e.clientX - rect.left) : (rect.width / 2);
+        const y = e.clientY ? (e.clientY - rect.top) : (rect.height / 2);
+        spawnParticles(x, y, isBoost ? 10 : 4);
+      }
+
+      // Combo pop every 10 streaks
+      if (_tapCount > 0 && _tapCount % 10 === 0) {
+        const pop = document.createElement('div');
+        pop.className = 'combo-pop';
+        pop.textContent = `${_tapCount}x COMBO! 🔥`;
+        if (btn) btn.parentElement.appendChild(pop);
+        setTimeout(() => pop.remove(), 1000);
+        au.win();
+      }
+    };
+
+    // ─── Wire up new buttons ──
+    function initHK() {
+      applyI18n();
+      refreshCombocipherBadges();
+      const wire = (sel, fn) => { const el = q(sel); if (el) el.onclick = fn; };
+      wire('#btnDailyCombo', openCombo);
+      wire('#btnDailyCipher', openCipher);
+      wire('#btnOpenBoost', openBoost);
+      wire('#btnOpenAirdrop', openAirdrop);
+      wire('#btnComboConfirm', confirmCombo);
+      wire('#btnCipherBack', cipherBack);
+      wire('#btnCipherSubmit', cipherSubmit);
+      wire('#btnConnectWallet', connectWallet);
+      document.querySelectorAll('.lang-toggle button').forEach(b => {
+        b.onclick = () => { au.click(); setLang(b.dataset.lang); };
+      });
+      // Refresh badges every minute (in case of midnight)
+      setInterval(refreshCombocipherBadges, 1000);
+    }
+    // Run after main init() has bound DOM
+    const _origInit = init;
+    async function bootHK() { await _origInit(); initHK(); }
+
     /* ── Run ── */
-    init();
+    bootHK();
   </script>
 </body>
 
