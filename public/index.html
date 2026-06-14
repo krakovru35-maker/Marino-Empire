@@ -56,7 +56,7 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      background: url('.assets/backgrounds/bg_portal_vertical_secondary.png') center/cover no-repeat;
+      background: url('./assets/backgrounds/bg_portal_vertical_secondary.png') center/cover no-repeat;
       overflow: hidden;
     }
 
@@ -1047,7 +1047,7 @@
     }
 
     .card-front {
-      background: url('.assets/illustrations/marino-avatar.png') center/cover, linear-gradient(135deg, #1e2333, #151924);
+      background: url('./assets/illustrations/marino-avatar.png') center/cover, linear-gradient(135deg, #1e2333, #151924);
       box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9);
     }
 
@@ -1601,7 +1601,7 @@
 
 <body>
   <div id="introAnim" class="intro-overlay">
-    <video id="introVid" src=".assets/intro.mp4" muted playsinline autoplay
+    <video id="introVid" src="./assets/intro.mp4" muted playsinline autoplay
       style="position:absolute; width:100%; height:100%; object-fit:cover; z-index:1"></video>
     <div class="intro-content">
       <div style="font-size: 14px; font-weight: 800; color: #ffd13b; letter-spacing: 2px; margin-bottom: 5px">PRESENTING
@@ -1623,7 +1623,7 @@
       <!-- Header -->
       <header class="header">
         <div class="profile-area" id="btnProfile" style="cursor:pointer" data-testid="profile-area">
-          <div class="avatar"><img src=".assets/illustrations/marino-avatar.png"
+          <div class="avatar"><img src="./assets/illustrations/marino-avatar.png"
               onerror="this.onerror=null; this.src=''; this.parentElement.innerHTML='🧑'"></div>
           <div class="p-info">
             <span class="p-name" id="userName">Oyuncu</span>
@@ -1655,13 +1655,13 @@
         </div>
         <div class="card">
           <div class="card-lbl">Casino</div>
-          <div class="card-val"><img src=".assets/currency/chip_spade_black_gold.png" alt="Chip"> <span id="valChips">0</span></div>
+          <div class="card-val"><img src="./assets/currency/chip_spade_black_gold.png" alt="Chip"> <span id="valChips">0</span></div>
         </div>
       </div>
 
       <!-- Balance -->
       <div class="balance-area">
-        <div class="bal-coin"><img src=".assets/currency/marino-coin.png" alt="Coin" onerror="this.src=null;">
+        <div class="bal-coin"><img src="./assets/currency/marino-coin.png" alt="Coin" onerror="this.src=null;">
           <span id="valCoin">0</span>
         </div>
       </div>
@@ -1708,7 +1708,7 @@
         <div class="tap-target">
           <button class="tap-btn" id="btnTap">
             <!-- Hamster Combat style big round character in middle -->
-            <img src=".assets/illustrations/marino-character.png" alt="Tap"
+            <img src="./assets/illustrations/marino-character.png" alt="Tap"
               onerror="this.style.display='none'; this.parentElement.innerHTML='🤜🤛'">
           </button>
         </div>
@@ -1995,7 +1995,7 @@
         <div class="sheet-handle"></div>
         <button class="sheet-close" data-close="sheetAirdrop">✕</button>
         <div class="ad-hero">
-          <img src=".assets/extra/airdrop_hero.png" class="ad-coin" onerror="this.src='.assets/currency/marino-coin.png'">
+          <img src="./assets/extra/airdrop_hero.png" class="ad-coin" onerror="this.src='./assets/currency/marino-coin.png'">
           <div class="ad-title">$MARINO AIRDROP</div>
           <p class="ad-sub" data-i18n="airdrop_sub">İmparatorluğunu büyüt, listeleme günü token'larını topla.</p>
         </div>
@@ -2009,7 +2009,7 @@
 
     <div id="toast" class="toast"></div>
     <!-- Background Music -->
-    <audio id="bgMusic" src=".assets/audio/fon.mp3" loop preload="auto"></audio>
+    <audio id="bgMusic" src="./assets/audio/fon.mp3" loop preload="auto"></audio>
   </div>
 
   <script>
@@ -2049,7 +2049,7 @@
     }
 
     function leagueIconHTML(l, size = 28) {
-      return `<img src=".assets/leagues/${l.img}.png" style="width:${size}px;height:${size}px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5))" onerror="this.outerHTML='<span style=&quot;font-size:${size}px&quot;>${l.icon}</span>'">`;
+      return `<img src="./assets/leagues/${l.img}.png" style="width:${size}px;height:${size}px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5))" onerror="this.outerHTML='<span style=&quot;font-size:${size}px&quot;>${l.icon}</span>'">`;
     }
 
     function openLeagues() {
@@ -2339,14 +2339,14 @@
 
       html += `<div class="alert-box green">Çevrimdışı gelir max <b>${s.cap} saat</b> birikir. Sık sık girip topla!</div>`;
 
-      html += `<div class="item-row"><div class="item-ico">👆</div><div class="item-info"><div class="item-title">Çoklu Tıklama</div><div class="item-sub">Sviye ${s.tap} • <img src=".assets/currency/marino-coin.png"> ${fmt(tapCost)}</div></div><button class="action-btn" onclick="doAction('marino_upgrade_tap',{})">Geliştir</button></div>`;
+      html += `<div class="item-row"><div class="item-ico">👆</div><div class="item-info"><div class="item-title">Çoklu Tıklama</div><div class="item-sub">Sviye ${s.tap} • <img src="./assets/currency/marino-coin.png"> ${fmt(tapCost)}</div></div><button class="action-btn" onclick="doAction('marino_upgrade_tap',{})">Geliştir</button></div>`;
 
-      html += `<div class="item-row"><div class="item-ico">🔋</div><div class="item-info"><div class="item-title">Kasa Kapasitesi</div><div class="item-sub">Limit ${s.cap}s • <img src=".assets/currency/marino-coin.png"> ${fmt(capCost)}</div></div><button class="action-btn" onclick="doAction('marino_upgrade_capacity',{})" ${s.cap >= 24 ? 'disabled' : ''}>Geliştir</button></div>`;
+      html += `<div class="item-row"><div class="item-ico">🔋</div><div class="item-info"><div class="item-title">Kasa Kapasitesi</div><div class="item-sub">Limit ${s.cap}s • <img src="./assets/currency/marino-coin.png"> ${fmt(capCost)}</div></div><button class="action-btn" onclick="doAction('marino_upgrade_capacity',{})" ${s.cap >= 24 ? 'disabled' : ''}>Geliştir</button></div>`;
 
       (S.game.upgrades || []).forEach(b => {
         const lock = s.lvl < (b.unlock_level || 1);
-        const imgSrc = `.assets/buildings/${b.building_key}.png`;
-        html += `<div class="item-row"><div class="item-ico ${lock ? 'locked' : ''}"><img src="${imgSrc}" onerror="this.style.display='none';this.parentElement.innerHTML+='🏗️'"></div><div class="item-info"><div class="item-title">${b.building_name}</div><div class="item-sub">${lock ? `🔒 Sv. ${b.unlock_level} gerekli` : `Sv. ${b.level} • +${fmt(b.current_income_per_hour)}/s`}</div><div class="item-sub" style="color:var(--accent)"><img src=".assets/currency/marino-coin.png"> ${fmt(b.next_cost_coin)}</div></div><button class="action-btn" onclick="doAction('upgrade_building',{p_building_key:'${b.building_key}'})" ${lock ? 'disabled' : ''}>Yükselt</button></div>`;
+        const imgSrc = `./assets/buildings/${b.building_key}.png`;
+        html += `<div class="item-row"><div class="item-ico ${lock ? 'locked' : ''}"><img src="${imgSrc}" onerror="this.style.display='none';this.parentElement.innerHTML+='🏗️'"></div><div class="item-info"><div class="item-title">${b.building_name}</div><div class="item-sub">${lock ? `🔒 Sv. ${b.unlock_level} gerekli` : `Sv. ${b.level} • +${fmt(b.current_income_per_hour)}/s`}</div><div class="item-sub" style="color:var(--accent)"><img src="./assets/currency/marino-coin.png"> ${fmt(b.next_cost_coin)}</div></div><button class="action-btn" onclick="doAction('upgrade_building',{p_building_key:'${b.building_key}'})" ${lock ? 'disabled' : ''}>Yükselt</button></div>`;
       });
 
       q('#listBuildings').innerHTML = html;
@@ -2364,14 +2364,14 @@
       ];
       sts.forEach(t => {
         const isD = done.includes(t.id);
-        html += `<div class="item-row"><div class="item-ico">${t.img}</div><div class="item-info"><div class="item-title">${t.n}</div><div class="item-sub"><img src=".assets/currency/marino-coin.png"> ${fmt(t.r)} Coin</div></div><button class="action-btn ${isD ? '' : 'gold'}" onclick="if(!${isD}){ if(window.Telegram?.WebApp && window.Telegram.WebApp.openLink) window.Telegram.WebApp.openLink('${t.link}'); else window.open('${t.link}', '_blank'); doAction('marino_claim_task',{p_task_id:'${t.id}', p_level_no:1}); }" ${isD ? 'disabled' : ''}>${isD ? 'Alındı' : 'Tamamla'}</button></div>`;
+        html += `<div class="item-row"><div class="item-ico">${t.img}</div><div class="item-info"><div class="item-title">${t.n}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(t.r)} Coin</div></div><button class="action-btn ${isD ? '' : 'gold'}" onclick="if(!${isD}){ if(window.Telegram?.WebApp && window.Telegram.WebApp.openLink) window.Telegram.WebApp.openLink('${t.link}'); else window.open('${t.link}', '_blank'); doAction('marino_claim_task',{p_task_id:'${t.id}', p_level_no:1}); }" ${isD ? 'disabled' : ''}>${isD ? 'Alındı' : 'Tamamla'}</button></div>`;
       });
 
       html += '<div class="sec-title">Günlük Görevler</div>';
       const dts = [{ id: 'daily_tap', n: '100 Dokunuş' }, { id: 'daily_collect', n: 'Kasa Topla' }, { id: 'daily_mini', n: 'Mini Oyun Oyna' }];
       dts.forEach(t => {
         const isD = done.includes(t.id);
-        html += `<div class="item-row"><div class="item-ico">${isD ? '✅' : '📅'}</div><div class="item-info"><div class="item-title">${t.n}</div><div class="item-sub"><img src=".assets/currency/marino-coin.png"> 200 Coin</div></div><button class="action-btn ${isD ? '' : 'gold'}" onclick="doAction('marino_claim_task',{p_task_id:'${t.id}', p_level_no:1})" ${isD ? 'disabled' : ''}>${isD ? 'Alındı' : 'Tamamla'}</button></div>`;
+        html += `<div class="item-row"><div class="item-ico">${isD ? '✅' : '📅'}</div><div class="item-info"><div class="item-title">${t.n}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> 200 Coin</div></div><button class="action-btn ${isD ? '' : 'gold'}" onclick="doAction('marino_claim_task',{p_task_id:'${t.id}', p_level_no:1})" ${isD ? 'disabled' : ''}>${isD ? 'Alındı' : 'Tamamla'}</button></div>`;
       });
 
       html += `<div class="sec-title">Seviye Görevleri (Sv. ${s.lvl})</div>`;
@@ -2379,7 +2379,7 @@
       for (let l = 1; l <= m; l++) {
         const tId = `L${l}_G1`; const isD = done.includes(tId); const lock = l > s.lvl;
         if (l < s.lvl && isD) continue; // Hide old
-        html += `<div class="item-row"><div class="item-ico">${lock ? '🔒' : (isD ? '✅' : '🔸')}</div><div class="item-info"><div class="item-title">Sv. ${l} Ulaş</div><div class="item-sub"><img src=".assets/currency/marino-coin.png"> ${fmt(l * 100)} Coin</div></div><button class="action-btn ${lock || isD ? '' : 'gold'}" onclick="doAction('marino_claim_task',{p_task_id:'${tId}', p_level_no:${l}})" ${lock || isD ? 'disabled' : ''}>${lock ? 'Kilitli' : (isD ? 'Alındı' : 'Al')}</button></div>`;
+        html += `<div class="item-row"><div class="item-ico">${lock ? '🔒' : (isD ? '✅' : '🔸')}</div><div class="item-info"><div class="item-title">Sv. ${l} Ulaş</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(l * 100)} Coin</div></div><button class="action-btn ${lock || isD ? '' : 'gold'}" onclick="doAction('marino_claim_task',{p_task_id:'${tId}', p_level_no:${l}})" ${lock || isD ? 'disabled' : ''}>${lock ? 'Kilitli' : (isD ? 'Alındı' : 'Al')}</button></div>`;
       }
       q('#listTasks').innerHTML = html;
     }
@@ -2404,8 +2404,8 @@
 
       html += '<div class="sec-title">Sanal Lig (Spor Bahisleri)</div>';
       html += `<div class="item-row"><div class="item-ico" style="background:#1e2333; position:relative; overflow:hidden">
-             <img src=".assets/teams/gs.png" style="position:absolute; width:28px; height:28px; top:-2px; left:-2px; z-index:2; filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.8))">
-             <img src=".assets/teams/fb.png" style="position:absolute; width:28px; height:28px; bottom:-2px; right:-2px; z-index:1; filter:drop-shadow(-2px -2px 2px rgba(0,0,0,0.8))">
+             <img src="./assets/teams/gs.png" style="position:absolute; width:28px; height:28px; top:-2px; left:-2px; z-index:2; filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.8))">
+             <img src="./assets/teams/fb.png" style="position:absolute; width:28px; height:28px; bottom:-2px; right:-2px; z-index:1; filter:drop-shadow(-2px -2px 2px rgba(0,0,0,0.8))">
            </div><div class="item-info"><div class="item-title">Canlı İddaa Bülteni</div><div class="item-sub">Gerçek Zamanlı Motor</div></div><button class="action-btn gold" onclick="openMini('sports','Sanal Sporlar')">Canlı İzle</button></div>`;
 
       html += '<div class="sec-title">Şans Oyunları (Bilet İle)</div>';
@@ -2418,7 +2418,7 @@
       if (items.length > 0) {
         html += '<div class="sec-title">Gerçek Ödüller</div>';
         items.forEach(i => {
-          html += `<div class="item-row"><div class="item-ico">🎟️</div><div class="item-info"><div class="item-title">${i.item_name}</div><div class="item-sub"><img src=".assets/currency/marino-coin.png"> ${fmt(i.cost_coin)} &nbsp; 🎟️ ${i.cost_token} bilet</div></div><button class="action-btn" onclick="doAction('request_reward',{p_item_code:'${i.item_code}'})">Talep Et</button></div>`;
+          html += `<div class="item-row"><div class="item-ico">🎟️</div><div class="item-info"><div class="item-title">${i.item_name}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(i.cost_coin)} &nbsp; 🎟️ ${i.cost_token} bilet</div></div><button class="action-btn" onclick="doAction('request_reward',{p_item_code:'${i.item_code}'})">Talep Et</button></div>`;
         });
       } else {
         html += '<div class="sec-title">Gerçek Ödüller</div>';
@@ -2878,10 +2878,10 @@
       let pCardsHtml = '';
       let dCardsHtml = '';
       if (state && state.player_hand) {
-        state.player_hand.forEach(c => { pCardsHtml += `<img src=".assets/cards/${c}.png" style="width:60px; margin:-15px; border-radius:6px; box-shadow:0 4px 10px rgba(0,0,0,0.5); position:relative">`; });
+        state.player_hand.forEach(c => { pCardsHtml += `<img src="./assets/cards/${c}.png" style="width:60px; margin:-15px; border-radius:6px; box-shadow:0 4px 10px rgba(0,0,0,0.5); position:relative">`; });
         state.dealer_hand.forEach((c, i) => {
-          if (isPlaying && i === 1) dCardsHtml += `<img src=".assets/cards/back.png" style="width:60px; margin:-15px; border-radius:6px; position:relative">`;
-          else dCardsHtml += `<img src=".assets/cards/${c}.png" style="width:60px; margin:-15px; border-radius:6px; box-shadow:0 4px 10px rgba(0,0,0,0.5); position:relative">`;
+          if (isPlaying && i === 1) dCardsHtml += `<img src="./assets/cards/back.png" style="width:60px; margin:-15px; border-radius:6px; position:relative">`;
+          else dCardsHtml += `<img src="./assets/cards/${c}.png" style="width:60px; margin:-15px; border-radius:6px; box-shadow:0 4px 10px rgba(0,0,0,0.5); position:relative">`;
         });
       }
 
@@ -3030,9 +3030,9 @@
         q('#pkRes').innerHTML = '<span style="color:#888; animation:pulse 1s infinite">Kartlar Dağıtılıyor...</span>';
 
         let pCardsHtml = '';
-        d.player_hand.forEach(c => pCardsHtml += `<img src=".assets/cards/${c}.png" style="width:50px; margin:-10px; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.5); transform:rotate(${(Math.random() - 0.5) * 15}deg)">`);
+        d.player_hand.forEach(c => pCardsHtml += `<img src="./assets/cards/${c}.png" style="width:50px; margin:-10px; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.5); transform:rotate(${(Math.random() - 0.5) * 15}deg)">`);
         let dCardsHtml = '';
-        d.dealer_hand.forEach(c => dCardsHtml += `<img src=".assets/cards/${c}.png" style="width:50px; margin:-10px; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.5); transform:rotate(${(Math.random() - 0.5) * 15}deg)">`);
+        d.dealer_hand.forEach(c => dCardsHtml += `<img src="./assets/cards/${c}.png" style="width:50px; margin:-10px; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.5); transform:rotate(${(Math.random() - 0.5) * 15}deg)">`);
 
         setTimeout(() => {
           q('#pkDealer').innerHTML = dCardsHtml;
@@ -3336,7 +3336,7 @@
         const val = i <= 7 ? i * 500 : 5000;
         const claimed = i <= strk;
         const active = i === strk + 1;
-        html += `<div class="cal-day ${claimed ? 'claimed' : ''} ${active ? 'active' : ''}"><div class="cal-day-num">Gün ${i}</div><div class="cal-day-val"><img src=".assets/currency/marino-coin.png">${fmt(val)}</div></div>`;
+        html += `<div class="cal-day ${claimed ? 'claimed' : ''} ${active ? 'active' : ''}"><div class="cal-day-num">Gün ${i}</div><div class="cal-day-val"><img src="./assets/currency/marino-coin.png">${fmt(val)}</div></div>`;
       }
       q('#calGrid').innerHTML = html;
     }
@@ -3592,7 +3592,7 @@
         if (comboSel[i]) {
           const c = COMBO_DECK.find(x => x.id === comboSel[i]);
           const visual = c.img
-            ? `<img src=".assets/combo_cards/${c.img}.png" style="width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))" onerror="this.outerHTML='<div style=&quot;font-size:42px&quot;>${c.emo}</div>'">`
+            ? `<img src="./assets/combo_cards/${c.img}.png" style="width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))" onerror="this.outerHTML='<div style=&quot;font-size:42px&quot;>${c.emo}</div>'">`
             : `<div style="font-size:42px">${c.emo}</div>`;
           div.innerHTML = `${visual}<div class="pick-name">${c.nm}</div>`;
         } else {
@@ -3608,7 +3608,7 @@
         const inSel = comboSel.includes(c.id);
         div.className = 'combo-card' + (inSel ? ' selected' : '') + (s.won ? ' disabled' : '');
         const visual = c.img
-          ? `<img src=".assets/combo_cards/${c.img}.png" style="width:60%;height:60%;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5))" onerror="this.outerHTML='<div class=&quot;emo&quot;>${c.emo}</div>'">`
+          ? `<img src="./assets/combo_cards/${c.img}.png" style="width:60%;height:60%;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5))" onerror="this.outerHTML='<div class=&quot;emo&quot;>${c.emo}</div>'">`
           : `<div class="emo">${c.emo}</div>`;
         div.innerHTML = `${visual}<div class="nm">${c.nm}</div>`;
         div.onclick = () => toggleComboPick(c.id);
@@ -3956,7 +3956,7 @@
       const list = items.map(it => `
         <div class="boost-card">
           <div class="boost-ico">
-            <img src=".assets/boosts/${it.ico}.png" onerror="this.style.display='none';this.parentElement.innerHTML+='<span style=\\'font-size:26px\\'>${it.emoji || it.ico}</span>'">
+            <img src="./assets/boosts/${it.ico}.png" onerror="this.style.display='none';this.parentElement.innerHTML+='<span style=\\'font-size:26px\\'>${it.emoji || it.ico}</span>'">
           </div>
           <div class="boost-meta">
             <div class="t">${it.t}</div>
