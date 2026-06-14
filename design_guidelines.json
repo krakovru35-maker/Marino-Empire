@@ -1,0 +1,96 @@
+{
+  "theme": "dark",
+  "archetype": "5 (Luxury)",
+  "vibe": "High-roller exclusive lounge, cinematic, expensive, modern casino",
+  "typography": {
+    "headings": {
+      "fontFamily": "Playfair Display, serif",
+      "weights": ["600", "700", "900"],
+      "usage": "Main titles, big balances, league names. Provides the classic luxury casino aesthetic."
+    },
+    "body_and_numbers": {
+      "fontFamily": "Outfit, sans-serif",
+      "weights": ["300", "400", "500", "700"],
+      "usage": "Counters, profit/hr, UI labels, tab names. Excellent for monospace-like number legibility, giving a premium modern crypto feel."
+    }
+  },
+  "colors": {
+    "background": {
+      "primary": "#0A0A0B",
+      "secondary": "#141416",
+      "tertiary": "#1C1C1F"
+    },
+    "accents": {
+      "gold": "#D4AF37",
+      "gold_glow": "rgba(212, 175, 55, 0.4)",
+      "emerald": "#097969",
+      "ruby": "#E0115F",
+      "neon_blue": "#4DFFFF"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#A0A0A5",
+      "highlight": "#D4AF37"
+    }
+  },
+  "spacing_and_layout": {
+    "container": "max-w-[480px] mx-auto h-[100dvh] overflow-hidden flex flex-col relative bg-[#0A0A0B]",
+    "padding": "px-4 py-6",
+    "bento_grid": "grid grid-cols-2 gap-4",
+    "radius": "rounded-2xl or rounded-3xl for a smooth, premium feel"
+  },
+  "surfaces": {
+    "cards": "bg-[#141416]/80 backdrop-blur-xl border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
+    "glass_header": "bg-[#0A0A0B]/80 backdrop-blur-2xl border-b border-white/5",
+    "bottom_nav": "bg-[#0A0A0B]/90 backdrop-blur-2xl border-t border-white/10 pb-safe pt-2",
+    "active_glow": "border-[#D4AF37]/50 shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+  },
+  "components": {
+    "bottom_navigation": "Fixed at bottom, 5 tabs (Exchange, Mine, Friends, Earn, Airdrop). Active tab has gold tint and slight '-translate-y-1'.",
+    "mascot_tap_area": "Massive circular area in center. Mascot image inside a gold ring. When Daily Cipher is active, ring glows Ruby Red. Use framer-motion for the scale down on tap.",
+    "progress_bar": "Energy bar at bottom. Gradient from Gold to Emerald. 4px height, rounded-full.",
+    "upgrade_card": "Vertical card. Image taking top 40%. Title, profit per hour (+1.2k), cost, and upgrade button.",
+    "combo_slots": "3 empty slots at the top of Mine page. '?' inside. Gold border when found.",
+    "league_badge": "Small pill or shield shape next to balance showing 'Bronze', 'Silver', 'Gold', up to 'Diamond'."
+  },
+  "animations": {
+    "tap_feedback": "scale-95 transition-transform duration-75, floating '+12' numbers moving upwards and fading out",
+    "card_hover": "hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(212,175,55,0.15)] transition-all duration-300",
+    "page_transition": "opacity-0 to opacity-100, subtle translate-y-4 on mount"
+  },
+  "images": {
+    "mascot": {
+      "url": "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwbWFuJTIwdHV4ZWRvfGVufDB8fHx8MTc4MTQ1MzQ3Mnww&ixlib=rb-4.1.0&q=85",
+      "description": "Man in black suit jacket and sunglasses. Use as the main tap character (Casino Boss). Apply circular mask and inner gold border."
+    },
+    "background_texture": {
+      "url": "https://images.pexels.com/photos/4862956/pexels-photo-4862956.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "High-quality black fabric. Use as global app background with opacity 0.4 over the solid dark background to give tactile depth."
+    },
+    "card_bg_chips": {
+      "url": "https://images.unsplash.com/photo-1518133120397-258d5eb470c6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2MzR8MHwxfHNlYXJjaHw0fHxjYXNpbm8lMjBjaGlwcyUyMHBva2VyJTIwZGFya3xlbnwwfHx8fDE3ODE0NTM0NzJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Poker chips. Use for upgrade cards related to Strategy/Tables."
+    },
+    "card_bg_roulette": {
+      "url": "https://images.unsplash.com/photo-1641228961613-b7b31adac671?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHw0fHxyb3VsZXR0ZSUyMGdvbGQlMjBuZW9ufGVufDB8fHx8MTc4MTQ1MzQ3Mnww&ixlib=rb-4.1.0&q=85",
+      "description": "Neon/Gold vibe. Use for VIP or Specials upgrade cards."
+    },
+    "card_bg_dice": {
+      "url": "https://images.unsplash.com/photo-1655159428752-c700435e9983?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2MzR8MHwxfHNlYXJjaHwyfHxjYXNpbm8lMjBjaGlwcyUyMHBva2VyJTIwZGFya3xlbnwwfHx8fDE3ODE0NTM0NzJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Dark money/dice background. Use for standard cards."
+    }
+  },
+  "instructions_to_main_agent": [
+    "Build a mobile-first layout (max-width 480px, mx-auto). Ensure h-[100dvh] so the app feels native and doesn't scroll the body inappropriately.",
+    "Implement 5 tabs in bottom navigation: Exchange (Tap), Mine (Cards), Friends, Earn, Airdrop. Toggle between these views.",
+    "For the tap mechanism: implement framer-motion scaling on the mascot image. Add floating +X text elements on click (track coordinates).",
+    "Include Turkish/English translation switcher in the header or settings (mock the translation dictionary).",
+    "Include simulated daily combo UI (3 slots at top of Mine page) and daily cipher UI (Morse code input toggle on main screen).",
+    "Cards in the Mine section should use the bento grid or standard 2-col grid with the provided image URLs as covers.",
+    "Never use generic fonts like Inter. Use 'Outfit' for numbers/body, and 'Playfair Display' for big headings.",
+    "Ensure ALL interactive elements and key text elements have `data-testid` attributes (e.g., data-testid='tap-mascot-button', data-testid='profit-per-hour').",
+    "Apply the background_texture image with low opacity (e.g., opacity-30 or opacity-40) on the main container to break the solid dark color.",
+    "Use lucide-react for icons (coins, users, wallet, zap, pickaxe, etc.).",
+    "Keep standard Shadcn components to a minimum unless heavily customized with dark luxury borders. Build raw HTML/Tailwind for custom cards."
+  ]
+}
