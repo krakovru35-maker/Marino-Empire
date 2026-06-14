@@ -35,24 +35,18 @@
       user-select: none;
     }
 
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
-      overflow: hidden;
-      /* --- TELEGRAM KESİN ÇÖZÜMÜ --- */
-      position: fixed;
+    #app {
+      width: 100%;
+      max-width: 480px;
+      position: absolute;
       top: 0;
-      left: 0;
-      right: 0;
       bottom: 0;
-      width: 100vw;
-      height: 100vh;
-      height: -webkit-fill-available;
-      /* --------------------------- */
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      background: url('./assets/backgrounds/bg_portal_vertical_secondary.png') center/cover no-repeat;
+      overflow: hidden;
+      /* --- TELEGRAM İÇİN ALT BOŞLUK KORUMASI --- */
+      padding-bottom: 85px; 
     }
 
     /* ── App Container (Mobile Full, Desktop Center) ── */
@@ -392,13 +386,19 @@
     .nav-bar {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      padding: 8px 8px calc(24px + var(--safeB));
+      padding: 8px 8px calc(15px + var(--safeB));
       background: rgba(16, 20, 29, 0.95);
       backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255, 255, 255, 0.05);
-      position: relative;
-      z-index: 20;
       border-radius: 20px 20px 0 0;
+      /* --- NÜKLEER SEÇENEK: EKRANIN ALTINA ÇİVİLE --- */
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      z-index: 9999;
     }
 
     .nav-btn {
