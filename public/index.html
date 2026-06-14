@@ -503,19 +503,32 @@
     }
 
     .item-ico {
-      width: 56px;
-      height: 56px;
+      width: 64px;
+      height: 64px;
+      min-width: 64px;
       border-radius: 16px;
-      background: rgba(0, 0, 0, 0.3);
+      background: linear-gradient(155deg, rgba(255,209,59,0.18), rgba(0, 0, 0, 0.5));
+      border: 1px solid rgba(255,209,59,0.15);
       display: grid;
       place-items: center;
       font-size: 28px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+      position: relative;
     }
 
     .item-ico img {
-      width: 80%;
-      height: 80%;
-      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
+    .item-ico.locked img { filter: grayscale(1) brightness(0.5); }
+    .item-ico.locked::after {
+      content: '🔒'; position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 22px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
 
     .item-info {
@@ -1371,7 +1384,7 @@
     .key-btn.wide { grid-column: span 2; aspect-ratio: 2/1; }
 
     .boost-card {
-      display: grid; grid-template-columns: 52px 1fr auto;
+      display: grid; grid-template-columns: 56px 1fr auto;
       gap: 12px; align-items: center;
       padding: 12px;
       background: rgba(30,35,51,0.6);
@@ -1380,13 +1393,16 @@
       margin-bottom: 10px;
     }
     .boost-ico {
-      width: 52px; height: 52px;
+      width: 56px; height: 56px;
       display: grid; place-items: center;
       font-size: 26px;
-      background: radial-gradient(circle at 30% 30%, rgba(255,209,59,0.3), rgba(0,0,0,0.6));
+      background: linear-gradient(155deg, rgba(255,209,59,0.25), rgba(0,0,0,0.6));
       border-radius: 14px;
-      border: 1px solid rgba(255,209,59,0.2);
+      border: 1px solid rgba(255,209,59,0.3);
+      overflow: hidden;
+      position: relative;
     }
+    .boost-ico img { width: 100%; height: 100%; object-fit: cover; border-radius: 13px; }
     .boost-meta .t { font-size: 14px; font-weight: 900; color: #fff; }
     .boost-meta .s { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
     .boost-meta .cost { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
@@ -1397,9 +1413,10 @@
       background: radial-gradient(circle at center, rgba(255,209,59,0.15), transparent 70%);
     }
     .ad-coin {
-      width: 100px; height: 100px;
+      width: 160px; height: 160px;
       margin: 0 auto 12px;
-      filter: drop-shadow(0 10px 30px rgba(255,209,59,0.5));
+      object-fit: contain;
+      filter: drop-shadow(0 12px 36px rgba(255,209,59,0.55));
       animation: floatY 3s ease-in-out infinite;
     }
     @keyframes floatY {
@@ -1978,7 +1995,7 @@
         <div class="sheet-handle"></div>
         <button class="sheet-close" data-close="sheetAirdrop">✕</button>
         <div class="ad-hero">
-          <img src="./assets/currency/marino-coin.png" class="ad-coin" onerror="this.style.display='none'">
+          <img src="./assets/extra/airdrop_hero.png" class="ad-coin" onerror="this.src='./assets/currency/marino-coin.png'">
           <div class="ad-title">$MARINO AIRDROP</div>
           <p class="ad-sub" data-i18n="airdrop_sub">İmparatorluğunu büyüt, listeleme günü token'larını topla.</p>
         </div>
@@ -2015,20 +2032,24 @@
 
     /* ── Global Tiers ── */
     const LEAGUES = [
-      { name: 'Bronz', icon: '🥉', min: 0, max: 9, color: '#cd7f32' },
-      { name: 'Gümüş', icon: '🥈', min: 10, max: 19, color: '#c0c0c0' },
-      { name: 'Altın', icon: '🥇', min: 20, max: 29, color: '#ffd700' },
-      { name: 'Platin', icon: '💎', min: 30, max: 39, color: '#e5e4e2' },
-      { name: 'Elmas', icon: '✨', min: 40, max: 49, color: '#b9f2ff' },
-      { name: 'Usta', icon: '🔮', min: 50, max: 59, color: '#a855f7' },
-      { name: 'Yüce', icon: '🎭', min: 60, max: 69, color: '#ef4444' },
-      { name: 'Şampiyon', icon: '🏆', min: 70, max: 79, color: '#f59e0b' },
-      { name: 'Efsane', icon: '🐉', min: 80, max: 89, color: '#10b981' },
-      { name: 'İmparator', icon: '👑', min: 90, max: 9999, color: '#ffd13b' }
+      { name: 'Bronz', icon: '🥉', img: 'league_bronze', min: 0, max: 9, color: '#cd7f32' },
+      { name: 'Gümüş', icon: '🥈', img: 'league_silver', min: 10, max: 19, color: '#c0c0c0' },
+      { name: 'Altın', icon: '🥇', img: 'league_gold', min: 20, max: 29, color: '#ffd700' },
+      { name: 'Platin', icon: '💎', img: 'league_platinum', min: 30, max: 39, color: '#e5e4e2' },
+      { name: 'Elmas', icon: '✨', img: 'league_diamond', min: 40, max: 49, color: '#b9f2ff' },
+      { name: 'Usta', icon: '🔮', img: 'league_diamond', min: 50, max: 59, color: '#a855f7' },
+      { name: 'Yüce', icon: '🎭', img: 'league_marino', min: 60, max: 69, color: '#ef4444' },
+      { name: 'Şampiyon', icon: '🏆', img: 'league_marino', min: 70, max: 79, color: '#f59e0b' },
+      { name: 'Efsane', icon: '🐉', img: 'league_marino', min: 80, max: 89, color: '#10b981' },
+      { name: 'İmparator', icon: '👑', img: 'league_marino', min: 90, max: 9999, color: '#ffd13b' }
     ];
 
     function getLeague(lvl) {
       return LEAGUES.find(l => lvl >= l.min && lvl <= l.max) || LEAGUES[0];
+    }
+
+    function leagueIconHTML(l, size = 28) {
+      return `<img src="./assets/leagues/${l.img}.png" style="width:${size}px;height:${size}px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5))" onerror="this.outerHTML='<span style=&quot;font-size:${size}px&quot;>${l.icon}</span>'">`;
     }
 
     function openLeagues() {
@@ -2040,7 +2061,7 @@
       sh.classList.add('show');
       q('#leagueList').innerHTML = LEAGUES.map(l => `
         <div style="display:flex; align-items:center; gap:15px; background:rgba(255,255,255,${cur.name === l.name ? 0.1 : 0.03}); padding:12px 15px; border-radius:16px; margin-bottom:8px; border:${cur.name === l.name ? '1px solid ' + l.color : '1px solid transparent'}">
-            <div style="font-size:28px">${l.icon}</div>
+            <div style="width:48px;height:48px;display:grid;place-items:center">${leagueIconHTML(l, 44)}</div>
             <div style="flex:1">
                 <div style="font-weight:900; color:${l.color}; font-size:14px">${l.name.toUpperCase()}</div>
                 <div style="font-size:11px; color:var(--text-muted)">Seviye ${l.min}${l.max > 1000 ? '++' : '-' + l.max}</div>
@@ -2303,7 +2324,7 @@
 
       // League Update
       const lg = getLeague(s.lvl);
-      q('#leagueIcon').textContent = lg.icon;
+      q('#leagueIcon').innerHTML = leagueIconHTML(lg, 22);
       q('#leagueName').textContent = lg.name.toUpperCase() + ' LİGİ';
       q('#leagueName').style.color = lg.color;
       q('#leagueBadge').style.borderColor = lg.color;
@@ -2324,7 +2345,8 @@
 
       (S.game.upgrades || []).forEach(b => {
         const lock = s.lvl < (b.unlock_level || 1);
-        html += `<div class="item-row"><div class="item-ico">🏗️</div><div class="item-info"><div class="item-title">${b.building_name}</div><div class="item-sub">${lock ? `🔒 Sv. ${b.unlock_level} gerekli` : `Sv. ${b.level} • +${fmt(b.current_income_per_hour)}/s`}</div><div class="item-sub" style="color:var(--accent)"><img src="./assets/currency/marino-coin.png"> ${fmt(b.next_cost_coin)}</div></div><button class="action-btn" onclick="doAction('upgrade_building',{p_building_key:'${b.building_key}'})" ${lock ? 'disabled' : ''}>Yükselt</button></div>`;
+        const imgSrc = `./assets/buildings/${b.building_key}.png`;
+        html += `<div class="item-row"><div class="item-ico ${lock ? 'locked' : ''}"><img src="${imgSrc}" onerror="this.style.display='none';this.parentElement.innerHTML+='🏗️'"></div><div class="item-info"><div class="item-title">${b.building_name}</div><div class="item-sub">${lock ? `🔒 Sv. ${b.unlock_level} gerekli` : `Sv. ${b.level} • +${fmt(b.current_income_per_hour)}/s`}</div><div class="item-sub" style="color:var(--accent)"><img src="./assets/currency/marino-coin.png"> ${fmt(b.next_cost_coin)}</div></div><button class="action-btn" onclick="doAction('upgrade_building',{p_building_key:'${b.building_key}'})" ${lock ? 'disabled' : ''}>Yükselt</button></div>`;
       });
 
       q('#listBuildings').innerHTML = html;
@@ -3523,12 +3545,18 @@
 
     // ─── DAILY COMBO ──────────────────────────────────────────
     const COMBO_DECK = [
-      { id: 'spade_a', emo: '🂡', nm: 'Ace ♠' }, { id: 'heart_a', emo: '🂱', nm: 'Ace ♥' },
-      { id: 'club_a', emo: '🃑', nm: 'Ace ♣' }, { id: 'diamond_a', emo: '🃁', nm: 'Ace ♦' },
-      { id: 'king', emo: '♚', nm: 'King' }, { id: 'queen', emo: '♛', nm: 'Queen' },
-      { id: 'jack', emo: '♝', nm: 'Jack' }, { id: 'joker', emo: '🃏', nm: 'Joker' },
-      { id: 'chip', emo: '🪙', nm: 'Chip' }, { id: 'dice', emo: '🎲', nm: 'Dice' },
-      { id: 'wheel', emo: '🎡', nm: 'Wheel' }, { id: 'slot', emo: '🎰', nm: 'Slot' }
+      { id: 'spade_a', emo: '🂡', nm: 'Ace ♠', img: 'card_spade_a' },
+      { id: 'heart_a', emo: '🂱', nm: 'Ace ♥', img: 'card_heart_a' },
+      { id: 'club_a', emo: '🃑', nm: 'Ace ♣', img: 'card_club_a' },
+      { id: 'diamond_a', emo: '🃁', nm: 'Ace ♦', img: 'card_diamond_a' },
+      { id: 'king', emo: '♚', nm: 'King', img: 'card_king' },
+      { id: 'queen', emo: '♛', nm: 'Queen', img: 'card_queen' },
+      { id: 'jack', emo: '♝', nm: 'Jack', img: 'card_jack' },
+      { id: 'joker', emo: '🃏', nm: 'Joker', img: 'card_joker' },
+      { id: 'chip', emo: '🪙', nm: 'Chip', img: 'card_chip' },
+      { id: 'dice', emo: '🎲', nm: 'Dice', img: 'card_dice' },
+      { id: 'wheel', emo: '🎡', nm: 'Wheel', img: 'card_wheel' },
+      { id: 'slot', emo: '🎰', nm: 'Slot', img: 'card_slot' }
     ];
     function getTodayCombo() {
       // Prefer server-cached combo (deterministic, fetched on init)
@@ -3563,7 +3591,10 @@
         div.className = 'combo-slot' + (comboSel[i] ? ' filled' : '') + (s.won ? ' right' : '');
         if (comboSel[i]) {
           const c = COMBO_DECK.find(x => x.id === comboSel[i]);
-          div.innerHTML = `<div style="font-size:42px">${c.emo}</div><div class="pick-name">${c.nm}</div>`;
+          const visual = c.img
+            ? `<img src="./assets/combo_cards/${c.img}.png" style="width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))" onerror="this.outerHTML='<div style=&quot;font-size:42px&quot;>${c.emo}</div>'">`
+            : `<div style="font-size:42px">${c.emo}</div>`;
+          div.innerHTML = `${visual}<div class="pick-name">${c.nm}</div>`;
         } else {
           div.textContent = '?';
         }
@@ -3576,7 +3607,10 @@
         const div = document.createElement('div');
         const inSel = comboSel.includes(c.id);
         div.className = 'combo-card' + (inSel ? ' selected' : '') + (s.won ? ' disabled' : '');
-        div.innerHTML = `<div class="emo">${c.emo}</div><div class="nm">${c.nm}</div>`;
+        const visual = c.img
+          ? `<img src="./assets/combo_cards/${c.img}.png" style="width:60%;height:60%;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5))" onerror="this.outerHTML='<div class=&quot;emo&quot;>${c.emo}</div>'">`
+          : `<div class="emo">${c.emo}</div>`;
+        div.innerHTML = `${visual}<div class="nm">${c.nm}</div>`;
         div.onclick = () => toggleComboPick(c.id);
         optsEl.appendChild(div);
       });
@@ -3804,7 +3838,7 @@
       const autoActive = perm.auto_tap_end > Date.now();
       const items = [
         {
-          id: 'full_energy', ico: '🔋',
+          id: 'full_energy', ico: 'full_energy', emoji: '🔋',
           t: t('boost_full_energy'), s: t('boost_full_energy_s'),
           cost: t('free_label'),
           state: `${bs.full_energy}/3 ${t('remaining')}`,
@@ -3824,7 +3858,7 @@
           }
         },
         {
-          id: 'tap_boost', ico: '⚡',
+          id: 'tap_boost', ico: 'tap_boost', emoji: '⚡',
           t: t('boost_tap_boost'), s: t('boost_tap_boost_s'),
           cost: t('free_label'),
           state: `${bs.tap_boost}/3 ${t('remaining')}`,
@@ -3851,7 +3885,7 @@
           }
         },
         {
-          id: 'multitap', ico: '👆',
+          id: 'multitap', ico: 'multitap', emoji: '👆',
           t: t('boost_multitap') + ` (Lv.${perm.multitap_lvl})`, s: t('boost_multitap_s'),
           cost: `${fmt(multitapCost)} coin`,
           state: '', disabled: false, gold: true,
@@ -3872,7 +3906,7 @@
           }
         },
         {
-          id: 'energy_limit', ico: '🔋',
+          id: 'energy_limit', ico: 'energy_limit', emoji: '🔋',
           t: t('boost_energy_limit') + ` (Lv.${perm.energy_lvl})`, s: t('boost_energy_limit_s'),
           cost: `${fmt(energyCost)} coin`,
           state: '', disabled: false, gold: true,
@@ -3895,7 +3929,7 @@
           }
         },
         {
-          id: 'auto_tap', ico: '🤖',
+          id: 'auto_tap', ico: 'auto_tap', emoji: '🤖',
           t: t('boost_auto_tap'), s: t('boost_auto_tap_s'),
           cost: autoActive ? '' : '5,000 coin',
           state: autoActive ? `${t('activated')} (${Math.ceil((perm.auto_tap_end - Date.now())/3600000)}h)` : '',
@@ -3921,7 +3955,9 @@
       ];
       const list = items.map(it => `
         <div class="boost-card">
-          <div class="boost-ico">${it.ico}</div>
+          <div class="boost-ico">
+            <img src="./assets/boosts/${it.ico}.png" onerror="this.style.display='none';this.parentElement.innerHTML+='<span style=\\'font-size:26px\\'>${it.emoji || it.ico}</span>'">
+          </div>
           <div class="boost-meta">
             <div class="t">${it.t}</div>
             <div class="s">${it.s}</div>
@@ -4096,4 +4132,3 @@
 </body>
 
 </html>
- 
