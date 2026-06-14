@@ -35,25 +35,29 @@
       user-select: none;
     }
 
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
-      overflow: hidden;
-      height: 100svh;
-      width: 100vw;
+    #app {
+      width: 100%;
+      max-width: 480px;
+      position: absolute;
+      top: 0;
+      bottom: 0;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      background: url('./assets/backgrounds/bg_portal_vertical_secondary.png') center/cover no-repeat;
+      overflow: hidden;
+      /* --- TELEGRAM İÇİN ALT BOŞLUK KORUMASI --- */
+      padding-bottom: 85px; 
     }
 
     /* ── App Container (Mobile Full, Desktop Center) ── */
     #app {
       width: 100%;
       max-width: 480px;
-      /* PC'de ortada telefon gibi dursun diye, telefonda %100 olur */
-      height: 100svh;
-      position: relative;
+      /* --- TELEGRAM KESİN ÇÖZÜMÜ --- */
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      /* --------------------------- */
       display: flex;
       flex-direction: column;
       background: url('./assets/backgrounds/bg_portal_vertical_secondary.png') center/cover no-repeat;
@@ -382,13 +386,19 @@
     .nav-bar {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      padding: 8px 8px calc(8px + var(--safeB));
+      padding: 8px 8px calc(15px + var(--safeB));
       background: rgba(16, 20, 29, 0.95);
       backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255, 255, 255, 0.05);
-      position: relative;
-      z-index: 20;
       border-radius: 20px 20px 0 0;
+      /* --- NÜKLEER SEÇENEK: EKRANIN ALTINA ÇİVİLE --- */
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      z-index: 9999;
     }
 
     .nav-btn {
