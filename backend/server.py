@@ -18,10 +18,10 @@ app.add_middleware(
 
 
 @app.get("/api/health")
-async def health():
+async def health() -> dict[str, str]:
     return {"status": "ok", "service": "marino-empire-sidecar"}
 
 
 @app.get("/api/")
-async def root():
+async def root() -> dict[str, str]:
     return {"message": "Marino Empire backend (Supabase-powered)"}
