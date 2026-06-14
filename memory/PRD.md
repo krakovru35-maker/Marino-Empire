@@ -2,70 +2,57 @@
 
 ## Original Problem Statement
 > "Bu oyunu en zirveye taşımamız lazım, ne gerekiyorsa yapalım. Aynı Hamster Kombat gibi olsun (zaten benziyor) ama en ince detayına kadar yapalım. Oyunun konusu casino."
+> + "Binalar sekmesinde binaların görselleri yok, bunları üret. Görseller vs daha da ne katabiliyorsak katalım, mükemmeliyete ulaşsın oyun."
 
 ## User Choices
 - **Karakter:** Casino oyuncusu (Marino mascot)
 - **Özellikler:** Hepsi (tap, mining, upgrade cards, Daily Combo, Daily Cipher, tasks, airdrop, league, referral, boosts)
-- **Auth:** Telegram-style (kayıtsız giriş — Telegram WebApp init data)
+- **Auth:** Telegram-style (Telegram WebApp init data)
 - **Diller:** Türkçe + İngilizce (anlık toggle)
 - **Tasarım:** Özgün modern casino teması
 
 ## Architecture
-- **Single-page Telegram Mini-App** at `/app/index.html` (~4k lines)
-- **Backend:** Supabase (PostgreSQL + PostgREST + RPC) — game state, RPC tap_coin/casino mini-games/HK features
-- **Sidecar Backend (this env):** FastAPI at `/app/backend/server.py` (/api/health)
-- **Frontend (this env):** `serve` static server in `/app/frontend/` → port 3000
+- **Single-page Telegram Mini-App** at `/app/index.html` (~4.1k lines)
+- **Backend:** Supabase (PostgreSQL + PostgREST + RPC) + FastAPI sidecar
+- **Frontend:** `serve` static server (`/app/frontend/public` → `/app` symlink) on port 3000
+- **AI Assets:** Gemini Nano Banana (`gemini-3.1-flash-image-preview`) via emergentintegrations + EMERGENT_LLM_KEY
 - **Storage:** Server-authoritative (Supabase tables) + localStorage offline fallback
 
 ## What's Been Implemented (Jan 2026)
 
-### Hamster-Kombat-Tier Upgrades — SERVER-AUTHORITATIVE
-- ✅ **Daily Combo**: 3-of-12 cards puzzle, 6 attempts/day, +5,000,000 coin via `marino_claim_combo` RPC
-- ✅ **Daily Cipher**: Morse-code keyboard puzzle (12 words), +1,000,000 coin via `marino_claim_cipher` RPC
-- ✅ **Boost Center**: 5 boosts via RPC — `marino_use_full_energy`, `marino_use_tap_boost`, `marino_upgrade_multitap`, `marino_upgrade_energy_limit`, `marino_activate_auto_tap`
-- ✅ **Airdrop**: TON wallet placeholder via `marino_connect_wallet`; checklist via `marino_airdrop_status`
-- ✅ **State Sync**: `marino_hk_state(p_telegram_id)` bundle RPC on init + 60s refresh
-- ✅ **Deterministic Daily Puzzles**: `marino_get_today_combo()` + `marino_get_today_cipher()` (same answer for all players)
-- ✅ **Offline Fallback**: If Supabase unreachable, localStorage logic kicks in seamlessly
-- ✅ **i18n (TR/EN)**: Live language toggle, ~50 keys, persists in localStorage `m_lang`
-- ✅ **Tap Combo Counter**: 10x/20x COMBO popup every 10 rapid taps
-- ✅ **Coin Particle Burst**: 4-10 gold particles per tap
-- ✅ **Pulse Ring + 5x Tap Boost Badge**: Visual indicators
+### Iteration 1 — Hamster-Kombat-Tier Features
+- Daily Combo, Daily Cipher, Boost Center, Airdrop, TR/EN i18n, tap-combo counter, particle effects
+- 4 new Supabase tables + 13 RPC functions
+- Server-authoritative with offline fallback
 
-### Supabase Tables Added (via `/app/supabase_migration.sql`)
-- `marino_daily_combo` (player + date + attempts + won + picks)
-- `marino_daily_cipher` (player + date + attempts + won)
-- `marino_player_boosts` (multitap_lvl, energy_lvl, auto_tap_until, daily counters)
-- `marino_wallets` (TON address per player)
+### Iteration 2 — Premium AI-Generated Visuals (this session)
+- **6 building images** (1024x1024): `casino_lobby`, `slot_area`, `sportsbook_area`, `vip_casino`, `rewards_office`, `admin_control` → `/app/public/assets/buildings/*.png`
+- **5 boost icons**: `full_energy`, `tap_boost`, `multitap`, `energy_limit`, `auto_tap` → `/app/public/assets/boosts/*.png`
+- **12 combo cards**: 4 Aces + King/Queen/Jack/Joker + Chip/Dice/Wheel/Slot → `/app/public/assets/combo_cards/*.png`
+- **6 league badges**: Bronze→Marino Empire hexagonal medals → `/app/public/assets/leagues/*.png`
+- **Airdrop hero**: Premium $MARINO coin landing graphic → `/app/public/assets/extra/airdrop_hero.png`
+- **Item-ico polish**: Gold-tinted gradient border, lock overlay for locked buildings, rounded corners, shadow effects
+- **Frontend wired**: All locations now use generated images with emoji/legacy fallbacks via `onerror`
 
-### Supabase RPCs Added (13)
-- `marino_get_today_combo`, `marino_get_today_cipher`
-- `marino_claim_combo`, `marino_claim_cipher`
-- `marino_get_boosts`, `marino_use_full_energy`, `marino_use_tap_boost`
-- `marino_upgrade_multitap`, `marino_upgrade_energy_limit`, `marino_activate_auto_tap`
-- `marino_connect_wallet`, `marino_airdrop_status`, `marino_hk_state`
-
-### Pre-existing (preserved, not modified)
-- Tap-to-earn with energy + regen, buildings/upgrades with passive income
-- Casino mini-games: Slot, Roulette V2, Blackjack, Poker, Horse Racing, Card Flip, Wheel, Vault
-- Live sports betting, tasks, friends + referrals + leaderboard
-- 10-tier league, prestige, daily login 8-day cycle, sound/music settings
-
-## Test Results
-- 16/16 server RPC tests **PASS** (Python httpx direct calls)
-- E2E browser tests: Combo wrong-attempt, Cipher solve, Full Energy boost, Wallet connect — all PASS, all reflected in Supabase
-- Game UI: 0 JS errors, 0 UI bugs
+### Asset Generation Pipeline
+- `/app/backend/gen_assets.py` — single-file Python script using Gemini Nano Banana
+- Idempotent: skips files already present + size > 5KB
+- Usage: `python3 gen_assets.py buildings boosts cards leagues extra`
+- Style brief: cinematic isometric 3D render, Las Vegas casino aesthetic, navy+gold+amber palette
 
 ## Backlog / Future
-- **P1**: Real TonConnect SDK integration (currently generates mock TON addresses)
-- **P2**: Daily Combo auto-reveal correct cards on Day End for replay value
-- **P2**: Cipher word expansion (currently 12 words; add 50+ with theme rotation)
-- **P2**: Auto-tap server-side accumulation (currently client-only timer)
-- **P3**: Split `index.html` (~4k lines) into modular JS files
+- **P1**: Real TonConnect SDK integration (currently mock UQ... addresses)
+- **P2**: Generate task icons (social, daily, level) via Gemini
+- **P2**: Add more casino room background videos
+- **P3**: Split `index.html` into modular JS
 
-## Files Modified
-- `/app/index.html` — added HK CSS + HTML + JS (~1200 lines)
-- `/app/supabase_migration.sql` — 4 tables + 13 RPCs (run on Supabase by user)
-- `/app/backend/server.py` — minimal FastAPI sidecar
-- `/app/backend/requirements.txt`, `/app/backend/.env` (with SUPABASE creds)
-- `/app/frontend/package.json`, `/app/frontend/.env`, `/app/frontend/public` (symlink to /app)
+## Files Modified This Session
+- `/app/backend/gen_assets.py` — NEW, asset generation pipeline
+- `/app/backend/.env` — added `EMERGENT_LLM_KEY`
+- `/app/index.html` — building/boost/league image integration (~40 line changes)
+- 29 PNG files generated: 6 buildings + 5 boosts + 12 cards + 6 leagues + 2 extras
+- `/app/supabase_migration.sql` — already deployed to Supabase by user
+
+## Test Status
+- E2E browser test: All sheets render with new images ✓ (buildings list, boost center, combo cards, league list, airdrop hero, league badge)
+- 0 JS errors, 0 broken images, fallbacks work
