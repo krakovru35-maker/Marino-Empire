@@ -41,9 +41,16 @@
       background: var(--bg);
       color: var(--text);
       overflow: hidden;
-      height: 100dvh;
-      padding-bottom: env(safe-area-inset-bottom);
+      /* --- TELEGRAM KESİN ÇÖZÜMÜ --- */
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100vw;
+      height: 100vh;
+      height: -webkit-fill-available;
+      /* --------------------------- */
       display: flex;
       justify-content: center;
     }
@@ -52,9 +59,11 @@
     #app {
       width: 100%;
       max-width: 480px;
-      /* PC'de ortada telefon gibi dursun diye, telefonda %100 olur */
-      height: 100%;
-      position: relative;
+      /* --- TELEGRAM KESİN ÇÖZÜMÜ --- */
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      /* --------------------------- */
       display: flex;
       flex-direction: column;
       background: url('./assets/backgrounds/bg_portal_vertical_secondary.png') center/cover no-repeat;
