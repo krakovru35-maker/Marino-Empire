@@ -41,7 +41,8 @@
       background: var(--bg);
       color: var(--text);
       overflow: hidden;
-      height: 100svh;
+      height: 100dvh;
+      padding-bottom: env(safe-area-inset-bottom);
       width: 100vw;
       display: flex;
       justify-content: center;
@@ -52,7 +53,7 @@
       width: 100%;
       max-width: 480px;
       /* PC'de ortada telefon gibi dursun diye, telefonda %100 olur */
-      height: 100svh;
+      height: 100%;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -382,7 +383,7 @@
     .nav-bar {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      padding: 8px 8px calc(8px + var(--safeB));
+      padding: 8px 8px calc(24px + var(--safeB));
       background: rgba(16, 20, 29, 0.95);
       backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255, 255, 255, 0.05);
