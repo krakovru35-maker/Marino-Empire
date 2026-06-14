@@ -40,10 +40,10 @@
       padding: 0;
       background: var(--bg);
       color: var(--text);
+      /* EKRANI KÖŞELERDEN KİLİTLE */
+      position: fixed;
+      inset: 0; 
       overflow: hidden;
-      /* --- DİNAMİK EKRAN BOYU --- */
-      height: 100dvh;
-      width: 100vw;
       display: flex;
       justify-content: center;
     }
@@ -52,10 +52,10 @@
     #app {
       width: 100%;
       max-width: 480px;
-      height: 100%;
-      position: relative;
+      height: 100%; /* Kilitli ekranın tam boyutunu alır */
       display: flex;
       flex-direction: column;
+      position: relative;
       background: url('./assets/backgrounds/bg_portal_vertical_secondary.png') center/cover no-repeat;
       overflow: hidden;
     }
@@ -382,13 +382,14 @@
     .nav-bar {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      padding: 8px 8px calc(8px + var(--safeB));
+      /* iOS cihazların alt çizgisi için güvenli alan koruması */
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
       background: rgba(16, 20, 29, 0.95);
       backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255, 255, 255, 0.05);
-      position: relative;
-      z-index: 20;
       border-radius: 20px 20px 0 0;
+      z-index: 20;
+      flex-shrink: 0; /* Ekran küçülse bile barın ezilmesini engeller */
     }
 
     .nav-btn {
@@ -2128,7 +2129,16 @@
       }
 
       try { tg?.ready(); tg?.expand(); tg?.disableVerticalSwipes?.(); } catch (e) { }
-
+      
+      // Telegram Dinamik Boyut Sabitleyici (Tüm Cihazlar İçin)
+    if (window.Telegram?.WebApp) {
+      const setTgHeight = () => {
+        document.body.style.height = window.Telegram.WebApp.viewportStableHeight + 'px';
+      };
+      window.Telegram.WebApp.onEvent('viewportChanged', setTgHeight);
+      setTgHeight();
+    }
+      
       S.user = tg?.initDataUnsafe?.user ? { id: tg.initDataUnsafe.user.id, name: tg.initDataUnsafe.user.first_name, user: tg.initDataUnsafe.user.username } :
         (isTest ? { id: '999123', name: 'Test User', user: 'tester' } : { id: '0000', name: 'Misafir', user: '' });
 
