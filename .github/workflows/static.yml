@@ -38,6 +38,8 @@ jobs:
         with:
           # Upload entire repository
           path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Sadece public klasörünü yayına alır, tüm backend ve SQL dosyalarını gizli tutar
+          path: './public'
