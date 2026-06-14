@@ -41,7 +41,8 @@
       background: var(--bg);
       color: var(--text);
       overflow: hidden;
-      height: 100svh;
+      /* --- DİNAMİK EKRAN BOYU --- */
+      height: 100dvh;
       width: 100vw;
       display: flex;
       justify-content: center;
@@ -51,13 +52,14 @@
     #app {
       width: 100%;
       max-width: 480px;
-      /* PC'de ortada telefon gibi dursun diye, telefonda %100 olur */
-      height: 100svh;
+      height: 100%;
       position: relative;
       display: flex;
       flex-direction: column;
       background: url('./assets/backgrounds/bg_portal_vertical_secondary.png') center/cover no-repeat;
       overflow: hidden;
+      /* --- MENÜ İÇİN GÜVENLİ ALAN --- */
+      padding-bottom: 75px;
     }
 
     /* ── Top Header ── */
