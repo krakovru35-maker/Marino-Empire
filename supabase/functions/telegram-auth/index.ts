@@ -36,6 +36,10 @@ async function hmac(key: CryptoKey | Uint8Array, value: string) {
   return new Uint8Array(await crypto.subtle.sign("HMAC", cryptoKey, encoder.encode(value)));
 }
 
+async function sha256(value: string) {
+  return toHex(new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(value))));
+}
+
 type TelegramUser = {
   id: number;
   first_name: string;
@@ -102,6 +106,21 @@ Deno.serve(async (request) => {
     const admin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+
+    const queryHash = await sha256(
+      verified.queryId ? `${telegramId}:${verified.queryId}` : `${telegramId}:${verified.authDate}`,
+    );
+    const { data: rateAllowed, error: rateError } = await admin.rpc(
+      "marino_check_bootstrap_rate_limit",
+      {
+        p_telegram_id: telegramId,
+        p_query_hash: queryHash,
+        p_max_attempts: Number(Deno.env.get("AUTH_BOOTSTRAP_MAX_ATTEMPTS") ?? "10"),
+        p_window_seconds: Number(Deno.env.get("AUTH_BOOTSTRAP_WINDOW_SECONDS") ?? "300"),
+      },
+    );
+    if (rateError) throw rateError;
+    if (!rateAllowed) throw new Error("bootstrap_rate_limited");
 
     const { data: existing, error: lookupError } = await admin
       .from("marino_identity_links")
@@ -177,7 +196,7 @@ Deno.serve(async (request) => {
   } catch (error) {
     console.error("telegram-auth rejected", error instanceof Error ? error.message : "unknown_error");
     const message = error instanceof Error ? error.message : "authentication_failed";
-    const status = message === "server_not_configured" ? 503 : 401;
+    const status = message === "server_not_configured" ? 503 : message === "bootstrap_rate_limited" ? 429 : 401;
     return json(status, { error: status === 401 ? "authentication_failed" : message });
   }
 });

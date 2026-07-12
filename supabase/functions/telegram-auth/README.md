@@ -10,6 +10,8 @@ Required function secrets:
 - `SUPABASE_ANON_KEY`
 - `APP_ORIGIN` — exact production origin, without a trailing slash
 - `TELEGRAM_INIT_DATA_MAX_AGE_SECONDS` — recommended value: `300`
+- `AUTH_BOOTSTRAP_MAX_ATTEMPTS` — recommended value: `10`
+- `AUTH_BOOTSTRAP_WINDOW_SECONDS` — recommended value: `300`
 
 `SUPABASE_URL` is provided by Supabase. Do not put any of these values in the
 repository or public frontend.
@@ -21,3 +23,7 @@ bootstrap authentication; all other functions must retain normal JWT checks.
 
 The function is not deployed by this branch. Deployment and secret provisioning
 are manual production operations described in `docs/security/P0_RUNBOOK.md`.
+
+The bootstrap limiter allows several attempts in a short window so legitimate
+page reloads keep working. It reduces automated reuse but does not make Telegram
+`initData` one-time-use and must not be described as complete replay prevention.

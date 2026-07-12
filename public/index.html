@@ -2030,7 +2030,7 @@
     const SUPABASE_URL = 'https://vxfjprvahjtfhvtuvsoy.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU';
     const db = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      auth: { persistSession: false, autoRefreshToken: true, detectSessionInUrl: false }
     });
 
     const tg = window.Telegram?.WebApp;
@@ -2041,7 +2041,8 @@
     const uid = () => crypto.randomUUID();
 
     let S = {
-      user: null, game: null, busy: false, authenticated: false, startParam: '', rankTab: 'global',
+      user: null, game: null, busy: false, authenticated: false, authBlockedReason: null,
+      sessionExpiresAt: 0, startParam: '', rankTab: 'global',
       settings: JSON.parse(localStorage.getItem('m_set') || '{"sfx":true,"mus":true}')
     };
 
@@ -2143,6 +2144,7 @@
       }
 
       try { tg?.ready(); tg?.expand(); tg?.disableVerticalSwipes?.(); } catch (e) { }
+      setupAuthStateListener();
       
       // Telegram Dinamik Boyut Sabitleyici (Tüm Cihazlar İçin)
     if (window.Telegram?.WebApp) {
@@ -2227,11 +2229,12 @@
         console.error('Telegram authentication failed');
         return false;
       }
-      const { error: sessionError } = await db.auth.setSession({
+      const { data: sessionData, error: sessionError } = await db.auth.setSession({
         access_token: data.access_token,
         refresh_token: data.refresh_token
       });
-      if (sessionError) return false;
+      if (sessionError || !sessionData?.session) return false;
+      scheduleSessionRefresh(sessionData.session);
       S.user = {
         id: String(data.user.id),
         name: data.user.first_name || 'Oyuncu',
@@ -2239,7 +2242,46 @@
       };
       S.startParam = typeof data.start_param === 'string' ? data.start_param : '';
       S.authenticated = true;
+      S.authBlockedReason = null;
       return true;
+    }
+
+    let authRefreshTimer = null;
+    function lockEconomicRpc(reason = 'session_refresh_failed') {
+      S.authenticated = false;
+      S.authBlockedReason = reason;
+      S.sessionExpiresAt = 0;
+      inFlightActions.clear();
+      if (authRefreshTimer) clearTimeout(authRefreshTimer);
+      authRefreshTimer = null;
+      toast('Oturum yenilenemedi. Lütfen oyunu Telegram üzerinden yeniden açın.');
+    }
+
+    function scheduleSessionRefresh(session) {
+      if (authRefreshTimer) clearTimeout(authRefreshTimer);
+      const expiresAtMs = Number(session?.expires_at || 0) * 1000;
+      S.sessionExpiresAt = expiresAtMs;
+      if (!expiresAtMs) return lockEconomicRpc('missing_session_expiry');
+      const delay = Math.max(1000, expiresAtMs - Date.now() - 60000);
+      authRefreshTimer = setTimeout(async () => {
+        const { data, error } = await db.auth.refreshSession();
+        if (error || !data?.session) lockEconomicRpc('session_refresh_failed');
+      }, delay);
+    }
+
+    function setupAuthStateListener() {
+      db?.auth.onAuthStateChange((event, session) => {
+        if (event === 'TOKEN_REFRESHED') {
+          if (!session) return lockEconomicRpc('token_refresh_missing_session');
+          S.authenticated = true;
+          S.authBlockedReason = null;
+          scheduleSessionRefresh(session);
+        } else if (event === 'SIGNED_IN' && session) {
+          scheduleSessionRefresh(session);
+        } else if (event === 'SIGNED_OUT') {
+          lockEconomicRpc('signed_out');
+        }
+      });
     }
 
     const READ_ONLY_ACTIONS = new Set([
@@ -2248,7 +2290,7 @@
     ]);
     const inFlightActions = new Set();
     async function rpc(name, p) {
-      if (!S.authenticated) throw new Error('authentication_required');
+      if (!S.authenticated || S.authBlockedReason) throw new Error('authentication_required');
       const payload = { ...(p || {}) };
       delete payload.p_telegram_id;
       delete payload.telegram_id;

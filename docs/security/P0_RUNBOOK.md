@@ -13,7 +13,8 @@ These changes are prepared but deliberately not applied to Supabase or deployed.
   `marino_secure_rpc`.
 - Economic offline fallbacks and client-generated wallet state were removed.
 - SQL migrations add identity links, admin roles/audit, idempotency, RLS,
-  privilege revocation, fixed `search_path`, gameplay gateway and admin gateway.
+  privilege revocation, fixed `search_path`, gameplay/admin gateways and a
+  reload-tolerant authentication bootstrap rate limiter.
 
 ## SECURITY DEFINER inventory in this repository
 
@@ -78,6 +79,8 @@ wrapper in source, repeat staging tests, review the diff, then apply.
    into `marino_admin_roles` through the Dashboard/service-role process. Do not
    accept a UUID or role from a browser request.
 9. Confirm no client has `EXECUTE` on legacy/admin/answer functions.
+   Explicitly verify `marino_connect_wallet(text,text)` is closed to `PUBLIC`,
+   `anon`, and `authenticated`; address formatting does not prove wallet ownership.
 10. Run the staged authorization matrix below before scheduling production.
 
 No `supabase db push`, `db reset`, `migration up`, SQL Editor execution, function
@@ -85,7 +88,9 @@ deployment, secret update or Pages deployment is performed by this branch.
 
 ## Required staged tests
 
-- Invalid, altered, expired and replayed Telegram payloads are rejected.
+- Invalid, altered and expired Telegram payloads are rejected.
+- Bootstrap attempts above the configured per-user short-window limit return
+  HTTP 429 while ordinary reloads below the threshold continue to work.
 - A valid Telegram payload creates a session mapped to exactly one Telegram ID.
 - A user cannot pass another `telegram_id` through the gateway.
 - `anon` cannot execute any legacy game, admin, Combo-answer or Cipher-answer RPC.
@@ -95,6 +100,10 @@ deployment, secret update or Pages deployment is performed by this branch.
 - Duplicate request UUIDs return the stored result or fail while in progress.
 - Negative, zero, over-limit and malformed bets/amounts/identifiers fail.
 - Supabase/network failure never awards coin, boost, wallet or airdrop state.
+- With a 900-second JWT expiry, keep the Mini App open beyond 15 minutes and
+  confirm `TOKEN_REFRESHED` occurs, the refresh token remains memory-only, and
+  authenticated economic RPCs continue. Then invalidate refresh credentials and
+  confirm `SIGNED_OUT`/refresh failure locks all economic RPCs with a reopen notice.
 - The public Pages artifact contains no admin console.
 
 ## Rollback plan
@@ -119,10 +128,14 @@ Do not use `db reset`; it would destroy data.
   compatibility must be proven against staging before apply.
 - Password-based managed Auth users are an implementation bridge. A dedicated
   signed custom-token service can replace it later.
-- The wallet flow is intentionally disabled until TonConnect signature validation
-  is implemented.
+- The wallet flow and gateway action are intentionally disabled until TonConnect
+  ownership/signature validation is implemented. A syntactically valid TON address
+  alone is not evidence that the current user owns that wallet.
 - Existing dynamic `innerHTML` usage remains an XSS risk outside this P0 scope.
 - The publishable Supabase configuration remains public by design; security now
   depends on RLS, ACLs and verified sessions, which require staged validation.
-- Rate limiting, replay storage for Telegram `query_id`, MFA enrollment UI and a
-  separately hosted admin console remain follow-up work.
+- The bootstrap rate limit reduces automated reuse without making `initData`
+  single-use. Full replay resistance that preserves legitimate reload behavior is
+  still a production blocker; no implemented protection is claimed beyond short
+  validity and rate limiting.
+- MFA enrollment UI and a separately hosted admin console remain follow-up work.

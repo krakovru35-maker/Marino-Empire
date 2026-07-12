@@ -87,9 +87,6 @@ begin
       v_response := public.marino_upgrade_energy_limit(v_telegram_id);
     when 'marino_activate_auto_tap' then
       v_response := public.marino_activate_auto_tap(v_telegram_id);
-    when 'marino_connect_wallet' then
-      if coalesce(p_payload->>'p_ton_address','') !~ '^(EQ|UQ)[A-Za-z0-9_-]{46}$' then raise exception 'valid_signed_ton_address_required'; end if;
-      v_response := public.marino_connect_wallet(v_telegram_id, p_payload->>'p_ton_address');
     when 'start_game' then
       if char_length(coalesce(p_payload->>'p_site_username','')) > 32 then raise exception 'invalid_username'; end if;
       if char_length(coalesce(p_payload->>'p_display_name','')) > 128 then raise exception 'invalid_display_name'; end if;

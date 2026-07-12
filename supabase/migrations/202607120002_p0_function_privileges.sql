@@ -32,6 +32,7 @@ $migration$;
 -- Puzzle answers are intentionally server-internal. No client role receives EXECUTE.
 revoke execute on function public.marino_get_today_combo() from public, anon, authenticated;
 revoke execute on function public.marino_get_today_cipher() from public, anon, authenticated;
+revoke execute on function public.marino_connect_wallet(text,text) from public, anon, authenticated;
 
 -- Existing P0 feature tables are never exposed through PostgREST directly.
 alter table if exists public.marino_daily_combo enable row level security;
