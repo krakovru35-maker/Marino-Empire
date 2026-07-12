@@ -9,6 +9,12 @@ const corsHeaders = {
 
 const encoder = new TextEncoder();
 
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
+}
+
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
@@ -32,7 +38,13 @@ function constantTimeEqual(left: string, right: string) {
 async function hmac(key: CryptoKey | Uint8Array, value: string) {
   const cryptoKey = key instanceof CryptoKey
     ? key
-    : await crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    : await crypto.subtle.importKey(
+      "raw",
+      toArrayBuffer(key),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
   return new Uint8Array(await crypto.subtle.sign("HMAC", cryptoKey, encoder.encode(value)));
 }
 
