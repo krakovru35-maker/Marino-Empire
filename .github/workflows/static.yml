@@ -33,6 +33,19 @@ jobs:
         run: |
           if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then BASE_SHA="$(git rev-parse HEAD^)"; fi
           git diff --check "$BASE_SHA"..HEAD
+      - name: Build synthetic staging artifact
+        env:
+          MARINO_TARGET_ENV: staging
+          MARINO_SUPABASE_URL: https://stagingref0000000001.supabase.co
+          MARINO_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder_not_secret
+          MARINO_EXPECTED_PROJECT_REF: stagingref0000000001
+          MARINO_STAGING_PROJECT_REF: stagingref0000000001
+          MARINO_PRODUCTION_PROJECT_REF: productionref0000000
+          MARINO_COMMIT_SHA: ${{ github.sha }}
+          MARINO_BUILD_TIME: "2026-01-01T00:00:00.000Z"
+        run: node scripts/build-runtime-config.mjs
+      - name: Test runtime config artifact
+        run: node --test tests/runtime-config.test.mjs
       - name: Validate static security invariants
         run: node scripts/validate-security.mjs
       - name: Setup Deno
@@ -41,7 +54,6 @@ jobs:
           deno-version: v2.x
       - name: Type-check Telegram auth function
         run: deno check supabase/functions/telegram-auth/index.ts
-
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: validate
@@ -56,18 +68,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Build production runtime artifact
+        env:
+          MARINO_TARGET_ENV: production
+          MARINO_SUPABASE_URL: ${{ vars.PRODUCTION_SUPABASE_URL }}
+          MARINO_SUPABASE_PUBLISHABLE_KEY: ${{ vars.PRODUCTION_SUPABASE_PUBLISHABLE_KEY }}
+          MARINO_EXPECTED_PROJECT_REF: ${{ vars.PRODUCTION_SUPABASE_PROJECT_REF }}
+          MARINO_PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_SUPABASE_PROJECT_REF }}
+          MARINO_STAGING_PROJECT_REF: ${{ vars.STAGING_SUPABASE_PROJECT_REF }}
+          MARINO_COMMIT_SHA: ${{ github.sha }}
+        run: node scripts/build-runtime-config.mjs
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Verify public artifact contains no admin console
         shell: bash
         run: |
-          test ! -e public/admin.html
+          test ! -e dist/admin.html
           ! grep -RIE --include='*.html' --include='*.js' \
-            '(admin_token|marino_authorized|type=.password)' public
+            '(admin_token|marino_authorized|type=.password)' dist
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './public'
+          path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

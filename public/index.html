@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#030b14">
   <title>Marino Empire</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="./__MARINO_RUNTIME_CONFIG_SCRIPT__"></script>
+  <script src="./runtime-config-loader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
@@ -2027,11 +2029,16 @@
 
   <script>
     /* ── Engine / Config ── */
-    const SUPABASE_URL = 'https://vxfjprvahjtfhvtuvsoy.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU';
-    const db = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: false, autoRefreshToken: true, detectSessionInUrl: false }
-    });
+    const runtimeConfigResult = window.MarinoRuntimeConfig?.read(window.MARINO_CONFIG);
+    const runtimeConfig = runtimeConfigResult?.ok ? runtimeConfigResult.config : null;
+    let db = null;
+    if (runtimeConfig && window.supabase?.createClient) {
+      db = window.supabase.createClient(
+        runtimeConfig.supabaseUrl,
+        runtimeConfig.supabasePublishableKey,
+        { auth: { persistSession: false, autoRefreshToken: true, detectSessionInUrl: false } }
+      );
+    }
 
     const tg = window.Telegram?.WebApp;
     const isTest = new URLSearchParams(location.search).has('testmode');
@@ -2141,6 +2148,18 @@
         v.onended = () => finishIntro();
         // Fallback if video fails
         setTimeout(() => finishIntro(), 9000);
+      }
+
+      if (!runtimeConfig || !db) {
+        S.authBlockedReason = runtimeConfigResult?.error || 'runtime_config_unavailable';
+        S.user = { id: null, name: 'Yapılandırma hatası', user: '' };
+        toast('Güvenli ortam yapılandırması doğrulanamadı. Oyun başlatılmadı.');
+        finishIntro();
+        return;
+      }
+
+      if (runtimeConfig.targetEnvironment === 'staging') {
+        window.MarinoRuntimeConfig.showStagingDiagnostic(runtimeConfig);
       }
 
       try { tg?.ready(); tg?.expand(); tg?.disableVerticalSwipes?.(); } catch (e) { }

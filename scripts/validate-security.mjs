@@ -28,6 +28,9 @@ const inlineScripts = [...frontend.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/sc
   .map((match) => match[1]).filter((source) => source.trim());
 new vm.Script(inlineScripts.at(-1), { filename: 'public/index.html' });
 
+assert(!/const\s+SUPABASE_(?:URL|KEY)\s*=/.test(frontend), 'hard-coded Supabase config found');
+assert(frontend.includes('__MARINO_RUNTIME_CONFIG_SCRIPT__'), 'runtime config build token missing');
+assert(/window\.MARINO_CONFIG/.test(frontend) && /runtimeConfigResult/.test(frontend), 'verified runtime config bootstrap missing');
 assert(!frontend.includes('initDataUnsafe'), 'frontend must not use initDataUnsafe');
 assert(!/(_offline|awardCoin|awardChips|awardEnergy|m_clientBonus|m_combo_today|m_cipher_today|m_boosts_|m_perm_boost|m_airdrop)/.test(frontend), 'economic offline/localStorage path found');
 assert(/persistSession:\s*false/.test(frontend), 'Supabase sessions must not persist');
@@ -57,5 +60,15 @@ for (const match of migrations.matchAll(/create or replace function[\s\S]*?\$\$;
 const edge = read('supabase/functions/telegram-auth/index.ts');
 assert(/TELEGRAM_INIT_DATA_MAX_AGE_SECONDS/.test(edge), 'short initData lifetime control missing');
 assert(/marino_check_bootstrap_rate_limit/.test(edge), 'bootstrap rate limit call missing');
+
+if (fs.existsSync(path.join(root, 'dist'))) {
+  const manifest = JSON.parse(read('dist/build-manifest.json'));
+  const distHtml = read('dist/index.html');
+  const distConfig = read(`dist/${manifest.configFile}`);
+  assert(!distHtml.includes('__MARINO_RUNTIME_CONFIG_SCRIPT__'), 'built HTML still contains runtime config token');
+  assert(distHtml.includes(manifest.configFile), 'built HTML does not load manifest config file');
+  assert(distConfig.includes(manifest.projectRef), 'runtime config and manifest project refs differ');
+  assert(!/(SUPABASE_SERVICE_ROLE_KEY|TELEGRAM_BOT_TOKEN|service_role\s*[:=])/i.test(distConfig), 'forbidden secret marker in runtime config');
+}
 
 console.log('security validation: ok');
