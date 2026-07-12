@@ -12,6 +12,8 @@
   <script src="./runtime-config-loader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="./styles/phase-1a.css" rel="stylesheet">
+  <script src="./js/phase-1a.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
    MARINO EMPIRE — HAMSTER COMBAT STYLE UI
@@ -1616,14 +1618,14 @@
 
 <body>
   <div id="introAnim" class="intro-overlay">
-    <video id="introVid" src="./assets/intro.mp4" muted playsinline autoplay
+    <video id="introVid" data-src="./assets/intro.mp4" preload="none" muted playsinline
       style="position:absolute; width:100%; height:100%; object-fit:cover; z-index:1"></video>
     <div class="intro-content">
       <div style="font-size: 14px; font-weight: 800; color: #ffd13b; letter-spacing: 2px; margin-bottom: 5px">PRESENTING
       </div>
       <h1 class="intro-title" style="font-size:36px">MARINO EMPIRE</h1>
       <div class="intro-bar">
-        <div class="intro-progress" style="animation-duration: 8s"></div>
+      <div class="intro-progress"></div>
       </div>
       <div id="skipIntro" onclick="finishIntro()"
         style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 900; background:rgba(255,255,255,0.1); padding:8px 20px; border-radius:99px; cursor:pointer; display:inline-block; border:1px solid rgba(255,255,255,0.1); z-index:10; position:relative">
@@ -1633,7 +1635,7 @@
 
   <div id="app">
 
-    <!-- HOME VIEW (Default Hamster Kombat Style Dashboard) -->
+    <!-- HOME VIEW (Phase 1A premium mobile composition) -->
     <div id="view-home" class="page" style="display: flex; flex-direction: column; height: 100%; flex: 1;">
       <!-- Header -->
       <header class="header">
@@ -1653,26 +1655,6 @@
           <button class="top-btn" id="btnSettings" data-testid="settings-btn">⚙️</button>
         </div>
       </header>
-
-      <!-- Info Row -->
-      <div class="info-row" style="grid-template-columns: repeat(4, 1fr);">
-        <div class="card">
-          <div class="card-lbl">Güç</div>
-          <div class="card-val"><span id="valTap">1</span></div>
-        </div>
-        <div class="card">
-          <div class="card-lbl">Kasa</div>
-          <div class="card-val"><span id="valCap">8s</span></div>
-        </div>
-        <div class="card">
-          <div class="card-lbl">Saatlik</div>
-          <div class="card-val"><span id="valInc">0</span></div>
-        </div>
-        <div class="card">
-          <div class="card-lbl">Casino</div>
-          <div class="card-val"><img src="./assets/currency/chip_spade_black_gold.png" alt="Chip"> <span id="valChips">0</span></div>
-        </div>
-      </div>
 
       <!-- Balance -->
       <div class="balance-area">
@@ -1702,24 +1684,13 @@
 
       <!-- Tap Area -->
       <div class="tap-container">
-        <!-- Daily Combo & Cipher floating pills -->
-        <div class="hk-floats">
-          <button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
-            <div class="hk-float-ico">🎴</div>
-            <div class="hk-float-meta">
-              <span class="lbl" data-i18n="daily_combo">Daily Combo</span>
-              <span class="val" id="comboReward">+5M</span>
-            </div>
-          </button>
-          <button class="hk-float-btn" id="btnDailyCipher" data-testid="daily-cipher-btn">
-            <div class="hk-float-ico">🔐</div>
-            <div class="hk-float-meta">
-              <span class="lbl" data-i18n="daily_cipher">Daily Cipher</span>
-              <span class="val" id="cipherReward">+1M</span>
-            </div>
-          </button>
+        <div class="casino-scene" aria-hidden="true">
+          <div class="scene-glow"></div>
+          <div class="scene-arch"></div>
+          <div class="scene-floor"></div>
+          <div class="scene-table"></div>
         </div>
-
+        <output class="visual-combo" id="visualCombo" aria-live="polite"></output>
         <div class="tap-target">
           <button class="tap-btn" id="btnTap">
             <!-- Hamster Combat style big round character in middle -->
@@ -1740,6 +1711,12 @@
         </button>
       </div>
 
+      <button class="upgrade-target" id="btnUpgradeTarget" type="button">
+        <span class="upgrade-target-kicker">SIRADAKİ HEDEF</span>
+        <span class="upgrade-target-title">İmparatorluğunu büyüt</span>
+        <span class="upgrade-target-arrow" aria-hidden="true">›</span>
+      </button>
+
       <!-- Quick action pills -->
       <div class="quick-bar">
         <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
@@ -1749,6 +1726,29 @@
           <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
         </button>
       </div>
+
+      <div class="empire-hub-backdrop" id="empireHubBackdrop" hidden></div>
+      <details class="empire-hub" id="empireHub">
+        <summary><span>EMPIRE HUB</span><small>İstatistikler</small></summary>
+        <div class="empire-hub-panel">
+          <div class="hk-floats empire-hub-actions">
+            <button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
+              <div class="hk-float-ico">🎴</div>
+              <div class="hk-float-meta"><span class="lbl" data-i18n="daily_combo">Daily Combo</span><span class="val" id="comboReward">+5M</span></div>
+            </button>
+            <button class="hk-float-btn" id="btnDailyCipher" data-testid="daily-cipher-btn">
+              <div class="hk-float-ico">🔐</div>
+              <div class="hk-float-meta"><span class="lbl" data-i18n="daily_cipher">Daily Cipher</span><span class="val" id="cipherReward">+1M</span></div>
+            </button>
+          </div>
+          <div class="info-row empire-hub-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="card"><div class="card-lbl">Güç</div><div class="card-val"><span id="valTap">1</span></div></div>
+            <div class="card"><div class="card-lbl">Kasa</div><div class="card-val"><span id="valCap">8s</span></div></div>
+            <div class="card"><div class="card-lbl">Saatlik</div><div class="card-val"><span id="valInc">0</span></div></div>
+            <div class="card"><div class="card-lbl">Casino</div><div class="card-val"><img src="./assets/currency/chip_spade_black_gold.png" alt=""><span id="valChips">0</span></div></div>
+          </div>
+        </div>
+      </details>
     </div>
 
     <!-- OTHER VIEWS (Using standard list design) -->
@@ -2094,10 +2094,20 @@
     `).join('');
     }
 
+    let introFinished = false;
+    let introFinishTimer = null;
     function finishIntro() {
+      if (introFinished) return;
       const intro = q('#introAnim');
       if (!intro) return;
+      introFinished = true;
+      if (introFinishTimer) {
+        clearTimeout(introFinishTimer);
+        introFinishTimer = null;
+      }
+      try { localStorage.setItem('marino_intro_seen_v1', '1'); } catch (e) { }
       intro.style.opacity = '0';
+      intro.style.pointerEvents = 'none';
       setTimeout(() => intro.remove(), 1000);
     }
 
@@ -2144,10 +2154,23 @@
     async function init() {
       // Video Intro Logic
       const v = q('#introVid');
-      if (v) {
-        v.onended = () => finishIntro();
-        // Fallback if video fails
-        setTimeout(() => finishIntro(), 9000);
+      let introSeen = false;
+      try { introSeen = localStorage.getItem('marino_intro_seen_v1') === '1'; } catch (e) { }
+      if (introSeen) {
+        q('#introAnim')?.remove();
+        introFinished = true;
+      } else if (v) {
+        const videoSrc = v.dataset.src;
+        if (videoSrc) {
+          v.src = videoSrc;
+          v.load();
+          const playAttempt = v.play();
+          if (playAttempt?.catch) playAttempt.catch(() => { });
+        }
+        v.onended = finishIntro;
+        // Phase 1A: shared CSS duration keeps progress and dismissal synchronized.
+        const introDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--intro-duration')) || 4.5;
+        introFinishTimer = setTimeout(finishIntro, introDuration * 1000);
       }
 
       if (!runtimeConfig || !db) {
@@ -2229,7 +2252,11 @@
       });
 
       // Actions
-      q('#btnTap').onpointerdown = e => { au.setup(); handleTap(e); };
+      q('#btnTap').onpointerdown = e => {
+        au.setup();
+        window.MarinoPhase1A?.tapFeedback(e);
+        handleTap(e);
+      };
       q('#btnCollect').onclick = handleCollect;
 
       // Initial load
@@ -4090,40 +4117,6 @@
         setTimeout(() => p.remove(), 800);
       }
     }
-
-    // ─── Hook into existing tap to apply tap boost multiplier + combo counter ──
-    let _tapCount = 0; let _tapLastTs = 0;
-    const _origHandleTap = handleTap;
-    handleTap = async function(e) {
-      if (!S.game) return _origHandleTap(e);
-      const now = Date.now();
-      const isBoost = (window._tapMultiplierUntil || 0) > now;
-      // combo streak: if tap within 600ms
-      if (now - _tapLastTs < 600) _tapCount++;
-      else _tapCount = 1;
-      _tapLastTs = now;
-
-      await _origHandleTap(e);
-
-      // Particle effect
-      const btn = q('#btnTap');
-      if (btn) {
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX ? (e.clientX - rect.left) : (rect.width / 2);
-        const y = e.clientY ? (e.clientY - rect.top) : (rect.height / 2);
-        spawnParticles(x, y, isBoost ? 10 : 4);
-      }
-
-      // Combo pop every 10 streaks
-      if (_tapCount > 0 && _tapCount % 10 === 0) {
-        const pop = document.createElement('div');
-        pop.className = 'combo-pop';
-        pop.textContent = `${_tapCount}x COMBO! 🔥`;
-        if (btn) btn.parentElement.appendChild(pop);
-        setTimeout(() => pop.remove(), 1000);
-        au.win();
-      }
-    };
 
     // ─── Wire up new buttons ──
     function initHK() {
