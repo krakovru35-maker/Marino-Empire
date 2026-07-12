@@ -2029,17 +2029,19 @@
     /* ── Engine / Config ── */
     const SUPABASE_URL = 'https://vxfjprvahjtfhvtuvsoy.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU';
-    const db = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const db = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
 
     const tg = window.Telegram?.WebApp;
     const isTest = new URLSearchParams(location.search).has('testmode');
 
     const q = s => document.querySelector(s);
     const fmt = n => new Intl.NumberFormat('en-US').format(Number(n || 0));
-    const uid = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+    const uid = () => crypto.randomUUID();
 
     let S = {
-      user: null, game: null, busy: false, rankTab: 'global',
+      user: null, game: null, busy: false, authenticated: false, startParam: '', rankTab: 'global',
       settings: JSON.parse(localStorage.getItem('m_set') || '{"sfx":true,"mus":true}')
     };
 
@@ -2151,8 +2153,12 @@
       setTgHeight();
     }
       
-      S.user = tg?.initDataUnsafe?.user ? { id: tg.initDataUnsafe.user.id, name: tg.initDataUnsafe.user.first_name, user: tg.initDataUnsafe.user.username } :
-        (isTest ? { id: '999123', name: 'Test User', user: 'tester' } : { id: '0000', name: 'Misafir', user: '' });
+      if (!await authenticateTelegram()) {
+        S.user = { id: null, name: 'Kimlik doğrulanamadı', user: '' };
+        toast('Güvenli Telegram oturumu kurulamadı. Lütfen oyunu Telegram içinden yeniden açın.');
+        finishIntro();
+        return;
+      }
 
       // Bind UI
       document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { au.click(); showTab(b.dataset.tab); });
@@ -2209,18 +2215,60 @@
       await fetchGame();
 
       // Energy Regen Loop (1 per min)
-      setInterval(() => {
-        if (S.game?.state && S.game.state.energy < S.game.state.max_energy) {
-          S.game.state.energy++; renderTop();
-        }
-      }, 60000);
     }
 
     /* ── API & Data ── */
+    async function authenticateTelegram() {
+      if (!db || !tg?.initData) return false;
+      const { data, error } = await db.functions.invoke('telegram-auth', {
+        body: { initData: tg.initData }
+      });
+      if (error || !data?.access_token || !data?.refresh_token || !data?.user?.id) {
+        console.error('Telegram authentication failed');
+        return false;
+      }
+      const { error: sessionError } = await db.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token
+      });
+      if (sessionError) return false;
+      S.user = {
+        id: String(data.user.id),
+        name: data.user.first_name || 'Oyuncu',
+        user: data.user.username || ''
+      };
+      S.startParam = typeof data.start_param === 'string' ? data.start_param : '';
+      S.authenticated = true;
+      return true;
+    }
+
+    const READ_ONLY_ACTIONS = new Set([
+      'marino_get_leaderboard', 'marino_get_referrals', 'marino_get_live_matches',
+      'marino_get_my_notifications', 'marino_hk_state'
+    ]);
+    const inFlightActions = new Set();
     async function rpc(name, p) {
-      const { data, error } = await db.rpc(name, p);
-      if (error) throw error;
-      return data;
+      if (!S.authenticated) throw new Error('authentication_required');
+      const payload = { ...(p || {}) };
+      delete payload.p_telegram_id;
+      delete payload.telegram_id;
+      delete payload.p_admin_id;
+      const suppliedRequestId = payload.p_request_id;
+      delete payload.p_request_id;
+      const isReadOnly = READ_ONLY_ACTIONS.has(name);
+      if (!isReadOnly && inFlightActions.has(name)) throw new Error('operation_in_progress');
+      if (!isReadOnly) inFlightActions.add(name);
+      try {
+        const { data, error } = await db.rpc('marino_secure_rpc', {
+          p_action: name,
+          p_payload: payload,
+          p_request_id: isReadOnly ? null : (suppliedRequestId || uid())
+        });
+        if (error) throw error;
+        return data;
+      } finally {
+        if (!isReadOnly) inFlightActions.delete(name);
+      }
     }
 
     function processState(d) {
@@ -2244,7 +2292,7 @@
 
     async function fetchGame() {
       try {
-        const sp = tg && tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
+        const sp = S.startParam;
         const refBy = (sp && sp.startsWith('ref_')) ? sp.replace('ref_', '') : '';
 
         const res = await rpc('start_game', {
@@ -2285,9 +2333,8 @@
       const s = S.game.state;
       if (s.en <= 0) { toast('Enerji bitti!'); au.fail(); return; }
 
-      // Optimistic UI updates
-      s.coin += s.tap; s.en -= 1;
-      renderTop(); au.tap();
+      // Economic state changes only after the authenticated server acknowledges them.
+      au.tap();
 
       // Float Animation
       const btn = q('#btnTap');
@@ -2301,9 +2348,10 @@
 
       // Buffer and sync (simplified for stability, sending 1 hit)
       try {
-        const d = await rpc('tap_coin', { p_telegram_id: String(S.user.id), p_taps: 1 });
-        // Don't fully overwrite state continuously to avoid flicker, just sync if needed
-      } catch (err) { /* silent fail on tap */ }
+        const d = await rpc('tap_coin', { p_taps: 1 });
+        if (d?.state) processState(d);
+        renderTop();
+      } catch (err) { toast('İşlem sunucu tarafından onaylanmadı.'); }
     }
 
     async function handleCollect() {
@@ -2709,28 +2757,25 @@
     function addRouletteBet(key) {
       if (S.busy) return;
       const current = window.rouletteBets[key] || 0;
+      const pendingTotal = Object.values(window.rouletteBets).reduce((a, b) => a + b, 0);
       // Optmistic check
-      if (S.game.state.chips < window.selChip) {
+      if (S.game.state.chips - pendingTotal < window.selChip) {
         toast("Yetersiz Çip! Vezneden alabilirsin.");
         return;
       }
       window.rouletteBets[key] = current + window.selChip;
-      S.game.state.chips -= window.selChip; // Deduct immediately for UI feedback
 
       // Visual update
       const container = q('#bet-' + key);
       if (container) {
         container.innerHTML = `<div class="chip-marker">${window.rouletteBets[key]}</div>`;
       }
-      if (q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips);
+      if (q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips - pendingTotal - window.selChip);
       au.tap();
     }
 
     function clearRBets() {
       if (S.busy) return;
-      // Refund locally
-      const total = Object.values(window.rouletteBets).reduce((a, b) => a + b, 0);
-      S.game.state.chips += total;
       window.rouletteBets = {};
       document.querySelectorAll('[id^="bet-"]').forEach(el => el.innerHTML = '');
       if (q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips);
@@ -3115,15 +3160,6 @@
 
         let activeMl = ml ? ml.filter(m => !m.is_finished) : [];
 
-        // AUTO-GENERATE MATCHES IF EMPTY (Autonomous Engine)
-        if (activeMl.length === 0) {
-          try {
-            await rpc('marino_generate_matches', { p_match_count: 15 });
-            ml = await rpc('marino_get_live_matches', {});
-            activeMl = ml ? ml.filter(m => !m.is_finished) : [];
-          } catch (e) { console.error("Auto-generate failed", e); }
-        }
-
         if (activeMl.length === 0) {
           b.innerHTML = '<div class="alert-box" style="margin-top:20px">Şu an aktif canlı maç bulunmuyor. Yeni bülten yakında açılacak.</div>';
           return;
@@ -3497,72 +3533,25 @@
     S.hk = null;
     async function hkRpc(name, args) {
       try {
-        if (typeof db === 'undefined' || !db || typeof db.rpc !== 'function') return { _offline: true };
-        const { data, error } = await db.rpc(name, args);
-        if (error) { console.warn('hkRpc err', name, error.message); return { _offline: true, _err: error.message }; }
-        return data;
-      } catch (e) { console.warn('hkRpc throw', name, e); return { _offline: true, _err: String(e) }; }
+        return await rpc(name, args);
+      } catch (e) {
+        console.warn('hkRpc rejected', name, e?.message || 'request_failed');
+        return { _failed: true };
+      }
     }
     async function hkRefreshState() {
       if (!S.user || !S.user.id) return;
       const r = await hkRpc('marino_hk_state', { p_telegram_id: String(S.user.id) });
-      // Always try to fetch authoritative daily word/combo (deterministic, public)
-      const wRes = await hkRpc('marino_get_today_cipher', {});
-      if (wRes && !wRes._offline && typeof wRes === 'string') {
-        localStorage.setItem('m_cipher_today_' + todayKey(), wRes);
-      }
-      const cRes = await hkRpc('marino_get_today_combo', {});
-      if (cRes && !cRes._offline && Array.isArray(cRes)) {
-        localStorage.setItem('m_combo_today_' + todayKey(), JSON.stringify(cRes));
-      }
-      if (r && !r._offline) {
+      if (r && !r._failed) {
         S.hk = r;
-        // Sync server combo/cipher into localStorage-backed state so UI is consistent
-        const cs = { attempts: r.combo.attempts_left, won: r.combo.won, selected: [] };
-        localStorage.setItem('m_combo_' + todayKey(), JSON.stringify(cs));
-        const ci = { won: r.cipher.won, input: '' };
-        localStorage.setItem('m_cipher_' + todayKey(), JSON.stringify(ci));
-        // Permanent boost levels mirror
-        const perm = {
-          multitap_lvl: r.boosts.multitap_lvl || 0,
-          energy_lvl: r.boosts.energy_lvl || 0,
-          auto_tap_end: r.boosts.auto_tap_until ? new Date(r.boosts.auto_tap_until).getTime() : 0
-        };
-        localStorage.setItem('m_perm_boost', JSON.stringify(perm));
-        // Daily boost usage mirror
-        const bs = {
-          full_energy: r.boosts.full_energy_left,
-          tap_boost: r.boosts.tap_boost_left,
-          auto_tap_done: r.boosts.auto_tap_active
-        };
-        localStorage.setItem('m_boosts_' + todayKey(), JSON.stringify(bs));
-        // Airdrop wallet
-        const a = { wallet_connected: !!r.airdrop.wallet_connected, ton_address: r.airdrop.ton_address };
-        localStorage.setItem('m_airdrop', JSON.stringify(a));
       }
       return r;
     }
 
     // Award coin client-side optimistically; persist accumulated client bonus
-    function awardCoin(n) {
-      if (!S.game || !S.game.state) return;
-      S.game.state.coin = (Number(S.game.state.coin) || 0) + n;
-      // Track client bonuses (so user knows + plus syncable later)
-      const k = 'm_clientBonus';
-      const cur = Number(localStorage.getItem(k) || 0);
-      localStorage.setItem(k, String(cur + n));
-      // Try server sync via existing claim_task RPC (fail silent)
-      renderTop();
-    }
-    function awardChips(n) {
-      if (!S.game || !S.game.state) return;
-      S.game.state.chips = (Number(S.game.state.chips) || 0) + n;
-      renderTop();
-    }
-    function awardEnergy(n) {
-      if (!S.game || !S.game.state) return;
-      S.game.state.en = Math.min(S.game.state.maxEn, (Number(S.game.state.en) || 0) + n);
-      renderTop();
+    async function refreshAuthoritativeEconomy() {
+      await fetchGame();
+      await hkRefreshState();
     }
 
     // ─── DAILY COMBO ──────────────────────────────────────────
@@ -3581,18 +3570,21 @@
       { id: 'slot', emo: '🎰', nm: 'Slot', img: 'card_slot' }
     ];
     function getTodayCombo() {
-      // Prefer server-cached combo (deterministic, fetched on init)
-      const srv = localStorage.getItem('m_combo_today_' + todayKey());
-      if (srv) { try { return JSON.parse(srv); } catch (e) { } }
-      const seed = seedFromDate('combo_' + todayKey());
-      const shuffled = seededShuffle(COMBO_DECK.map(c => c.id), seed);
-      return shuffled.slice(0, 3).sort();
+      return [];
     }
     function getComboState() {
-      const k = 'm_combo_' + todayKey();
-      return JSON.parse(localStorage.getItem(k) || '{"attempts":6,"won":false,"selected":[]}');
+      return {
+        attempts: Number(S.hk?.combo?.attempts_left ?? 0),
+        won: !!S.hk?.combo?.won,
+        selected: comboSel || []
+      };
     }
-    function saveComboState(s) { localStorage.setItem('m_combo_' + todayKey(), JSON.stringify(s)); }
+    function saveComboState(s) {
+      if (S.hk?.combo) {
+        S.hk.combo.attempts_left = s.attempts;
+        S.hk.combo.won = !!s.won;
+      }
+    }
     let comboSel = [];
     function openCombo() {
       au.click();
@@ -3660,7 +3652,7 @@
         p_picks: comboSel.slice()
       });
 
-      if (res && !res._offline) {
+      if (res && !res._failed) {
         // Server is authoritative
         s.attempts = Number(res.attempts_left ?? Math.max(0, s.attempts - 1));
         s.selected = comboSel.slice();
@@ -3669,8 +3661,7 @@
         if (res.won) {
           s.won = true;
           saveComboState(s);
-          // Server already added reward to marino_coin; reflect in UI
-          awardCoin(Number(res.reward || 5000000));
+          await refreshAuthoritativeEconomy();
           au.win(); toast(t('combo_success'));
           renderComboSheet();
           refreshCombocipherBadges();
@@ -3688,44 +3679,23 @@
         }
       }
 
-      // OFFLINE FALLBACK: localStorage-only
-      const target = getTodayCombo();
-      const picked = comboSel.slice().sort();
-      const ok = JSON.stringify(picked) === JSON.stringify(target);
-      s.attempts -= 1; s.selected = comboSel;
-      if (ok) {
-        s.won = true; saveComboState(s);
-        awardCoin(5000000); au.win(); toast(t('combo_success') + ' (offline)');
-        renderComboSheet(); refreshCombocipherBadges();
-      } else {
-        saveComboState(s); au.fail();
-        toast(t('combo_wrong') + ` (${s.attempts}/6)`);
-        document.querySelectorAll('#comboSlots .combo-slot').forEach(el => {
-          el.style.animation = 'shake 0.3s'; setTimeout(() => el.style.animation = '', 320);
-        });
-        comboSel = []; renderComboSheet();
-      }
+      au.fail();
+      toast('Sunucu onayı alınamadı. Ödül veya hak kullanımı yapılmadı.');
     }
 
     // ─── DAILY CIPHER ──────────────────────────────────────────
-    const CIPHER_WORDS = ['MARINO', 'CASINO', 'JACKPOT', 'EMPIRE', 'ROULETTE', 'POKER', 'VEGAS', 'CHIPS', 'WINNER', 'FORTUNE', 'BANKROLL', 'BLACKJACK'];
     const MORSE = {
       A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---',
       K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-',
       U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..'
     };
     function getTodayCipher() {
-      // Prefer server-cached word (deterministic, fetched on init)
-      const srv = localStorage.getItem('m_cipher_today_' + todayKey());
-      if (srv) return srv;
-      const seed = seedFromDate('cipher_' + todayKey());
-      return CIPHER_WORDS[seed % CIPHER_WORDS.length];
+      return '';
     }
     function cipherState() {
-      const k = 'm_cipher_' + todayKey();
-      return JSON.parse(localStorage.getItem(k) || '{"won":false,"input":""}');
+      return { won: !!S.hk?.cipher?.won, input: '' };
     }
-    function saveCipherState(s) { localStorage.setItem('m_cipher_' + todayKey(), JSON.stringify(s)); }
+    function saveCipherState(s) { if (S.hk?.cipher) S.hk.cipher.won = !!s.won; }
     let cipherInput = '';
     function openCipher() {
       au.click();
@@ -3735,11 +3705,8 @@
     }
     function renderCipherSheet() {
       const s = cipherState();
-      // Prefer server-stored winning word, fallback to local seed
-      const storedWord = localStorage.getItem('m_cipher_word_' + todayKey());
-      const word = (s.won && storedWord) ? storedWord : getTodayCipher();
-      // Morse display
-      const morse = word.split('').map(c => MORSE[c] || '').join('   ');
+      const wordLength = Number(S.hk?.cipher_hint?.word_length || 0);
+      const morse = String(S.hk?.cipher_hint?.morse || '');
       // Visual dot/dash
       const visual = morse.split('').map(ch => {
         if (ch === '.') return '<span class="morse-dot"></span>';
@@ -3749,10 +3716,10 @@
       q('#morseDisplay').innerHTML = visual;
       // Boxes
       const boxesEl = q('#cipherBoxes'); boxesEl.innerHTML = '';
-      for (let i = 0; i < word.length; i++) {
+      for (let i = 0; i < wordLength; i++) {
         const div = document.createElement('div');
         div.className = 'cipher-box' + (cipherInput[i] ? ' filled' : '') + (s.won ? ' correct' : '');
-        div.textContent = (s.won ? word[i] : (cipherInput[i] || ''));
+        div.textContent = cipherInput[i] || '';
         boxesEl.appendChild(div);
       }
       // Keys
@@ -3761,7 +3728,7 @@
       letters.split('').forEach(L => {
         const b = document.createElement('button');
         b.className = 'key-btn'; b.textContent = L;
-        b.onclick = () => { if (s.won || cipherInput.length >= word.length) return; cipherInput += L; au.tap(); renderCipherSheet(); };
+        b.onclick = () => { if (s.won || cipherInput.length >= wordLength) return; cipherInput += L; au.tap(); renderCipherSheet(); };
         keysEl.appendChild(b);
       });
       // Submit state
@@ -3781,13 +3748,11 @@
         p_word: cipherInput.toUpperCase()
       });
 
-      if (res && !res._offline) {
+      if (res && !res._failed) {
         if (res.won) {
           s.won = true; s.input = cipherInput; saveCipherState(s);
           if (S.hk && S.hk.cipher) { S.hk.cipher.won = true; S.hk.cipher.reward = res.reward; }
-          // Store winning word for display (server-authoritative)
-          localStorage.setItem('m_cipher_word_' + todayKey(), cipherInput.toUpperCase());
-          awardCoin(Number(res.reward || 1000000));
+          await refreshAuthoritativeEconomy();
           au.win(); toast(t('cipher_correct'));
           renderCipherSheet(); refreshCombocipherBadges();
         } else {
@@ -3800,19 +3765,8 @@
         return;
       }
 
-      // OFFLINE FALLBACK
-      const word = getTodayCipher();
-      if (cipherInput.toUpperCase() === word) {
-        s.won = true; s.input = cipherInput; saveCipherState(s);
-        awardCoin(1000000); au.win(); toast(t('cipher_correct') + ' (offline)');
-        renderCipherSheet(); refreshCombocipherBadges();
-      } else {
-        au.fail(); toast(t('cipher_wrong'));
-        document.querySelectorAll('#cipherBoxes .cipher-box').forEach(el => {
-          el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 400);
-        });
-        cipherInput = ''; renderCipherSheet();
-      }
+      au.fail();
+      toast('Sunucu onayı alınamadı. Ödül veya hak kullanımı yapılmadı.');
     }
 
     function refreshCombocipherBadges() {
@@ -3841,14 +3795,32 @@
 
     // ─── BOOSTS ──────────────────────────────────────────
     function boostState() {
-      const k = 'm_boosts_' + todayKey();
-      return JSON.parse(localStorage.getItem(k) || '{"full_energy":3,"tap_boost":3,"auto_tap_done":false}');
+      return {
+        full_energy: Number(S.hk?.boosts?.full_energy_left ?? 0),
+        tap_boost: Number(S.hk?.boosts?.tap_boost_left ?? 0),
+        auto_tap_done: !!S.hk?.boosts?.auto_tap_active
+      };
     }
-    function saveBoostState(s) { localStorage.setItem('m_boosts_' + todayKey(), JSON.stringify(s)); }
+    function saveBoostState(s) {
+      if (S.hk?.boosts) {
+        S.hk.boosts.full_energy_left = s.full_energy;
+        S.hk.boosts.tap_boost_left = s.tap_boost;
+      }
+    }
     function permBoostState() {
-      return JSON.parse(localStorage.getItem('m_perm_boost') || '{"multitap_lvl":0,"energy_lvl":0,"auto_tap_end":0}');
+      return {
+        multitap_lvl: Number(S.hk?.boosts?.multitap_lvl ?? 0),
+        energy_lvl: Number(S.hk?.boosts?.energy_lvl ?? 0),
+        auto_tap_end: S.hk?.boosts?.auto_tap_until ? new Date(S.hk.boosts.auto_tap_until).getTime() : 0
+      };
     }
-    function savePermBoostState(s) { localStorage.setItem('m_perm_boost', JSON.stringify(s)); }
+    function savePermBoostState(s) {
+      if (S.hk?.boosts) {
+        S.hk.boosts.multitap_lvl = s.multitap_lvl;
+        S.hk.boosts.energy_lvl = s.energy_lvl;
+        S.hk.boosts.auto_tap_until = s.auto_tap_end ? new Date(s.auto_tap_end).toISOString() : null;
+      }
+    }
 
     function openBoost() { au.click(); q('#sheetBoost').classList.add('show'); renderBoosts(); }
 
@@ -3868,13 +3840,12 @@
           action: async () => {
             const s = boostState(); if (s.full_energy <= 0) return;
             const res = await hkRpc('marino_use_full_energy', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               s.full_energy = Number(res.left ?? s.full_energy - 1); saveBoostState(s);
               if (S.game?.state) { S.game.state.en = Number(res.energy ?? S.game.state.maxEn); renderTop(); }
             } else {
-              s.full_energy -= 1; saveBoostState(s);
-              if (S.game?.state) { S.game.state.en = S.game.state.maxEn; renderTop(); }
+              return toast('Sunucu onayı alınamadı. Hak kullanılmadı.');
             }
             toast(t('full_energy_done')); au.win(); renderBoosts();
           }
@@ -3888,11 +3859,11 @@
           action: async () => {
             const s = boostState(); if (s.tap_boost <= 0) return;
             const res = await hkRpc('marino_use_tap_boost', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               s.tap_boost = Number(res.left ?? s.tap_boost - 1);
             } else {
-              s.tap_boost -= 1;
+              return toast('Sunucu onayı alınamadı. Hak kullanılmadı.');
             }
             saveBoostState(s);
             window._tapMultiplierUntil = Date.now() + 20000;
@@ -3914,15 +3885,13 @@
           action: async () => {
             if (!S.game?.state || (Number(S.game.state.coin) || 0) < multitapCost) return toast(t('insufficient_coin'));
             const res = await hkRpc('marino_upgrade_multitap', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               const p2 = permBoostState(); p2.multitap_lvl = Number(res.new_level ?? p2.multitap_lvl + 1); savePermBoostState(p2);
               S.game.state.coin -= Number(res.cost || multitapCost);
               S.game.state.tap = Number(res.new_tap_power ?? (S.game.state.tap || 1) + 1);
             } else {
-              const p2 = permBoostState(); p2.multitap_lvl += 1; savePermBoostState(p2);
-              S.game.state.coin -= multitapCost;
-              S.game.state.tap = (Number(S.game.state.tap) || 1) + 1;
+              return toast('Sunucu onayı alınamadı. Bakiye değiştirilmedi.');
             }
             renderTop(); toast(t('boost_activated')); au.win(); renderBoosts();
           }
@@ -3935,17 +3904,14 @@
           action: async () => {
             if (!S.game?.state || (Number(S.game.state.coin) || 0) < energyCost) return toast(t('insufficient_coin'));
             const res = await hkRpc('marino_upgrade_energy_limit', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               const p2 = permBoostState(); p2.energy_lvl = Number(res.new_level ?? p2.energy_lvl + 1); savePermBoostState(p2);
               S.game.state.coin -= Number(res.cost || energyCost);
               S.game.state.maxEn = Number(res.new_max_energy ?? S.game.state.maxEn + 500);
               S.game.state.en = S.game.state.maxEn;
             } else {
-              const p2 = permBoostState(); p2.energy_lvl += 1; savePermBoostState(p2);
-              S.game.state.coin -= energyCost;
-              S.game.state.maxEn = (Number(S.game.state.maxEn) || 500) + 500;
-              S.game.state.en = S.game.state.maxEn;
+              return toast('Sunucu onayı alınamadı. Bakiye değiştirilmedi.');
             }
             renderTop(); toast(t('boost_activated')); au.win(); renderBoosts();
           }
@@ -3960,15 +3926,14 @@
             if (autoActive) return;
             if (!S.game?.state || (Number(S.game.state.coin) || 0) < 5000) return toast(t('insufficient_coin'));
             const res = await hkRpc('marino_activate_auto_tap', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               const p2 = permBoostState();
               p2.auto_tap_end = res.until ? new Date(res.until).getTime() : (Date.now() + 12*3600*1000);
               savePermBoostState(p2);
               S.game.state.coin -= Number(res.cost || 5000);
             } else {
-              const p2 = permBoostState(); p2.auto_tap_end = Date.now() + 12 * 3600 * 1000; savePermBoostState(p2);
-              S.game.state.coin -= 5000;
+              return toast('Sunucu onayı alınamadı. Bakiye değiştirilmedi.');
             }
             renderTop();
             toast(t('auto_tap_active')); au.win(); renderBoosts();
@@ -3997,21 +3962,19 @@
       });
     }
 
-    // Auto-tap loop (when active, 1 tap/sec)
-    setInterval(() => {
-      const p = permBoostState();
-      if (p.auto_tap_end > Date.now() && S.game?.state) {
-        const tap = Number(S.game.state.tap) || 1;
-        S.game.state.coin = (Number(S.game.state.coin) || 0) + tap;
-        renderTop();
-      }
-    }, 1000);
-
     // ─── AIRDROP ──────────────────────────────────────────
     function airdropState() {
-      return JSON.parse(localStorage.getItem('m_airdrop') || '{"wallet_connected":false}');
+      return {
+        wallet_connected: !!S.hk?.airdrop?.wallet_connected,
+        ton_address: S.hk?.airdrop?.ton_address || null
+      };
     }
-    function saveAirdropState(s) { localStorage.setItem('m_airdrop', JSON.stringify(s)); }
+    function saveAirdropState(s) {
+      if (S.hk?.airdrop) {
+        S.hk.airdrop.wallet_connected = !!s.wallet_connected;
+        S.hk.airdrop.ton_address = s.ton_address || null;
+      }
+    }
     function openAirdrop() { au.click(); q('#sheetAirdrop').classList.add('show'); renderAirdrop(); }
     function renderAirdrop() {
       if (!q('#airdropChecklist')) return;
@@ -4047,20 +4010,7 @@
     async function connectWallet() {
       const a = airdropState();
       if (a.wallet_connected) { toast('✅ ' + (LANG === 'tr' ? 'Zaten bağlı' : 'Already connected')); return; }
-      const res = await hkRpc('marino_connect_wallet', {
-        p_telegram_id: String(S.user?.id || 'guest'),
-        p_ton_address: null
-      });
-      if (res && !res._offline && res.ok) {
-        a.wallet_connected = true;
-        a.ton_address = res.ton_address;
-        saveAirdropState(a);
-        au.win();
-        toast('✅ ' + (LANG === 'tr' ? `Cüzdan bağlandı: ${String(res.ton_address).slice(0,8)}...` : `Wallet connected: ${String(res.ton_address).slice(0,8)}...`));
-      } else {
-        a.wallet_connected = true; saveAirdropState(a);
-        au.win(); toast(t('wallet_coming_soon'));
-      }
+      toast(t('wallet_coming_soon'));
       renderAirdrop();
     }
 
@@ -4092,15 +4042,7 @@
       else _tapCount = 1;
       _tapLastTs = now;
 
-      // Pre-apply 5x boost by mutating tap power temporarily (then restore)
-      const s = S.game.state;
-      const originalTap = s.tap;
-      if (isBoost) s.tap = originalTap * 5;
-      try {
-        await _origHandleTap(e);
-      } finally {
-        if (isBoost) s.tap = originalTap;
-      }
+      await _origHandleTap(e);
 
       // Particle effect
       const btn = q('#btnTap');

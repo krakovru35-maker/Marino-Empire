@@ -33,6 +33,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Verify public artifact contains no admin console
+        shell: bash
+        run: |
+          test ! -e public/admin.html
+          ! grep -RIE --include='*.html' --include='*.js' \
+            '(admin_token|marino_authorized|type=.password)' public
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
