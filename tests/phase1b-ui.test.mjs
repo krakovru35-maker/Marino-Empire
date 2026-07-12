@@ -51,3 +51,12 @@ test('new static markup IDs remain unique', () => {
   const ids = [...markup.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
   assert.equal(new Set(ids).size, ids.length);
 });
+
+test('premium home polish keeps the target viewport matrix and fallbacks', () => {
+  assert.match(css, /@media\(max-height:700px\)/);
+  assert.match(css, /@media\(max-height:600px\)/);
+  assert.match(css, /@media\(min-width:430px\) and \(min-height:820px\)/);
+  assert.match(css, /\.nav-bar\{left:10px!important;right:10px!important/);
+  assert.match(css, /\.quality-lite \.tap-btn img\{animation:none/);
+  assert.match(css, /@media\(prefers-reduced-motion:reduce\)[\s\S]*?\.tap-btn img\{animation:none!important\}/);
+});

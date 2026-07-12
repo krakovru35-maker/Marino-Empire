@@ -1641,15 +1641,15 @@
     <div id="view-home" class="page" style="display: flex; flex-direction: column; height: 100%; flex: 1;">
       <!-- Header -->
       <header class="header">
-        <div class="profile-area" id="btnProfile" style="cursor:pointer" data-testid="profile-area">
+        <button type="button" class="profile-area" id="btnProfile" data-testid="profile-area" aria-label="Oyuncu profilini aç">
           <div class="avatar"><img src="./assets/illustrations/marino-avatar.png"
               onerror="this.onerror=null; this.src=''; this.parentElement.innerHTML='🧑'"></div>
           <div class="p-info">
             <span class="p-name" id="userName">Oyuncu</span>
             <span class="p-role" data-i18n="role_emperor">İmparator</span>
           </div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center">
+        </button>
+        <div class="header-actions">
           <div class="lang-toggle" data-testid="lang-toggle">
             <button id="langTR" class="active" data-lang="tr">TR</button>
             <button id="langEN" data-lang="en">EN</button>
@@ -1660,13 +1660,14 @@
 
       <!-- Balance -->
       <div class="balance-area">
+        <span class="balance-eyebrow">MARINO COIN</span>
         <div class="bal-coin"><img src="./assets/currency/marino-coin.png" alt="Coin" onerror="this.src=null;">
           <span id="valCoin">0</span>
         </div>
       </div>
 
       <!-- League Badge -->
-      <div style="display:flex; justify-content:center; margin-bottom:10px; position:relative; z-index:10">
+      <div class="league-wrap">
         <div onclick="openLeagues()" id="leagueBadge"
           style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.6); padding:8px 16px; border-radius:99px; border:1px solid #ffd13b; cursor:pointer; transition:0.2s; box-shadow:0 4px 15px rgba(0,0,0,0.5)">
           <span id="leagueIcon">🥉</span>
@@ -1676,12 +1677,14 @@
       </div>
 
       <!-- Rank / Level -->
-      <div class="rank-row">
-        <span class="rank-name">Seviye <span id="valLvl">1</span></span>
-        <span class="rank-lvl">XP <span id="valXp">0</span></span>
-      </div>
-      <div class="progress-bg">
-        <div class="progress-fill" id="valProg" style="width: 5%;"></div>
+      <div class="rank-shell">
+        <div class="rank-row">
+          <span class="rank-name">SEVİYE <strong id="valLvl">1</strong></span>
+          <span class="rank-lvl"><span id="valXp">0</span> XP</span>
+        </div>
+        <div class="progress-bg">
+          <div class="progress-fill" id="valProg" style="width: 5%;"></div>
+        </div>
       </div>
 
       <!-- Tap Area -->
@@ -1713,30 +1716,30 @@
         </div>
         <!-- Right Boost button can open buildings/upgrades -->
         <button class="boost-btn" id="btnCollect" data-testid="collect-btn">
-          <span data-i18n="collect_vault">KASAYI TOPLA</span>
+          <span class="collect-glint" aria-hidden="true"></span>
+          <span class="collect-copy"><small>HAZIR GELİR</small><strong data-i18n="collect_vault">KASAYI TOPLA</strong></span>
         </button>
       </div>
 
       <button class="upgrade-target" id="btnUpgradeTarget" type="button">
         <span class="upgrade-target-kicker">SIRADAKİ HEDEF</span>
         <span class="upgrade-target-title">İmparatorluğunu büyüt</span>
+        <span class="upgrade-target-sub">Yeni gelir kaynaklarını aç</span>
         <span class="upgrade-target-arrow" aria-hidden="true">›</span>
       </button>
-
-      <!-- Quick action pills -->
-      <div class="quick-bar">
-        <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
-          <span class="ico">🚀</span><span data-i18n="boost">BOOST</span>
-        </button>
-        <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
-          <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
-        </button>
-      </div>
 
       <div class="empire-hub-backdrop" id="empireHubBackdrop" hidden></div>
       <details class="empire-hub" id="empireHub">
         <summary><span>EMPIRE HUB</span><small>İstatistikler</small></summary>
         <div class="empire-hub-panel">
+          <div class="quick-bar">
+            <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
+              <span class="ico">🚀</span><span data-i18n="boost">BOOST</span>
+            </button>
+            <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
+              <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
+            </button>
+          </div>
           <div class="hk-floats empire-hub-actions">
             <button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
               <div class="hk-float-ico">🎴</div>
