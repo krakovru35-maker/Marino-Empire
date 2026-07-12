@@ -13,7 +13,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link href="./styles/phase-1a.css" rel="stylesheet">
+  <link href="./styles/phase-1b.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
+  <script src="./js/phase-1b.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
    MARINO EMPIRE — HAMSTER COMBAT STYLE UI
@@ -1686,9 +1688,13 @@
       <div class="tap-container">
         <div class="casino-scene" aria-hidden="true">
           <div class="scene-glow"></div>
+          <div class="scene-ambient scene-ambient-left"></div>
+          <div class="scene-ambient scene-ambient-right"></div>
           <div class="scene-arch"></div>
+          <div class="scene-marino-sign">M</div>
           <div class="scene-floor"></div>
           <div class="scene-table"></div>
+          <div class="scene-reflection"></div>
         </div>
         <output class="visual-combo" id="visualCombo" aria-live="polite"></output>
         <div class="tap-target">
@@ -2023,6 +2029,15 @@
     </div>
 
     <div id="toast" class="toast"></div>
+    <div id="onboardingOverlay" class="onboarding-overlay" hidden aria-live="polite">
+      <div class="onboarding-shade"></div>
+      <section class="onboarding-card" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+        <span class="onboarding-step" id="onboardingStep">1 / 3</span>
+        <h2 id="onboardingTitle">Marino'ya dokun</h2>
+        <p id="onboardingText">İmparatorluğunun enerjisini uyandırmak için Marino'ya bir kez dokun.</p>
+        <button type="button" id="onboardingSkip" class="onboarding-skip">Turu atla</button>
+      </section>
+    </div>
     <!-- Background Music -->
     <audio id="bgMusic" src="./assets/audio/fon.mp3" loop preload="auto"></audio>
   </div>
@@ -2145,7 +2160,7 @@
         o.connect(g); g.connect(this.ctx.destination);
         o.start(); g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + d); o.stop(this.ctx.currentTime + d + 0.1);
       },
-      tap() { this.play(800, 0.05); }, click() { this.play(500, 0.05, 'triangle'); },
+      tap() { if (!window.MarinoPhase1B) this.play(800, 0.05); }, click() { this.play(500, 0.05, 'triangle'); },
       win() { this.play(600, 0.1, 'triangle'); setTimeout(() => this.play(900, 0.15, 'triangle'), 100); },
       fail() { this.play(200, 0.2, 'sawtooth'); }
     };
@@ -2253,14 +2268,15 @@
 
       // Actions
       q('#btnTap').onpointerdown = e => {
-        au.setup();
-        window.MarinoPhase1A?.tapFeedback(e);
+        if (S.settings.sfx) au.setup();
+        (window.MarinoPhase1B?.tapFeedback || window.MarinoPhase1A?.tapFeedback)?.(e);
         handleTap(e);
       };
       q('#btnCollect').onclick = handleCollect;
 
       // Initial load
       await fetchGame();
+      window.MarinoPhase1B?.maybeStartOnboarding();
 
       // Energy Regen Loop (1 per min)
     }
