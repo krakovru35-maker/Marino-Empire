@@ -1,4 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
+import {
+  BootstrapError,
+  DuplicateIdentityEmailError,
+  createMagicLinkSession,
+  ensureIdentity,
+  withBootstrapLease,
+} from "./auth-bootstrap.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": Deno.env.get("APP_ORIGIN") ?? "",
@@ -50,6 +57,19 @@ async function hmac(key: CryptoKey | Uint8Array, value: string) {
 
 async function sha256(value: string) {
   return toHex(new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(value))));
+}
+
+function sleep(milliseconds: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function logMasked(entry: { event: string; status: number | null; code: string }) {
+  console.error("telegram-auth security event", entry);
+}
+
+function isDuplicateEmailError(error: unknown) {
+  const candidate = error as { code?: string };
+  return candidate?.code === "email_exists" || candidate?.code === "user_already_exists";
 }
 
 type TelegramUser = {
@@ -134,63 +154,107 @@ Deno.serve(async (request) => {
     if (rateError) throw rateError;
     if (!rateAllowed) throw new Error("bootstrap_rate_limited");
 
-    const { data: existing, error: lookupError } = await admin
-      .from("marino_identity_links")
-      .select("auth_user_id")
-      .eq("telegram_id", telegramId)
-      .maybeSingle();
-    if (lookupError) throw lookupError;
-
     const email = `telegram_${telegramId}@sessions.invalid`;
-    const password = `${crypto.randomUUID()}-${crypto.randomUUID()}`;
-    let authUserId = existing?.auth_user_id as string | undefined;
+    const leaseToken = crypto.randomUUID();
+    const identity = await withBootstrapLease(leaseToken, {
+      acquire: async (token, leaseSeconds) => {
+        const { data, error } = await admin.rpc("marino_acquire_auth_bootstrap_lease", {
+          p_telegram_id: telegramId, p_lease_token: token, p_lease_seconds: leaseSeconds,
+        });
+        if (error) throw error;
+        return data === true;
+      },
+      release: async (token) => {
+        const { data, error } = await admin.rpc("marino_release_auth_bootstrap_lease", {
+          p_telegram_id: telegramId, p_lease_token: token,
+        });
+        if (error) throw error;
+        return data === true;
+      },
+      sleep,
+      logMasked,
+    }, async () => {
+      const result = await ensureIdentity({
+        findLink: async () => {
+          const { data, error } = await admin.from("marino_identity_links")
+            .select("auth_user_id").eq("telegram_id", telegramId).maybeSingle();
+          if (error) throw error;
+          return data?.auth_user_id ?? null;
+        },
+        createUser: async () => {
+          const { data, error } = await admin.auth.admin.createUser({
+            email,
+            email_confirm: true,
+            app_metadata: { auth_source: "telegram", telegram_id: telegramId },
+            user_metadata: {
+              first_name: verified.user.first_name,
+              last_name: verified.user.last_name ?? "",
+              username: verified.user.username ?? "",
+            },
+          });
+          if (error) {
+            if (isDuplicateEmailError(error)) throw new DuplicateIdentityEmailError();
+            throw error;
+          }
+          if (!data.user) throw new BootstrapError("identity_creation_failed");
+          return data.user.id;
+        },
+        insertLink: async (authUserId) => {
+          const { error } = await admin.from("marino_identity_links").insert({
+            auth_user_id: authUserId,
+            telegram_id: telegramId,
+            telegram_username: verified.user.username ?? null,
+            display_name: [verified.user.first_name, verified.user.last_name].filter(Boolean).join(" "),
+            last_verified_at: new Date().toISOString(),
+          });
+          if (error) throw error;
+        },
+        deleteUser: async (authUserId) => {
+          const { error } = await admin.auth.admin.deleteUser(authUserId);
+          if (error) throw error;
+        },
+        sleep,
+        logMasked,
+      });
 
-    if (!authUserId) {
-      const { data: created, error: createError } = await admin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        app_metadata: { auth_source: "telegram", telegram_id: telegramId },
-        user_metadata: {
-          first_name: verified.user.first_name,
-          last_name: verified.user.last_name ?? "",
-          username: verified.user.username ?? "",
-        },
-      });
-      if (createError || !created.user) throw createError ?? new Error("auth_user_create_failed");
-      authUserId = created.user.id;
-      const { error: linkError } = await admin.from("marino_identity_links").insert({
-        auth_user_id: authUserId,
-        telegram_id: telegramId,
-        telegram_username: verified.user.username ?? null,
-        display_name: [verified.user.first_name, verified.user.last_name].filter(Boolean).join(" "),
-        last_verified_at: new Date().toISOString(),
-      });
-      if (linkError) throw linkError;
-    } else {
-      const { error: updateError } = await admin.auth.admin.updateUserById(authUserId, {
-        password,
-        app_metadata: { auth_source: "telegram", telegram_id: telegramId },
-        user_metadata: {
-          first_name: verified.user.first_name,
-          last_name: verified.user.last_name ?? "",
-          username: verified.user.username ?? "",
-        },
-      });
-      if (updateError) throw updateError;
-      const { error: touchError } = await admin.from("marino_identity_links").update({
-        telegram_username: verified.user.username ?? null,
-        display_name: [verified.user.first_name, verified.user.last_name].filter(Boolean).join(" "),
-        last_verified_at: new Date().toISOString(),
-      }).eq("auth_user_id", authUserId);
-      if (touchError) throw touchError;
-    }
+      if (!result.createdThisRequest) {
+        const { error: updateError } = await admin.auth.admin.updateUserById(result.authUserId, {
+          app_metadata: { auth_source: "telegram", telegram_id: telegramId },
+          user_metadata: {
+            first_name: verified.user.first_name,
+            last_name: verified.user.last_name ?? "",
+            username: verified.user.username ?? "",
+          },
+        });
+        if (updateError) throw updateError;
+        const { error: touchError } = await admin.from("marino_identity_links").update({
+          telegram_username: verified.user.username ?? null,
+          display_name: [verified.user.first_name, verified.user.last_name].filter(Boolean).join(" "),
+          last_verified_at: new Date().toISOString(),
+        }).eq("auth_user_id", result.authUserId);
+        if (touchError) throw touchError;
+      }
+      return result;
+    });
 
     const sessionClient = createClient(supabaseUrl, anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: signIn, error: signInError } = await sessionClient.auth.signInWithPassword({ email, password });
-    if (signInError || !signIn.session) throw signInError ?? new Error("session_create_failed");
+    const signIn = await createMagicLinkSession({
+      generateHashedToken: async () => {
+        const { data, error } = await admin.auth.admin.generateLink({ type: "magiclink", email });
+        if (error) throw error;
+        const tokenHash = data.properties?.hashed_token;
+        if (!tokenHash) throw new BootstrapError("session_create_failed");
+        return tokenHash;
+      },
+      verifyHashedToken: async (tokenHash) => {
+        const { data, error } = await sessionClient.auth.verifyOtp({ token_hash: tokenHash, type: "magiclink" });
+        if (error || !data.session) throw error ?? new BootstrapError("session_create_failed");
+        return data;
+      },
+    });
+    if (!identity.authUserId || !signIn.session) throw new BootstrapError("session_create_failed");
 
     return json(200, {
       access_token: signIn.session.access_token,
@@ -206,9 +270,14 @@ Deno.serve(async (request) => {
       start_param: verified.startParam,
     });
   } catch (error) {
-    console.error("telegram-auth rejected", error instanceof Error ? error.message : "unknown_error");
-    const message = error instanceof Error ? error.message : "authentication_failed";
-    const status = message === "server_not_configured" ? 503 : message === "bootstrap_rate_limited" ? 429 : 401;
-    return json(status, { error: status === 401 ? "authentication_failed" : message });
+    const known = error instanceof BootstrapError ? error : null;
+    console.error("telegram-auth rejected", {
+      event: known?.telemetryCode ?? "authentication_failed",
+      status: known?.httpStatus ?? null,
+      code: known?.publicCode ?? "unknown",
+    });
+    const message = known?.publicCode ?? (error instanceof Error ? error.message : "authentication_failed");
+    const status = known?.httpStatus ?? (message === "server_not_configured" ? 503 : message === "bootstrap_rate_limited" ? 429 : 401);
+    return json(status, { error: status === 401 ? "authentication_failed" : known?.publicCode ?? "authentication_failed" });
   }
 });

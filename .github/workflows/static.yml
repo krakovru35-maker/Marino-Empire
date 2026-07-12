@@ -54,6 +54,9 @@ jobs:
           deno-version: v2.x
       - name: Type-check Telegram auth function
         run: deno check supabase/functions/telegram-auth/index.ts
+      - name: Test Telegram auth helpers
+        run: deno test supabase/functions/telegram-auth/*_test.ts
+
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: validate

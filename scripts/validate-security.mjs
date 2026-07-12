@@ -60,6 +60,11 @@ for (const match of migrations.matchAll(/create or replace function[\s\S]*?\$\$;
 const edge = read('supabase/functions/telegram-auth/index.ts');
 assert(/TELEGRAM_INIT_DATA_MAX_AGE_SECONDS/.test(edge), 'short initData lifetime control missing');
 assert(/marino_check_bootstrap_rate_limit/.test(edge), 'bootstrap rate limit call missing');
+assert(/withBootstrapLease/.test(edge) && /createMagicLinkSession/.test(edge), 'bootstrap lease or magic-link session missing');
+
+const leaseMigration = read('supabase/migrations/202607120006_p0_auth_bootstrap_lease.sql');
+assert(/security definer/gi.test(leaseMigration) && /set search_path = pg_catalog, public/gi.test(leaseMigration), 'lease functions are not hardened');
+assert(/from public, anon, authenticated/gi.test(leaseMigration) && /to service_role/gi.test(leaseMigration), 'lease RPC privileges are not service-role-only');
 
 if (fs.existsSync(path.join(root, 'dist'))) {
   const manifest = JSON.parse(read('dist/build-manifest.json'));
