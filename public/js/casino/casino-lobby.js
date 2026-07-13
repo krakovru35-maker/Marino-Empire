@@ -1,0 +1,15 @@
+(() => {
+  'use strict';
+  const icon=id=>`<svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/ui/casino/marino-casino-icons.svg#casino-${id}"></use></svg>`;
+  const games=[
+    {id:'slots',name:'Marino Fortune Slots',type:'5×3 VIDEO SLOT',description:'Marino’nun imparatorluk sembolleriyle 20 hatlı premium demo.',icon:'slot',right:'FREE SPIN',ready:true},
+    {id:'roulette',name:'Marino European Roulette',type:'TEK SIFIR AVRUPA RULETİ',description:'0–36 masa, profesyonel bahis alanı ve canlı sonuç sunumu.',icon:'roulette',right:'FREE BET',ready:true},
+    {id:'blackjack',name:'Blackjack Lounge',type:'MASA OYUNU',description:'Marino VIP katında sıradaki amiral oyun.',icon:'blackjack',right:'YAKINDA'},
+    {id:'baccarat',name:'VIP Baccarat',type:'PRIVATE TABLE',description:'Seçkin casino katı için hazırlanıyor.',icon:'vip',right:'YAKINDA'}
+  ];
+  function card(game,index){return `<article class="casino-lobby-card game-${game.id} ${game.ready?'':'is-coming'}"><div class="casino-cover-art">${icon(game.icon)}<i></i><b>M</b></div><div class="casino-card-copy"><span>${game.type}</span><h3>${game.name}</h3><p>${game.description}</p><small>Sanal hak • nakit değeri yoktur</small></div><div class="casino-card-actions"><em>${game.right}</em>${game.ready?`<button type="button" data-casino-play="${game.id}">OYNA</button><button type="button" data-casino-rules="${game.id}">KURALLAR</button>`:'<button type="button" disabled>YAKINDA</button>'}${index===0?'<mark>SON OYNANAN</mark>':''}</div></article>`;}
+  function render(){const list=document.querySelector('#listStore');if(!list)return;const wallet=window.MarinoDemoWallet?.snapshot?.()||{};list.innerHTML=`<section class="casino-lobby"><header><div><span>MARINO EMPIRE</span><h2>MARINO CASINO</h2><p>Amiral demo oyunlar • gerçek para ve nakit ödül yoktur</p></div><div class="casino-lobby-balance"><small>DEMO BAKİYE</small><strong>${new Intl.NumberFormat('tr-TR').format(wallet.balance||0)}</strong></div></header><div class="casino-lobby-stats"><span>${icon('free-spin')}<b>${wallet.freeSpins||0}</b><small>Free Spin</small></span><span>${icon('free-bet')}<b>${wallet.freeBets||0}</b><small>Free Bet</small></span><span>${icon('win')}<b>0/1</b><small>Günlük görev</small></span></div><div class="casino-game-grid">${games.map(card).join('')}</div><footer><b>18+ görsel alanı</b><span>Demo sonuçları nakit değeri taşımaz; para yatırma, çekme veya transfer yoktur.</span></footer></section>`;}
+  function open(id){const game=id==='slots'?window.MarinoSlots:id==='roulette'?window.MarinoRoulette:null;if(game)window.MarinoGameShell?.open(game);}
+  document.addEventListener('click',event=>{const nav=event.target.closest('.nav-btn[data-tab="store"]');if(nav)setTimeout(render,0);const play=event.target.closest('[data-casino-play]');if(play)open(play.dataset.casinoPlay);const rules=event.target.closest('[data-casino-rules]');if(rules){open(rules.dataset.casinoRules);setTimeout(()=>document.querySelector('[data-shell-action="rules"]')?.click(),0);}});
+  window.MarinoCasinoLobby=Object.freeze({render,open,games});
+})();

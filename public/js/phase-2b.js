@@ -254,6 +254,7 @@
     if (preview()) state.regenTimer=window.setInterval(()=>window.MarinoPhase2BBridge?.regeneratePreviewEnergy?.(),3000);
   }
 
-  window.MarinoPhase2B = Object.freeze({ sync, BUILDINGS, TASKS, REWARDS, openRewardStore, getDemoState:() => ({ rewardPoints:state.rewardPoints, claimed:[...state.claimed], metrics:{...state.metrics}, entitlements:{...state.entitlements} }) });
+  function consumeDemoEntitlement(type){if(!preview()||!['spin','bet'].includes(type)||state.entitlements[type]<=0)return false;state.entitlements[type]-=1;renderHomePulse();renderRewardStore();return true;}
+  window.MarinoPhase2B = Object.freeze({ sync, BUILDINGS, TASKS, REWARDS, openRewardStore, consumeDemoEntitlement, getDemoState:() => ({ rewardPoints:state.rewardPoints, claimed:[...state.claimed], metrics:{...state.metrics}, entitlements:{...state.entitlements} }) });
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
 })();
