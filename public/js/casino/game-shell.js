@@ -16,5 +16,5 @@
   function unBindPanel(){const panelEl=document.querySelector('#casinoShellPanel');if(panelEl)panelEl.hidden=true;}
   function keydown(event){if(state.active&&event.key==='Escape'){event.preventDefault();if(!document.querySelector('#casinoShellPanel')?.hidden)return unBindPanel();close();}}
   document.addEventListener('keydown',keydown,true);document.addEventListener('visibilitychange',()=>{if(state.active)state.game?.setPaused?.(document.hidden)});
-  window.MarinoGameShell=Object.freeze({open,close,refreshWallet:wallet,isOpen:()=>state.active});
+  window.MarinoGameShell=Object.freeze({open,close,openPanel:panel,refreshWallet:wallet,isOpen:()=>state.active});
 })();

@@ -182,6 +182,30 @@
     },
     {
       "id": "music_empire_lounge", "file": "audio/music/empire_lounge_loop.ogg", "type": "audio/ogg", "usage": "Loopable premium casino music bed", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Legacy audio/fon.mp3 after user interaction or silence", "available": false
+    },
+    {
+      "id": "reel_start", "file": "audio/sfx/reel_start.ogg", "type": "audio/ogg", "usage": "Fortune Slots reel start", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "reel_stop_1_to_5", "file": "audio/sfx/reel_stop_[1-5].ogg", "type": "audio/ogg", "usage": "Five sequential Fortune Slots reel stops", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Five pitched procedural Web Audio tones", "available": false
+    },
+    {
+      "id": "symbol_match", "file": "audio/sfx/symbol_match.ogg", "type": "audio/ogg", "usage": "Fortune Slots symbol match", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "scatter_anticipation", "file": "audio/sfx/scatter_anticipation.ogg", "type": "audio/ogg", "usage": "Fortune Slots scatter anticipation", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "small_win", "file": "audio/sfx/small_win.ogg", "type": "audio/ogg", "usage": "Fortune Slots small demo win", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "big_win", "file": "audio/sfx/big_win.ogg", "type": "audio/ogg", "usage": "Fortune Slots large demo win", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "free_spin_start", "file": "audio/sfx/free_spin_start.ogg", "type": "audio/ogg", "usage": "Fortune Slots free spin start", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "free_spin_end", "file": "audio/sfx/free_spin_end.ogg", "type": "audio/ogg", "usage": "Fortune Slots free spin end", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
     }
   ]
 }

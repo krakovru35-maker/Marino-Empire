@@ -16,7 +16,10 @@
     free_spin_unlock:{file:'./assets/audio/sfx/free_spin_unlock.ogg',available:false,fallback:[1040,.18,'sine']},
     free_bet_unlock:{file:'./assets/audio/sfx/free_bet_unlock.ogg',available:false,fallback:[880,.18,'triangle']},
     league_up:{file:'./assets/audio/sfx/league_up.ogg',available:false,fallback:[980,.22,'triangle']},
-    empire_rush:{file:'./assets/audio/sfx/empire_rush.ogg',available:false,fallback:[1160,.2,'sawtooth']}
+    empire_rush:{file:'./assets/audio/sfx/empire_rush.ogg',available:false,fallback:[1160,.2,'sawtooth']},
+    reel_start:{file:'./assets/audio/sfx/reel_start.ogg',available:false,fallback:[180,.12,'sawtooth'],rateLimit:120},
+    reel_stop_1:{file:'./assets/audio/sfx/reel_stop_1.ogg',available:false,fallback:[320,.045,'triangle']},reel_stop_2:{file:'./assets/audio/sfx/reel_stop_2.ogg',available:false,fallback:[360,.045,'triangle']},reel_stop_3:{file:'./assets/audio/sfx/reel_stop_3.ogg',available:false,fallback:[400,.045,'triangle']},reel_stop_4:{file:'./assets/audio/sfx/reel_stop_4.ogg',available:false,fallback:[440,.045,'triangle']},reel_stop_5:{file:'./assets/audio/sfx/reel_stop_5.ogg',available:false,fallback:[480,.045,'triangle']},
+    symbol_match:{file:'./assets/audio/sfx/symbol_match.ogg',available:false,fallback:[720,.08,'triangle']},scatter_anticipation:{file:'./assets/audio/sfx/scatter_anticipation.ogg',available:false,fallback:[880,.12,'sine']},small_win:{file:'./assets/audio/sfx/small_win.ogg',available:false,fallback:[760,.15,'triangle']},big_win:{file:'./assets/audio/sfx/big_win.ogg',available:false,fallback:[1040,.24,'sawtooth']},free_spin_start:{file:'./assets/audio/sfx/free_spin_start.ogg',available:false,fallback:[940,.18,'triangle']},free_spin_end:{file:'./assets/audio/sfx/free_spin_end.ogg',available:false,fallback:[560,.14,'sine']}
   };
   const state={context:null,unlocked:false,voices:0,maxVoices:6,lastPlayed:new Map(),buffers:new Map(),failed:new Set(),missingReported:false,musicEnabled:false,musicWasPlaying:false};
   const sfxEnabled=()=>document.querySelector('#swSfx')?.classList.contains('on')===true;
