@@ -235,6 +235,9 @@
       "id": "blackjack_card_actions", "file": "audio/sfx/card_[deal|flip].ogg", "type": "audio/ogg", "usage": "Blackjack card deal and reveal", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Distinct procedural Web Audio card tones", "available": false
     },
     {
+      "id": "blackjack_player_actions", "file": "audio/sfx/blackjack_[hit|stand|double|split].ogg", "type": "audio/ogg", "usage": "Blackjack Hit, Stand, Double and Split feedback", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Four distinct procedural Web Audio action tones", "available": false
+    },
+    {
       "id": "blackjack_results", "file": "audio/sfx/[blackjack_win|normal_win|push|bust].ogg", "type": "audio/ogg", "usage": "Blackjack demo result ceremonies", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio result tones", "available": false
     },
     {
