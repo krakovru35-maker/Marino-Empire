@@ -206,6 +206,18 @@
     },
     {
       "id": "free_spin_end", "file": "audio/sfx/free_spin_end.ogg", "type": "audio/ogg", "usage": "Fortune Slots free spin end", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "roulette_chip_actions", "file": "audio/sfx/chip_[place|remove].ogg", "type": "audio/ogg", "usage": "European Roulette chip placement and removal", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Pitched procedural Web Audio tones", "available": false
+    },
+    {
+      "id": "roulette_wheel", "file": "audio/sfx/wheel_start.ogg", "type": "audio/ogg", "usage": "European Roulette wheel start", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "roulette_ball", "file": "audio/sfx/ball_[tick|drop].ogg", "type": "audio/ogg", "usage": "European Roulette ball movement and pocket drop", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Pitched procedural Web Audio tones", "available": false
+    },
+    {
+      "id": "roulette_result", "file": "audio/sfx/roulette_[win|lose].ogg", "type": "audio/ogg", "usage": "European Roulette demo result", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tones", "available": false
     }
   ]
 }
