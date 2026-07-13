@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="badge-first-spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 16V8l5 5 5-5v8" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="badge-first-roulette" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m12 3 2 7 7 2-7 2-2 7-2-7-7-2 7-2 2-7Z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="badge-first-blackjack" viewBox="0 0 24 24"><rect x="5" y="4" width="10" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m10 8 2 3-2 3-2-3 2-3Zm5-2 4 3v11H9" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="badge-split-master" viewBox="0 0 24 24"><path d="M12 4v5m0 0-6 5v6m6-11 6 5v6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="19" r="2" fill="none" stroke="currentColor"/><circle cx="18" cy="19" r="2" fill="none" stroke="currentColor"/></symbol>
+  <symbol id="badge-double-down" viewBox="0 0 24 24"><path d="M5 7h9l-3-3m3 3-3 3M19 17h-9l3 3m-3-3 3-3M6 12h12" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="badge-triple-casino" viewBox="0 0 24 24"><path d="m12 3 2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.3l5-.7L12 3Z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="badge-seven-day" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 3v4m8-4v4M4 10h16m-10 3h4l-3 5" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="badge-slots-master" viewBox="0 0 24 24"><path d="M4 19V5l8 8 8-8v14M8 19v-6m8 6v-6M3 21h18" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="badge-roulette-master" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 3v5m9 4h-5m-4 9v-5m-9-4h5" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="badge-blackjack-master" viewBox="0 0 24 24"><path d="M5 19 3 7l8-3 3 12-9 3Zm7-12 7 2-2 11-8-2" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+  <symbol id="badge-casino-champion" viewBox="0 0 24 24"><path d="m4 8 4 3 4-7 4 7 4-3-2 11H6L4 8ZM7 16h10m-8 5h6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+</svg>
