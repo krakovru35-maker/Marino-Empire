@@ -18,6 +18,7 @@
   <link href="./styles/phase-2a.css" rel="stylesheet">
   <link href="./styles/phase-2b.css" rel="stylesheet">
   <link href="./styles/daily-rewards.css" rel="stylesheet">
+  <link href="./styles/daily-content-adapter.css" rel="stylesheet">
   <link href="./styles/casino/game-shell.css" rel="stylesheet">
   <link href="./styles/casino/slot.css" rel="stylesheet">
   <link href="./styles/casino/roulette.css" rel="stylesheet">
@@ -29,6 +30,7 @@
   <script src="./js/phase-2b.js" defer></script>
   <script src="./js/audio-manager.js" defer></script>
   <script src="./js/daily-rewards.js" defer></script>
+  <script src="./js/daily-content-adapter.js" defer></script>
   <script src="./js/casino/demo-wallet.js" defer></script>
   <script src="./js/casino/rng-adapter.js" defer></script>
   <script src="./js/casino/game-shell.js" defer></script>
@@ -1780,14 +1782,15 @@
         <h3>Empire Hub</h3>
         <div class="empire-hub-panel">
           <div class="hk-floats empire-hub-actions">
-            <button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
-              <div class="hk-float-ico">🎴</div>
-              <div class="hk-float-meta"><span class="lbl" data-i18n="daily_combo">Daily Combo</span><span class="val" id="comboReward">+5M</span></div>
-            </button>
-            <button class="hk-float-btn" id="btnDailyCipher" data-testid="daily-cipher-btn">
-              <div class="hk-float-ico">🔐</div>
-              <div class="hk-float-meta"><span class="lbl" data-i18n="daily_cipher">Daily Cipher</span><span class="val" id="cipherReward">+1M</span></div>
-            </button>
+            <article class="content-hub-card"><button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
+              <div class="hk-float-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="10" height="14" rx="2"/><path d="m9 9 2 3-2 3-2-3 2-3Zm6-2 5 3v10H9"/></svg></div>
+              <div class="hk-float-meta"><span class="lbl" id="comboContentTitle">Daily Combo</span><span class="val" id="comboReward">—</span><small id="comboContentReset"></small></div>
+            </button><span class="content-status" id="comboContentStatus">Yükleniyor</span><button type="button" class="content-claim" data-content-claim="daily_combo" hidden>CLAIM</button></article>
+            <article class="content-hub-card"><button class="hk-float-btn" id="btnDailyCipher" data-testid="daily-cipher-btn">
+              <div class="hk-float-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg></div>
+              <div class="hk-float-meta"><span class="lbl" id="cipherContentTitle">Daily Cipher</span><span class="val" id="cipherReward">—</span><small id="cipherContentReset"></small></div>
+            </button><span class="content-status" id="cipherContentStatus">Yükleniyor</span><button type="button" class="content-claim" data-content-claim="daily_cipher" hidden>CLAIM</button></article>
+            <button type="button" id="contentAdapterRetry" class="content-adapter-retry" hidden>İçeriği tekrar yükle</button>
           </div>
           <div class="info-row empire-hub-grid" style="grid-template-columns: repeat(4, 1fr);">
             <div class="card"><div class="card-lbl">Güç</div><div class="card-val"><span id="valTap">1</span></div></div>
@@ -2005,7 +2008,7 @@
       <div class="sheet">
         <div class="sheet-handle"></div>
         <button class="sheet-close" data-close="sheetCombo">✕</button>
-        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_combo_title">🎴 Daily Combo</h3>
+        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_combo_title">Daily Combo</h3>
         <p style="margin:0 0 14px; text-align:center; color:var(--text-muted); font-size:12px" data-i18n="daily_combo_desc">
           Doğru 3 kartı bul, <b style="color:#ffd13b">+5.000.000 Coin</b> kazan. Günde 6 deneme.
         </p>
@@ -2026,7 +2029,7 @@
       <div class="sheet">
         <div class="sheet-handle"></div>
         <button class="sheet-close" data-close="sheetCipher">✕</button>
-        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_cipher_title">🔐 Daily Cipher</h3>
+        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_cipher_title">Daily Cipher</h3>
         <p style="margin:0 0 14px; text-align:center; color:var(--text-muted); font-size:12px" data-i18n="daily_cipher_desc">
           Mors kodunu çöz, <b style="color:#ffd13b">+1.000.000 Coin</b> kazan.
         </p>
@@ -3633,10 +3636,10 @@
         role_emperor: 'İmparator', collect_vault: 'KASAYI TOPLA',
         daily_combo: 'Daily Combo', daily_cipher: 'Daily Cipher',
         boost: 'BOOST', airdrop: 'AIRDROP',
-        daily_combo_title: '🎴 Günlük Kombo',
-        daily_combo_desc_html: 'Doğru 3 kartı bul, <b style="color:#ffd13b">+5.000.000 Coin</b> kazan. Günde 6 deneme.',
-        daily_cipher_title: '🔐 Günlük Şifre',
-        daily_cipher_desc_html: 'Mors kodunu çöz, <b style="color:#ffd13b">+1.000.000 Coin</b> kazan.',
+        daily_combo_title: 'Günlük Kombo',
+        daily_combo_desc_html: 'Üç kartı seç; doğru sıra ve sanal ödül sunucu tarafından doğrulanır.',
+        daily_cipher_title: 'Günlük Şifre',
+        daily_cipher_desc_html: 'Mors kodunu çöz; cevap ve sanal ödül sunucu tarafından doğrulanır.',
         boost_title: '🚀 Boost Merkezi',
         boost_desc: 'Güçlendir, daha fazla coin kazan. Bazı boostlar günlük yenilenir.',
         airdrop_sub: 'İmparatorluğunu büyüt, listeleme günü token\'larını topla.',
@@ -3670,10 +3673,10 @@
         role_emperor: 'Emperor', collect_vault: 'COLLECT VAULT',
         daily_combo: 'Daily Combo', daily_cipher: 'Daily Cipher',
         boost: 'BOOST', airdrop: 'AIRDROP',
-        daily_combo_title: '🎴 Daily Combo',
-        daily_combo_desc_html: 'Find the 3 right cards, win <b style="color:#ffd13b">+5,000,000 Coin</b>. 6 tries per day.',
-        daily_cipher_title: '🔐 Daily Cipher',
-        daily_cipher_desc_html: 'Decode the Morse code, win <b style="color:#ffd13b">+1,000,000 Coin</b>.',
+        daily_combo_title: 'Daily Combo',
+        daily_combo_desc_html: 'Select three cards; the order and virtual reward are verified by the server.',
+        daily_cipher_title: 'Daily Cipher',
+        daily_cipher_desc_html: 'Decode the Morse message; the answer and virtual reward are verified by the server.',
         boost_title: '🚀 Boost Center',
         boost_desc: 'Power up, earn more. Some boosts refresh daily.',
         airdrop_sub: 'Grow your empire, claim tokens on listing day.',
@@ -3863,6 +3866,15 @@
       const s = getComboState();
       if (s.won || s.attempts <= 0 || comboSel.length !== 3) return;
 
+      const stagedContent = await window.MarinoDailyContent?.submitAndClaim?.('daily_combo', comboSel.slice());
+      if (stagedContent?.handled) {
+        s.attempts = Number(stagedContent.attempts_remaining ?? Math.max(0, s.attempts - 1));
+        if (S.hk?.combo) { S.hk.combo.attempts_left = s.attempts; S.hk.combo.won = !!stagedContent.won; }
+        if (stagedContent.won) { s.won = true; saveComboState(s); au.win(); toast('İçerik ödülü sunucu tarafından claim edildi.'); }
+        else { au.fail(); toast(stagedContent.error ? 'Sunucu isteği reddetti.' : t('combo_wrong')); comboSel = []; }
+        renderComboSheet(); refreshCombocipherBadges(); return;
+      }
+
       // SERVER-FIRST: try Supabase RPC
       const res = await hkRpc('marino_claim_combo', {
         p_telegram_id: String(S.user?.id || 'guest'),
@@ -3922,8 +3934,9 @@
     }
     function renderCipherSheet() {
       const s = cipherState();
-      const wordLength = Number(S.hk?.cipher_hint?.word_length || 0);
-      const morse = String(S.hk?.cipher_hint?.morse || '');
+      const stagedCipher = window.MarinoDailyContent?.content?.('daily_cipher');
+      const wordLength = Number(stagedCipher?.payload?.word_length ?? S.hk?.cipher_hint?.word_length ?? 0);
+      const morse = String(stagedCipher?.payload?.morse ?? S.hk?.cipher_hint?.morse ?? '');
       // Visual dot/dash
       const visual = morse.split('').map(ch => {
         if (ch === '.') return '<span class="morse-dot"></span>';
@@ -3959,6 +3972,13 @@
     async function cipherSubmit() {
       const s = cipherState(); if (s.won) return;
 
+      const stagedContent = await window.MarinoDailyContent?.submitAndClaim?.('daily_cipher', cipherInput);
+      if (stagedContent?.handled) {
+        if (stagedContent.won) { s.won = true; s.input = cipherInput; saveCipherState(s); if (S.hk?.cipher) S.hk.cipher.won = true; au.win(); toast('İçerik ödülü sunucu tarafından claim edildi.'); }
+        else { au.fail(); toast(stagedContent.error ? 'Sunucu isteği reddetti.' : t('cipher_wrong')); cipherInput = ''; }
+        renderCipherSheet(); refreshCombocipherBadges(); return;
+      }
+
       // SERVER-FIRST
       const res = await hkRpc('marino_claim_cipher', {
         p_telegram_id: String(S.user?.id || 'guest'),
@@ -3991,12 +4011,13 @@
       const comboBtn = q('#btnDailyCombo'), cipherBtn = q('#btnDailyCipher');
       if (comboBtn) {
         comboBtn.classList.toggle('done', cs.won);
-        q('#comboReward').textContent = cs.won ? '✓' : '+5M';
+        if (!window.MarinoDailyContent?.content?.('daily_combo')) q('#comboReward').textContent = cs.won ? '✓' : '—';
       }
       if (cipherBtn) {
         cipherBtn.classList.toggle('done', ci.won);
-        q('#cipherReward').textContent = ci.won ? '✓' : '+1M';
+        if (!window.MarinoDailyContent?.content?.('daily_cipher')) q('#cipherReward').textContent = ci.won ? '✓' : '—';
       }
+      window.MarinoDailyContent?.syncHub?.();
       // Live countdown
       const tEl = q('#comboTimer');
       if (tEl) {
@@ -4251,6 +4272,17 @@
     function initHK() {
       applyI18n();
       refreshCombocipherBadges();
+      window.MarinoDailyContent?.configure?.({
+        preview: isLocalPreview,
+        language: () => LANG,
+        invoke: async (name, args) => {
+          if (isLocalPreview) throw new Error('preview_network_blocked');
+          if (!db) throw new Error('content_client_unavailable');
+          const { data, error } = await db.rpc(name, args);
+          if (error) throw error;
+          return data;
+        }
+      })?.load?.();
       const wire = (sel, fn) => { const el = q(sel); if (el) el.onclick = fn; };
       wire('#btnDailyCombo', openCombo);
       wire('#btnDailyCipher', openCipher);
