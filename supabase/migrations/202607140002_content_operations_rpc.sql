@@ -124,6 +124,7 @@ begin
   if v_role not in ('editor','publisher','super_admin') then raise exception 'editor_role_required' using errcode='42501'; end if;
   if p_request_id is null then raise exception 'request_id_required'; end if;
   if p_document::text ~* '"(answer|solution|correct_answer|combo_order|cipher_answer)"\s*:' then raise exception 'secret_in_public_payload'; end if;
+  if coalesce(p_document->>'status','draft') not in ('draft','scheduled') then raise exception 'upsert_status_not_allowed'; end if;
   v_starts:=(p_document->>'starts_at')::timestamptz; v_ends:=(p_document->>'ends_at')::timestamptz;
   v_reward:=coalesce(p_document->>'reward_type','none'); v_amount:=coalesce((p_document->>'reward_amount')::integer,0);
   if v_ends<=v_starts then raise exception 'invalid_schedule'; end if;

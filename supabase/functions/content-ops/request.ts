@@ -11,11 +11,12 @@ export const ADMIN_ACTIONS = Object.freeze({
   admin_publish: { rpc: "admin_publish_daily_content", fields: ["content_id", "expected_version", "request_id"] },
   admin_cancel: { rpc: "admin_cancel_daily_content", fields: ["content_id", "expected_version", "request_id"] },
 });
+const ACTIONS: Record<string, { rpc: string; fields: readonly string[] }> = { ...PLAYER_ACTIONS, ...ADMIN_ACTIONS };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function mapAction(action: unknown, input: Record<string, unknown>) {
-  const definition = { ...PLAYER_ACTIONS, ...ADMIN_ACTIONS }[String(action) as keyof typeof PLAYER_ACTIONS];
+  const definition = ACTIONS[String(action)];
   if (!definition) throw new Error("action_not_allowed");
   const params: Record<string, unknown> = {};
   for (const field of definition.fields) {

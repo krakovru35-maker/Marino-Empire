@@ -33,6 +33,8 @@ test('build creates matching HTML, config and manifest with cache-busted filenam
   const manifest = buildArtifact({ rootDir, publicDir, distDir, input: input() });
   assert.equal(manifest.configFile, `runtime-config.${commitSha.slice(0, 12)}.js`);
   assert.match(fs.readFileSync(path.join(distDir, 'index.html'), 'utf8'), new RegExp(manifest.configFile.replaceAll('.', '\\.')));
+  assert.match(fs.readFileSync(path.join(distDir, 'admin-content.html'), 'utf8'), new RegExp(manifest.configFile.replaceAll('.', '\\.')));
+  assert.doesNotMatch(fs.readFileSync(path.join(distDir, 'admin-content.html'), 'utf8'), /__MARINO_RUNTIME_CONFIG_SCRIPT__/);
   assert.match(fs.readFileSync(path.join(distDir, manifest.configFile), 'utf8'), new RegExp(stagingRef));
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(distDir, 'build-manifest.json'), 'utf8')), manifest);
   assert.equal(fs.existsSync(path.join(publicDir, manifest.configFile)), false);

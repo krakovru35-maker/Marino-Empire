@@ -66,6 +66,17 @@ const leaseMigration = read('supabase/migrations/202607120006_p0_auth_bootstrap_
 assert(/security definer/gi.test(leaseMigration) && /set search_path = pg_catalog, public/gi.test(leaseMigration), 'lease functions are not hardened');
 assert(/from public, anon, authenticated/gi.test(leaseMigration) && /to service_role/gi.test(leaseMigration), 'lease RPC privileges are not service-role-only');
 
+const contentSchema = read('supabase/migrations/202607140001_content_operations_schema.sql');
+const contentRpc = read('supabase/migrations/202607140002_content_operations_rpc.sql');
+const contentEdge = read('supabase/functions/content-ops/index.ts');
+const contentAdmin = read('public/js/admin/content-admin.js');
+assert(/daily_content_player_active_read[\s\S]*status = 'published'[\s\S]*starts_at <= now\(\)[\s\S]*ends_at > now\(\)/.test(contentSchema), 'active content RLS policy missing');
+assert(/pg_advisory_xact_lock/.test(contentRpc) && /unique \(user_id, content_id\)/.test(contentSchema), 'claim concurrency barriers missing');
+assert(!/(SUPABASE_SERVICE_ROLE_KEY|sb_secret_|service.role)/i.test(contentEdge), 'privileged key reference in content Edge Function');
+assert(/Authorization: authorization/.test(contentEdge), 'content Edge Function does not forward caller authorization');
+assert(!/\.from\s*\(/.test(contentAdmin) && /\.rpc\s*\(/.test(contentAdmin), 'admin panel bypasses RPC gateway');
+assert(!/(localStorage|admin_token|marino_authorized)/i.test(contentAdmin), 'client-derived admin authorization found');
+
 if (fs.existsSync(path.join(root, 'dist'))) {
   const manifest = JSON.parse(read('dist/build-manifest.json'));
   const distHtml = read('dist/index.html');
