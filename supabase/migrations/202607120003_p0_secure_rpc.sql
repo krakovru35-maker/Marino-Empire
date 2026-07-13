@@ -142,11 +142,13 @@ begin
     when 'marino_prestige' then
       v_response := to_jsonb(public.marino_prestige(v_telegram_id, coalesce(p_request_id::text,'')));
     when 'marino_get_leaderboard' then
-      if coalesce((p_payload->>'p_limit')::int, 50) not between 1 and 100 then raise exception 'invalid_limit'; end if;
+      if coalesce(p_payload->>'p_scope','global') not in ('global','league') then raise exception 'invalid_scope'; end if;
+      if coalesce(p_payload->>'p_country_code','TR') !~ '^[A-Z]{2}$' then raise exception 'invalid_country'; end if;
       v_response := to_jsonb(public.marino_get_leaderboard(
-        coalesce((p_payload->>'p_limit')::int, 50),
-        nullif(p_payload->>'p_min_lvl','')::int,
-        nullif(p_payload->>'p_max_lvl','')::int
+        coalesce(p_payload->>'p_scope','global'),
+        coalesce(p_payload->>'p_country_code','TR'),
+        coalesce(nullif(p_payload->>'p_min_lvl','')::int,0),
+        coalesce(nullif(p_payload->>'p_max_lvl','')::int,999)
       ));
     when 'marino_play_roulette_v2' then
       if jsonb_typeof(p_payload->'p_bets') <> 'object'
@@ -165,18 +167,19 @@ begin
       v_bet := coalesce((p_payload->>'p_bet_amount')::bigint, 0);
       if v_bet not between 1 and 1000000 then raise exception 'invalid_bet'; end if;
       if coalesce((p_payload->>'p_horse_id')::int, 0) not between 1 and 6 then raise exception 'invalid_horse'; end if;
-      v_response := to_jsonb(public.marino_play_horse_racing(v_telegram_id, v_bet, (p_payload->>'p_horse_id')::int));
+      v_response := to_jsonb(public.marino_play_horse_racing(v_telegram_id, v_bet::int, (p_payload->>'p_horse_id')::int));
     when 'marino_play_poker' then
       v_bet := coalesce((p_payload->>'p_bet_amount')::bigint, 0);
       if v_bet not between 1 and 1000000 then raise exception 'invalid_bet'; end if;
-      v_response := to_jsonb(public.marino_play_poker(v_telegram_id, v_bet));
+      v_response := to_jsonb(public.marino_play_poker(v_telegram_id, v_bet::int));
     when 'marino_get_live_matches' then
       v_response := to_jsonb(public.marino_get_live_matches());
     when 'marino_place_sports_bet' then
       v_bet := coalesce((p_payload->>'p_amount')::bigint, 0);
       if v_bet not between 1 and 1000000 then raise exception 'invalid_bet'; end if;
+      if coalesce(p_payload->>'p_match_id','') !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$' then raise exception 'invalid_match_id'; end if;
       if coalesce(p_payload->>'p_selection','') !~ '^[A-Za-z0-9_ -]{1,32}$' then raise exception 'invalid_selection'; end if;
-      v_response := to_jsonb(public.marino_place_sports_bet(v_telegram_id, (p_payload->>'p_match_id')::bigint, p_payload->>'p_selection', v_bet));
+      v_response := to_jsonb(public.marino_place_sports_bet(v_telegram_id, (p_payload->>'p_match_id')::uuid, p_payload->>'p_selection', v_bet));
     else
       raise exception 'action_not_allowed' using errcode = '42501';
   end case;

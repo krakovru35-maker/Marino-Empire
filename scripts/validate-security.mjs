@@ -41,8 +41,10 @@ assert(!/hkRpc\(['"]marino_connect_wallet/.test(frontend), 'frontend calls walle
 
 const gateway = read('supabase/migrations/202607120003_p0_secure_rpc.sql');
 const privileges = read('supabase/migrations/202607120002_p0_function_privileges.sql');
+const legacyBaseline = read('supabase/migrations/202607110001_legacy_gameplay_baseline.sql');
 assert(!/when\s+'marino_connect_wallet'/i.test(gateway), 'wallet action remains in secure gateway allowlist');
-assert(/revoke execute on function public\.marino_connect_wallet\(text,text\) from public, anon, authenticated;/i.test(privileges), 'legacy wallet RPC revoke missing');
+assert(/revoke all on function public\.marino_connect_wallet\(text, text\) from public, anon, authenticated;/i.test(legacyBaseline), 'creation-time wallet RPC revoke missing');
+assert(/from pg_proc p[\s\S]*p\.proname like 'marino\\_%'/i.test(privileges), 'legacy wallet hardening sweep missing');
 
 const migrationDir = path.join(root, 'supabase', 'migrations');
 const migrations = fs.readdirSync(migrationDir).filter((name) => name.endsWith('.sql'))

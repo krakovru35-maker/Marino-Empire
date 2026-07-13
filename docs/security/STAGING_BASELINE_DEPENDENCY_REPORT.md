@@ -3,7 +3,8 @@
 Date: 2026-07-14
 
 Branch: `feature/supabase-content-ops`
-Decision: **B — canonical legacy definitions are incomplete in this repository.**
+Decision: **Canonical legacy definitions recovered from a reviewed production
+schema-only export; clean staging execution remains untested.**
 
 This is a source-only audit. No staging or production database operation is part
 of this report. The known staging state is intentionally left unchanged:
@@ -12,11 +13,14 @@ of this report. The known staging state is intentionally left unchanged:
 
 ## Executive finding
 
-The repository cannot build the application database from an empty Supabase
-project. `supabase_migration.sql` is an add-on for Daily Combo/Cipher, boosts and
-wallet/airdrop. It is not a gameplay baseline. It requires `marino_players`, and
-the secure gameplay and admin gateways require many legacy functions whose
-definitions and transitive table dependencies are absent.
+The previous audit correctly found that the repository could not build the
+application database from an empty Supabase project. A later read-only,
+schema-only production export supplied the missing canonical definitions. The
+reviewed result is now captured in
+`202607110001_legacy_gameplay_baseline.sql`: 24 tables, 17 owned sequences, 50
+constraints (including 12 foreign keys), 10 indexes and 74 installable function
+overloads. Five stale production functions with four absent table dependencies
+are inventoried but deliberately excluded.
 
 Copying `supabase_migration.sql` into the migration chain would also restore
 unsafe behavior: its `SECURITY DEFINER` functions do not set a trusted
@@ -27,15 +31,19 @@ applied unchanged.
 
 ## Repository SQL inventory
 
-The repository contains only:
+The repository now contains:
 
 - `supabase_migration.sql`: four add-on tables and thirteen Daily/Boost/Wallet
-  functions. It depends on a missing `marino_players` table.
+  functions. It remains historical evidence only and is not the baseline.
+- `supabase/migrations/202607110001_legacy_gameplay_baseline.sql`: reviewed
+  canonical legacy DDL without production rows, owners, secrets or managed
+  `auth`/`storage` schema definitions.
 - `supabase/migrations/202607120001` through `202607120006`: P0 identity,
   privilege, authenticated gateway, admin gateway and auth bootstrap controls.
 - `supabase/migrations/202607140001` through `202607140003`: Content Operations
   schema, RPCs and reporting.
-- Two pgTAP files covering Content Operations authorization and claim structure.
+- Two pgTAP files covering Content Operations authorization and claim structure,
+  plus a static canonical-baseline security/dependency test.
 
 There are no SQL files under `backend/`; that directory contains only Python
 application/asset files. README material explicitly says the live legacy
@@ -103,9 +111,10 @@ Pre-existing requirements from `202607120001`:
 
 - `marino_current_telegram_id()` and `marino_idempotency_keys`.
 
-Pre-existing legacy functions called by the gateway:
+Canonical legacy functions called by the gateway are now defined in
+`202607110001`. The recovered exact signatures showed four gateway mismatches:
 
-- Present only in the non-canonical add-on SQL:
+- Existing Daily/Boost/HK functions:
   - `marino_get_today_cipher()`
   - `marino_hk_state(text)`
   - `marino_claim_combo(text,text[])`
@@ -115,7 +124,7 @@ Pre-existing legacy functions called by the gateway:
   - `marino_upgrade_multitap(text)`
   - `marino_upgrade_energy_limit(text)`
   - `marino_activate_auto_tap(text)`
-- Missing entirely from repository SQL:
+- Recovered core/casino/social functions:
   - `start_game(text,text,text,text,text,text)`
   - `tap_coin(text,integer)`
   - `collect_income(text,text)`
@@ -133,27 +142,26 @@ Pre-existing legacy functions called by the gateway:
   - `request_reward(text,text,text)`
   - `marino_claim_referral(text,text,text)`
   - `marino_prestige(text,text)`
-  - `marino_get_leaderboard(integer,integer,integer)`
+  - `marino_get_leaderboard(text,text,integer,integer)`
   - `marino_play_roulette_v2(text,jsonb,text)`
   - `marino_bj_deal(text,bigint)`
   - `marino_bj_hit(text)`
   - `marino_bj_stand(text)`
-  - `marino_play_horse_racing(text,bigint,integer)`
-  - `marino_play_poker(text,bigint)`
+  - `marino_play_horse_racing(text,integer,integer)`
+  - `marino_play_poker(text,integer)`
   - `marino_get_live_matches()`
-  - `marino_place_sports_bet(text,bigint,text,bigint)`
+  - `marino_place_sports_bet(text,uuid,text,bigint)`
 
-The signatures above are the compatibility signatures implied by the gateway
-calls, not proof of the live canonical signatures. They must be compared with a
-schema-only source before the gateway is considered compatible.
+The gateway now passes scope/country/level arguments to the canonical leaderboard
+signature, validates and casts sports match IDs as UUID, safely narrows bounded
+horse/poker bets to integer, and uses the canonical integer admin request ID.
 
 Creates:
 
 - `_marino_cipher_hint()` and `marino_secure_rpc(text,jsonb,uuid)`.
 
-The SQL helper `_marino_cipher_hint()` directly resolves
-`marino_get_today_cipher()` at creation. The PL/pgSQL gateway also cannot be
-accepted without all legacy signatures and dependencies being verified.
+The SQL helper `_marino_cipher_hint()` and every PL/pgSQL gateway dependency now
+resolve statically to a canonical baseline function.
 
 ### `202607120004_p0_admin_gateway.sql`
 
@@ -161,16 +169,16 @@ Pre-existing requirements from `202607120001`:
 
 - `marino_admin_roles` and `marino_admin_audit_log`.
 
-Missing legacy admin functions:
+Recovered legacy admin functions:
 
 - `marino_admin_get_users(text)`
 - `marino_admin_get_requests(text)`
 - `marino_admin_update_user(text,text,bigint,bigint,integer)`
 - `marino_admin_toggle_ban(text,text)`
-- `marino_admin_resolve_request(text,bigint,text,text)`
+- `marino_admin_resolve_request(text,integer,text,text)`
 
-Creates `marino_admin_rpc(text,jsonb,uuid)`. Its legacy dependencies and their
-transitive tables are absent, so the gateway is not buildable from this repo.
+Creates `marino_admin_rpc(text,jsonb,uuid)`. All five legacy admin dependencies
+and their transitive reward-request table now exist in the baseline.
 
 ### `202607120005_p0_auth_bootstrap_rate_limit.sql`
 
@@ -216,24 +224,26 @@ Requires `content_admin_role()`, `daily_content`,
 Content Operations migrations. It replaces `admin_get_daily_content()` and
 retains a fixed `search_path` and authenticated-only execution.
 
-## Missing tables and schema details
+## Recovered tables and schema details
 
-Directly proven missing canonical table:
+The canonical `public.marino_players` definition and all transitive legacy tables
+were recovered. The baseline contains 24 tables, including:
 
-- `public.marino_players`.
+- `public.marino_players`
+- building, task, season, achievement and daily-login state
+- Combo/Cipher, boosts, wallet and processed-request state
+- reward/store/sink state
+- sports matches, teams, players and coupons
 
-The add-on SQL proves at least these expected columns:
+The canonical player table includes the previously expected columns:
 
 - `telegram_id`, `marino_coin`, `updated_at`, `energy`, `max_energy`,
   `last_energy_update`, `tap_power`, `casino_level`, `casino_chips`,
   `reputation`, `referred_by`, and `completed_tasks`.
 
-Their exact types, defaults, constraints, indexes, RLS policies, triggers and
-relationships are not present and must not be inferred. The missing gameplay
-and admin functions almost certainly require additional tables, types,
-sequences and extensions, but their names cannot be established from this
-repository without inventing schema. A schema-only baseline is required to list
-those transitive objects accurately.
+Exact types, defaults, constraints, indexes and relationships are now carried by
+the baseline. The production export contained no custom public types, views,
+materialized views or triggers.
 
 The following add-on tables have definitions in `supabase_migration.sql` but are
 not canonical baseline definitions: `marino_daily_combo`,
@@ -256,48 +266,31 @@ not canonical baseline definitions: `marino_daily_combo`,
 The file is useful evidence of historical signatures only. It must not be copied
 or executed as a migration.
 
-## Required canonical schema-only acquisition
+## Completed canonical schema-only acquisition
 
-Because the repository is incomplete, an authorized database operator must
-capture a schema-only baseline. Codex must not connect to production or receive
-database credentials.
+An authorized operator supplied a repository-external public schema-only dump.
+It was read locally without database credentials and passed these gates:
 
-1. In an approved read-only operator environment, verify the intended source
-   project independently. Use a temporary least-privilege read-only database
-   role and keep its connection details outside Git, logs and this task.
-2. Run `pg_dump` in schema-only mode for `public`, with owner and privilege
-   emission disabled. Do not request or export table data, `auth.users` rows,
-   storage objects or secrets. Example shape (operator substitutes the connection
-   securely):
+1. No top-level `COPY` or `INSERT`, `auth.users` rows, e-mail/Telegram values,
+   secrets, database password or connection URI was present.
+2. The raw dump stayed outside the repository and is not tracked.
+3. All 74 included production function bodies compare equal to the baseline after
+   newline and trailing-whitespace normalization; no included economy body was rewritten.
+4. Owner/schema dump scaffolding and nine permissive `USING (true)` policies were
+   not imported.
+5. All 64 included `SECURITY DEFINER` functions now fix `search_path` to
+   `pg_catalog, public`; all baseline tables, sequences and functions are revoked
+   from `PUBLIC`, `anon` and `authenticated` until P0 gateways grant entry points.
 
-   ```powershell
-   pg_dump --schema-only --no-owner --no-privileges --schema=public --file=marino-public-schema.sql "<operator-managed-read-only-connection>"
-   ```
+## Canonical migration order
 
-3. Separately export read-only metadata for exact function identity arguments,
-   return types, `SECURITY DEFINER`, `proconfig`, ACLs, table columns,
-   constraints, indexes, triggers, RLS flags/policies, owned sequences,
-   extensions and function dependencies. The P0 runbook queries are the minimum,
-   not the full audit.
-4. Remove environment-specific ownership/comments, inspect every function body,
-   and compare its hash/signature with the application contract. Never commit
-   credentials, data rows or unreviewed dump output.
-5. Convert the reviewed objects into a deterministic baseline migration. Do not
-   blindly rename the raw dump or `supabase_migration.sql` into a migration.
-6. In the same creation migration, fix each definer `search_path` and close
-   direct execution; expose only reviewed gateways. Any behavior-changing fix
-   requires separate economy/security approval.
-
-## Proposed migration order after canonical recovery
-
-No file is renamed by this audit. The target clean-project order is:
+The target clean-project order is:
 
 1. `202607110001_legacy_gameplay_baseline.sql` — new, reviewed canonical schema
    and exact legacy functions, with safe ownership/search paths/ACL boundaries.
 2. `202607120001_p0_identity_roles_rls.sql` — unchanged.
-3. A reviewed successor to `202607120002_p0_function_privileges.sql` — only
-   after the baseline exists; remove redundant direct revokes or guard exact
-   optional objects with `to_regprocedure`/`to_regclass`.
+3. `202607120002_p0_function_privileges.sql` — generic `pg_proc` sweep retained;
+   redundant signature-specific direct revokes removed.
 4. `202607120003_p0_secure_rpc.sql` after all exact compatibility signatures
    pass.
 5. `202607120004_p0_admin_gateway.sql` after all legacy admin signatures pass.
@@ -354,20 +347,17 @@ On an isolated local Supabase instance or newly approved empty staging project:
 8. Verify failure paths do not create player rewards, entitlements, economy
    changes or audit gaps.
 
-Local execution is currently blocked: the Docker engine is unavailable, so a
-local Supabase database cannot start. Existing pgTAP files also cover only
-Content Operations, not the missing legacy baseline. No staging retry was made.
+Local execution remains blocked: the Docker engine is unavailable, so a clean
+local Supabase database cannot start. Static baseline tests cover inventory,
+data/secret absence, safe definer search paths, revokes, exact gateway signatures
+and complete gateway dependency resolution. No staging retry was made.
 
 ## Blockers before another staging write approval
 
-- Obtain and security-review the canonical schema-only legacy baseline.
-- Resolve exact signatures and transitive dependencies for all missing gameplay
-  and admin functions.
-- Establish the exact `marino_players` definition and every additional legacy
-  table/type/sequence/extension.
-- Convert the baseline without importing unsafe grants, caller-trusted identity,
-  wallet placeholders or unreviewed economy behavior.
-- Review the successor privilege migration and creation-time ACL boundaries.
-- Add empty-database legacy object/ACL/gateway tests and run them with a working
-  local Supabase/Docker environment.
+- Run the complete chain on a genuinely empty local Supabase database once
+  Docker is available; static parsing cannot prove PostgreSQL execution.
+- Confirm actual post-migration ACLs, RLS, exact function resolution and
+  compilation with catalog queries/pgTAP.
+- Exercise Telegram auth and both gateways with authenticated staging sessions.
+- Run a real two-session claim concurrency test.
 - Recreate staging cleanly; do not continue the current partial migration history.

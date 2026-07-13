@@ -49,11 +49,11 @@ begin
       v_response := to_jsonb(public.marino_admin_toggle_ban('0', v_target));
     when 'resolve_request' then
       if v_role not in ('operator','security_admin') then raise exception 'insufficient_admin_role'; end if;
-      if coalesce((p_payload->>'request_id')::bigint, 0) <= 0 then raise exception 'invalid_request'; end if;
+      if coalesce((p_payload->>'request_id')::bigint, 0) not between 1 and 2147483647 then raise exception 'invalid_request'; end if;
       if (p_payload->>'resolution') not in ('approved','rejected') then raise exception 'invalid_resolution'; end if;
       if char_length(coalesce(p_payload->>'note','')) > 500 then raise exception 'note_too_long'; end if;
       v_response := to_jsonb(public.marino_admin_resolve_request(
-        '0', (p_payload->>'request_id')::bigint, p_payload->>'resolution', coalesce(p_payload->>'note','')
+        '0', (p_payload->>'request_id')::integer, p_payload->>'resolution', coalesce(p_payload->>'note','')
       ));
     else
       raise exception 'admin_action_not_allowed' using errcode = '42501';
