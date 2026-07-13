@@ -2,16 +2,16 @@
   'use strict';
 
   const BUILDINGS = [
-    ['casino_lobby','Slot Salonu','income','Gelir',1,1200,180],
-    ['roulette_table','Rulet Masası','entertainment','Eğlence',2,2400,260],
-    ['blackjack_lounge','Blackjack Lounge','vip','VIP',4,4200,390],
-    ['vip_hall','VIP Salon','vip','VIP',7,7200,620],
-    ['casino_bar','Casino Bar','entertainment','Eğlence',3,3100,310],
-    ['security_center','Güvenlik Merkezi','security','Güvenlik',6,5400,460],
-    ['hotel_floor','Otel Katı','prestige','Prestij',10,9800,760],
-    ['marina','Marina','prestige','Prestij',15,14500,980],
-    ['private_vault','Özel Kasa','security','Güvenlik',20,21000,1320],
-    ['marino_penthouse','Marino Penthouse','vip','VIP',30,32000,1900]
+    ['casino_lobby','Slot Salonu','slot-hall','Gelir',1,1200,180],
+    ['roulette_table','Rulet Masası','roulette-table','Eğlence',2,2400,260],
+    ['blackjack_lounge','Blackjack Lounge','blackjack-lounge','VIP',4,4200,390],
+    ['vip_hall','VIP Salon','vip-hall','VIP',7,7200,620],
+    ['casino_bar','Casino Bar','casino-bar','Eğlence',3,3100,310],
+    ['security_center','Güvenlik Merkezi','security-center','Güvenlik',6,5400,460],
+    ['hotel_floor','Otel Katı','hotel','Prestij',10,9800,760],
+    ['marina','Marina','marina','Prestij',15,14500,980],
+    ['private_vault','Özel Kasa','private-vault','Güvenlik',20,21000,1320],
+    ['marino_penthouse','Marino Penthouse','penthouse','VIP',30,32000,1900]
   ].map(([key,name,icon,category,unlock,cost,income]) => ({ key,name,icon,category,unlock,cost,income,max:12 }));
   const TASKS = [
     ['tap_100','daily','Marino Ritmi','Marino’ya 100 kez dokun.',100,25,'taps'],
@@ -38,17 +38,16 @@
     claimed:new Set(), rewardPoints:0, previewLevels:new Map(), serverTasksMarkup:'', startedAt:Date.now(), regenTimer:0,
     entitlements:{ spin:0,bet:0,energy:0,boost:0,income:0,cosmetic:0,decor:0 }, pendingReward:null
   };
-  const iconPaths = {
-    income:'<path d="M4 19V8m5 11V5m6 14v-8m5 8V3M2 21h20"/>',
-    entertainment:'<circle cx="12" cy="12" r="8"/><path d="m12 4 2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',
-    vip:'<path d="m4 8 4 4 4-7 4 7 4-4-2 11H6L4 8Z"/>',
-    security:'<path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/>',
-    prestige:'<path d="M4 20h16M6 20V9l6-5 6 5v11M9 13h6M9 16h6"/>'
-  };
-  const svg = type => `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[type] || iconPaths.income}</svg>`;
+  const SPRITES={buildings:'./assets/ui/buildings/marino-building-icons.svg',tasks:'./assets/ui/tasks/marino-task-icons.svg',casino:'./assets/ui/casino/marino-casino-icons.svg'};
+  const PREFIX={buildings:'building',tasks:'task',casino:'casino'};
+  const fallbackPaths={building:'<path d="M4 21V9l8-6 8 6v12M2 21h20M9 13h6M9 17h6"/>',task:'<circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/>',casino:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h.01M12 9h.01M16 9h.01M8 15h.01M12 15h.01M16 15h.01"/>'};
   const preview = () => window.MarinoPhase2BBridge?.isPreview?.() === true;
   const fmt = value => new Intl.NumberFormat('tr-TR').format(Number(value || 0));
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const spriteIcon=(scope,id,label='')=>`<svg class="marino-sprite-icon" viewBox="0 0 24 24" ${label?`role="img" aria-label="${escape(label)}"`:'aria-hidden="true"'}><g class="sprite-fallback">${fallbackPaths[scope==='buildings'?'building':scope==='tasks'?'task':'casino']}</g><use href="${SPRITES[scope]}#${PREFIX[scope]}-${id}"></use></svg>`;
+  const TASK_ICONS={taps:'tap',energy:'energy',collects:'vault-collect',upgrades:'building-upgrade',owned:'building-upgrade',level:'league',combo:'daily',cipher:'weekly',casino:'progress',friends:'social',streak:'login-streak'};
+  const CATEGORY_ICONS={daily:'daily',weekly:'weekly',progress:'progress',social:'social'};
+  const REWARD_ICONS={spin:'free-spin',bet:'free-bet',energy:'chip',boost:'vip',income:'win',cosmetic:'vip',decor:'jackpot'};
 
   function metricValue(task) {
     if (!state.snapshot) return 0;
@@ -73,7 +72,7 @@
     const income = isPreview ? level * definition.income : Number(server?.current_income_per_hour || 0);
     const frame = ['bronze','silver','gold','platinum','diamond'][Math.min(4, Math.floor((state.snapshot?.level || 1) / 10))];
     return `<article class="empire-building-card frame-${frame} ${locked?'is-locked':''} ${!supported?'is-demo':''}" data-building="${definition.key}">
-      <div class="building-icon">${svg(definition.icon)}</div><div class="building-copy">
+      <div class="building-icon">${spriteIcon('buildings',definition.icon,definition.name)}</div><div class="building-copy">
         <div class="building-heading"><span>${escape(definition.name)}</span><em>${escape(definition.category)}</em></div>
         <div class="building-level">Seviye <b>${level}</b> <i>→</i> <b>${Math.min(definition.max,level+1)}</b></div>
         <div class="building-income">Saatlik etki <strong>+${fmt(income)}</strong></div>
@@ -92,13 +91,18 @@
       <p class="authority-note">Fiyat, gelir ve yükseltme sonucu gerçek oyunda yalnız sunucu yanıtından gelir. Demo kartları kalıcı değildir.</p>`;
   }
 
+  function renderCasinoIcons(){
+    const mappings=[[/Casino Çipi|Çip Satın/i,'chip'],[/Klasik Slot|Slot/i,'slot'],[/Rulet|Çark/i,'roulette'],[/Blackjack/i,'blackjack'],[/Poker|Kart/i,'card'],[/At Yarışı|Zar/i,'dice'],[/İddaa|Spor/i,'free-bet'],[/Kasa Aç|Ödül/i,'jackpot']];
+    document.querySelectorAll('#listStore .item-row').forEach(row=>{const title=row.querySelector('.item-title')?.textContent||'';const match=mappings.find(([pattern])=>pattern.test(title));const shell=row.querySelector('.item-ico');if(!match||!shell||shell.querySelector('.marino-sprite-icon'))return;shell.classList.add('casino-sprite-shell');shell.innerHTML=spriteIcon('casino',match[1],title)});
+  }
+
   function taskCard(task) {
     const progress = Math.min(task.goal, metricValue(task));
     const percent = Math.round(progress / task.goal * 100);
     const claimed = state.claimed.has(task.id);
     const ready = taskReady(task);
     const disabled = !preview() || !ready;
-    return `<article class="empire-task-card ${claimed?'is-complete':''}"><div class="task-point">${task.points}<small>MRP</small></div><div class="task-copy"><h4>${escape(task.title)}</h4><p>${escape(task.description)}</p><div class="task-progress"><i style="width:${percent}%"></i></div><span>${fmt(progress)} / ${fmt(task.goal)}</span></div><button type="button" data-claim-task="${task.id}" ${disabled?'disabled':''}>${claimed?'ALINDI':ready?'AL':'DEVAM'}</button>${!preview()?'<em class="demo-label">DEMO</em>':''}</article>`;
+    return `<article class="empire-task-card ${claimed?'is-complete':''}"><div class="task-point">${spriteIcon('tasks',claimed?'complete':TASK_ICONS[task.metric]||'daily',task.title)}<small>${task.points} MRP</small></div><div class="task-copy"><h4>${escape(task.title)}</h4><p>${escape(task.description)}</p><div class="task-progress"><i style="width:${percent}%"></i></div><span>${fmt(progress)} / ${fmt(task.goal)}</span></div><button type="button" data-claim-task="${task.id}" ${disabled?'disabled':''}>${claimed?'ALINDI':ready?'AL':'DEVAM'}</button>${!preview()?'<em class="demo-label">DEMO</em>':''}</article>`;
   }
 
   function dailyCalendar() {
@@ -113,7 +117,7 @@
     if (!preview() && !list.querySelector('.phase2b-task-root')) state.serverTasksMarkup = list.innerHTML;
     const tasks = TASKS.filter(task => task.category === state.category);
     list.innerHTML = `<div class="phase2b-task-root"><div class="task-summary"><div><span>MARINO REWARD POINT</span><strong>${preview()?fmt(state.rewardPoints):'—'}</strong><small>${preview()?'Yalnız bu oturumda demo':'Sunucu desteği bekleniyor'}</small></div><div><span>OTURUM</span><strong id="sessionDuration">0 dk</strong><small>Uzun oturumlarda mola ver.</small></div></div>
-      ${dailyCalendar()}<div class="task-tabs" role="tablist">${Object.entries(CATEGORY_LABELS).map(([key,label])=>`<button type="button" role="tab" data-task-category="${key}" aria-selected="${key===state.category}">${label}</button>`).join('')}</div>
+      ${dailyCalendar()}<div class="task-tabs" role="tablist">${Object.entries(CATEGORY_LABELS).map(([key,label])=>`<button type="button" role="tab" data-task-category="${key}" aria-selected="${key===state.category}">${spriteIcon('tasks',CATEGORY_ICONS[key])}<span>${label}</span></button>`).join('')}</div>
       <div class="empire-task-list">${tasks.map(taskCard).join('')}</div>
       ${!preview()&&state.serverTasksMarkup?`<details class="server-task-archive"><summary>Mevcut sunucu görevleri</summary>${state.serverTasksMarkup}</details>`:''}</div>`;
   }
@@ -142,7 +146,7 @@
   function rewardCard(reward){
     const enough=state.rewardPoints>=reward.cost, canBuy=preview()&&enough;
     const count=state.entitlements[reward.type]||0;
-    return `<article class="reward-card"><div class="reward-symbol ${reward.type}">${reward.type==='spin'?'S':reward.type==='bet'?'B':'M'}</div><div class="reward-copy"><h4>${escape(reward.name)}</h4><p>Sanal oyun hakkı • nakit değeri yoktur • transfer edilemez</p><span>Kalan kullanım: <b>${count}</b></span><small>Koşul / süre: ${escape(reward.expiry)}</small></div><button type="button" data-buy-reward="${reward.id}" ${canBuy?'':'disabled'}><b>${fmt(reward.cost)} MRP</b><small>${preview()?(enough?'SATIN AL':'PUAN YETERSİZ'):'SUNUCU GEREKLİ'}</small></button></article>`;
+    return `<article class="reward-card"><div class="reward-symbol ${reward.type}">${spriteIcon('casino',REWARD_ICONS[reward.type]||'chip',reward.name)}</div><div class="reward-copy"><h4>${escape(reward.name)}</h4><p>Sanal oyun hakkı • nakit değeri yoktur • transfer edilemez</p><span>Kalan kullanım: <b>${count}</b></span><small>Koşul / süre: ${escape(reward.expiry)}</small></div><button type="button" data-buy-reward="${reward.id}" ${canBuy?'':'disabled'}><b>${fmt(reward.cost)} MRP</b><small>${preview()?(enough?'SATIN AL':'PUAN YETERSİZ'):'SUNUCU GEREKLİ'}</small></button></article>`;
   }
 
   function walletMarkup(){return `<section class="virtual-wallet"><header><div><span>SANAL HAK CÜZDANI</span><h3>Casino avantajların</h3></div><b>${preview()?'DEMO':'SUNUCU BEKLİYOR'}</b></header><div class="wallet-grid"><div><strong>${state.entitlements.spin}</strong><span>Free Spin</span><small>Aktif • oturum sonu</small></div><div><strong>${state.entitlements.bet}</strong><span>Free Bet</span><small>Demo kupon • nakit yok</small></div><div><strong>${state.entitlements.energy}</strong><span>Enerji Paketi</span><small>${state.entitlements.energy?'Kullanılmadı':'Yok'}</small></div><div><strong>${state.entitlements.boost+state.entitlements.income}</strong><span>Aktif Boost</span><small>Sunucu aktivasyonu gerekir</small></div></div></section>`}
@@ -230,7 +234,7 @@
       if (event.target.closest('#btnDailyCombo')) track('combo');
       if (event.target.closest('#btnDailyCipher')) track('cipher');
       const nav = event.target.closest('.nav-btn');
-      if (nav?.dataset.tab === 'casino' || nav?.dataset.tab === 'store') track('casino');
+      if (nav?.dataset.tab === 'casino' || nav?.dataset.tab === 'store') { track('casino'); window.setTimeout(renderCasinoIcons,0); }
       if (nav?.dataset.tab === 'friends') track('friends');
       if (nav?.dataset.tab === 'buildings') window.setTimeout(renderBuildings,0);
       if (nav?.dataset.tab === 'tasks') window.setTimeout(renderTasks,0);
@@ -241,7 +245,7 @@
     if (!snapshot) return;
     state.snapshot = snapshot;
     TASKS.forEach(task => { if (snapshot.completedTasks?.includes(task.id)) state.claimed.add(task.id); });
-    renderBuildings(); renderTasks(); renderHomePulse();
+    renderBuildings(); renderTasks(); renderHomePulse(); renderCasinoIcons();
   }
 
   function init() {

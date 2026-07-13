@@ -22,34 +22,34 @@
       "id": "marino_building_icons",
       "file": "ui/buildings/marino-building-icons.svg",
       "type": "svg-sprite",
-      "usage": "Future building catalogue icon asset",
-      "source": "Pending original Marino Empire vector artwork",
-      "license": "Not yet supplied; do not distribute",
-      "sizeBytes": 0,
+      "usage": "Building catalogue cards and upgrade states",
+      "source": "Original Marino Empire vector artwork created in-repository",
+      "license": "Project-owned original",
+      "sizeBytes": 2141,
       "fallback": "Inline original SVG paths in phase-2b.js",
-      "available": false
+      "available": true
     },
     {
       "id": "marino_task_icons",
       "file": "ui/tasks/marino-task-icons.svg",
       "type": "svg-sprite",
-      "usage": "Future task category and progress icons",
-      "source": "Pending original Marino Empire vector artwork",
-      "license": "Not yet supplied; do not distribute",
-      "sizeBytes": 0,
+      "usage": "Task categories, progress signals and task states",
+      "source": "Original Marino Empire vector artwork created in-repository",
+      "license": "Project-owned original",
+      "sizeBytes": 2137,
       "fallback": "CSS and text task markers",
-      "available": false
+      "available": true
     },
     {
       "id": "marino_casino_icons",
       "file": "ui/casino/marino-casino-icons.svg",
       "type": "svg-sprite",
-      "usage": "Future casino mini-game icon asset",
-      "source": "Pending original Marino Empire vector artwork",
-      "license": "Not yet supplied; do not distribute",
-      "sizeBytes": 0,
+      "usage": "Casino catalogue, reward store and virtual entitlements",
+      "source": "Original Marino Empire vector artwork created in-repository",
+      "license": "Project-owned original",
+      "sizeBytes": 2624,
       "fallback": "Existing inline casino UI symbols",
-      "available": false
+      "available": true
     },
     {
       "id": "legacy_background_secondary",
