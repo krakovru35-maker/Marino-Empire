@@ -16,9 +16,11 @@
   <link href="./styles/phase-1a.css" rel="stylesheet">
   <link href="./styles/phase-1b.css" rel="stylesheet">
   <link href="./styles/phase-2a.css" rel="stylesheet">
+  <link href="./styles/phase-2b.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
   <script src="./js/phase-1b.js" defer></script>
   <script src="./js/phase-2a.js" defer></script>
+  <script src="./js/phase-2b.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
    MARINO EMPIRE — HAMSTER COMBAT STYLE UI
@@ -2187,6 +2189,30 @@
       fail() { this.play(200, 0.2, 'sawtooth'); }
     };
 
+    window.MarinoPhase2BBridge = Object.freeze({
+      isPreview: () => isLocalPreview,
+      snapshot: () => S.game?.state ? {
+        level: Number(S.game.state.lvl || 1), coin: Number(S.game.state.coin || 0),
+        energy: Number(S.game.state.en || 0), maxEnergy: Number(S.game.state.maxEn || 0),
+        hourlyIncome: Number(S.game.state.inc || 0), upgrades: (S.game.upgrades || []).map(item => ({ ...item })),
+        completedTasks: [...(S.game.completed_tasks || [])], streak: Number(S.game.daily_login?.current_streak || 0)
+      } : null,
+      upgradeBuilding: async (buildingKey, previewCost = 0, previewIncome = 0) => {
+        if (!isLocalPreview) return doAction('upgrade_building', { p_building_key: buildingKey });
+        if (!S.game?.state || Number(S.game.state.coin) < Number(previewCost)) return { ok: false, reason: 'insufficient' };
+        S.game.state.coin -= Number(previewCost);
+        S.game.state.inc += Number(previewIncome);
+        renderTop();
+        return { ok: true, state: window.MarinoPhase2BBridge.snapshot() };
+      },
+      regeneratePreviewEnergy: () => {
+        if (!isLocalPreview || !S.game?.state || S.game.state.en >= S.game.state.maxEn) return false;
+        S.game.state.en = Math.min(S.game.state.maxEn, S.game.state.en + 1);
+        renderTop();
+        return true;
+      }
+    });
+
     let uiEventsBound = false;
     function bindUiEvents() {
       if (uiEventsBound) return;
@@ -2532,7 +2558,7 @@
     }
 
     /* ── UI Rendering ── */
-    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); if (!isLocalPreview) renderRank(); }
+    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); if (!isLocalPreview) renderRank(); window.MarinoPhase2B?.sync?.(window.MarinoPhase2BBridge.snapshot()); }
 
     function renderPreviewRank() {
       q('#listRank').innerHTML = '<div class="sec-title">Yerel Önizleme Sıralaması</div><div class="item-row"><div class="item-ico">1</div><div class="item-info"><div class="item-title">Local Marino</div><div class="item-sub">Sv. 8 • XP: 2,750</div></div></div>';

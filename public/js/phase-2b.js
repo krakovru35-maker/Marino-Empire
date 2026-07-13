@@ -1,0 +1,200 @@
+(() => {
+  'use strict';
+
+  const BUILDINGS = [
+    ['casino_lobby','Slot Salonu','income','Gelir',1,1200,180],
+    ['roulette_table','Rulet Masası','entertainment','Eğlence',2,2400,260],
+    ['blackjack_lounge','Blackjack Lounge','vip','VIP',4,4200,390],
+    ['vip_hall','VIP Salon','vip','VIP',7,7200,620],
+    ['casino_bar','Casino Bar','entertainment','Eğlence',3,3100,310],
+    ['security_center','Güvenlik Merkezi','security','Güvenlik',6,5400,460],
+    ['hotel_floor','Otel Katı','prestige','Prestij',10,9800,760],
+    ['marina','Marina','prestige','Prestij',15,14500,980],
+    ['private_vault','Özel Kasa','security','Güvenlik',20,21000,1320],
+    ['marino_penthouse','Marino Penthouse','vip','VIP',30,32000,1900]
+  ].map(([key,name,icon,category,unlock,cost,income]) => ({ key,name,icon,category,unlock,cost,income,max:12 }));
+  const TASKS = [
+    ['tap_100','daily','Marino Ritmi','Marino’ya 100 kez dokun.',100,25,'taps'],
+    ['energy_500','weekly','Enerji Operasyonu','Toplam 500 enerji harca.',500,90,'energy'],
+    ['collect_3','daily','Kasa Turu','Kasayı 3 kez başarıyla topla.',3,30,'collects'],
+    ['upgrade_1','daily','İlk Yatırım','Bir binayı yükselt.',1,35,'upgrades'],
+    ['own_5','progress','Beş Yıldızlı Portföy','5 farklı binayı aç.',5,120,'owned'],
+    ['level_10','progress','Lounge Lisansı','Casino seviye 10’a ulaş.',10,150,'level'],
+    ['combo_open','daily','Combo Masası','Daily Combo ekranını aç.',1,20,'combo'],
+    ['cipher_open','daily','Şifre Odası','Daily Cipher ekranını aç.',1,20,'cipher'],
+    ['casino_try','weekly','Masa Deneyimi','Bir casino mini oyununu dene.',1,55,'casino'],
+    ['friends_visit','social','Empire Ağı','Arkadaşlar sayfasını ziyaret et.',1,25,'friends'],
+    ['streak_3','weekly','Üç Günlük Ritim','3 günlük giriş serisine ulaş.',3,80,'streak']
+  ].map(([id,category,title,description,goal,points,metric]) => ({ id,category,title,description,goal,points,metric }));
+  const CATEGORY_LABELS = { daily:'Günlük', weekly:'Haftalık', progress:'İlerleme', social:'Sosyal' };
+  const state = {
+    snapshot:null, category:'daily', metrics:{ taps:0,energy:0,collects:0,upgrades:0,combo:0,cipher:0,casino:0,friends:0 },
+    claimed:new Set(), rewardPoints:0, previewLevels:new Map(), serverTasksMarkup:'', startedAt:Date.now(), regenTimer:0
+  };
+  const iconPaths = {
+    income:'<path d="M4 19V8m5 11V5m6 14v-8m5 8V3M2 21h20"/>',
+    entertainment:'<circle cx="12" cy="12" r="8"/><path d="m12 4 2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',
+    vip:'<path d="m4 8 4 4 4-7 4 7 4-4-2 11H6L4 8Z"/>',
+    security:'<path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/>',
+    prestige:'<path d="M4 20h16M6 20V9l6-5 6 5v11M9 13h6M9 16h6"/>'
+  };
+  const svg = type => `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[type] || iconPaths.income}</svg>`;
+  const preview = () => window.MarinoPhase2BBridge?.isPreview?.() === true;
+  const fmt = value => new Intl.NumberFormat('tr-TR').format(Number(value || 0));
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
+  function metricValue(task) {
+    if (!state.snapshot) return 0;
+    if (task.metric === 'level') return state.snapshot.level;
+    if (task.metric === 'streak') return state.snapshot.streak;
+    if (task.metric === 'owned') return preview()
+      ? [...state.previewLevels.values()].filter(level => level > 0).length
+      : state.snapshot.upgrades.filter(item => Number(item.level || 0) > 0).length;
+    return state.metrics[task.metric] || 0;
+  }
+  const taskReady = task => metricValue(task) >= task.goal && !state.claimed.has(task.id);
+
+  function buildingCard(definition, index) {
+    const server = state.snapshot?.upgrades?.find(item => item.building_key === definition.key) || state.snapshot?.upgrades?.[index];
+    const isPreview = preview();
+    const supported = isPreview || Boolean(server);
+    const level = isPreview ? (state.previewLevels.get(definition.key) || (index === 0 ? 3 : 0)) : Number(server?.level || 0);
+    const unlock = Number(server?.unlock_level || definition.unlock);
+    const locked = Number(state.snapshot?.level || 1) < unlock;
+    const maxed = level >= definition.max;
+    const cost = isPreview ? definition.cost + level * definition.cost : Number(server?.next_cost_coin || 0);
+    const income = isPreview ? level * definition.income : Number(server?.current_income_per_hour || 0);
+    const frame = ['bronze','silver','gold','platinum','diamond'][Math.min(4, Math.floor((state.snapshot?.level || 1) / 10))];
+    return `<article class="empire-building-card frame-${frame} ${locked?'is-locked':''} ${!supported?'is-demo':''}" data-building="${definition.key}">
+      <div class="building-icon">${svg(definition.icon)}</div><div class="building-copy">
+        <div class="building-heading"><span>${escape(definition.name)}</span><em>${escape(definition.category)}</em></div>
+        <div class="building-level">Seviye <b>${level}</b> <i>→</i> <b>${Math.min(definition.max,level+1)}</b></div>
+        <div class="building-income">Saatlik etki <strong>+${fmt(income)}</strong></div>
+        ${!supported?'<small class="demo-label">KATALOG • SUNUCU DESTEĞİ BEKLİYOR</small>':''}
+        ${locked?`<small class="lock-label">Seviye ${unlock} gerekli</small>`:''}
+      </div><button type="button" class="building-upgrade" data-upgrade="${definition.key}" data-cost="${cost}" data-income="${definition.income}" ${locked||maxed||!supported?'disabled':''}>
+        <span>${maxed?'MAKSİMUM':'YÜKSELT'}</span><small>${maxed?'Tamamlandı':fmt(cost)+' coin'}</small></button></article>`;
+  }
+
+  function renderBuildings() {
+    const list = document.querySelector('#listBuildings');
+    if (!list || !state.snapshot) return;
+    list.innerHTML = `<div class="empire-view-intro"><div><span>CASINO PORTFÖYÜ</span><h3>İmparatorluğunu kat kat büyüt</h3></div><div class="income-chip">+${fmt(state.snapshot.hourlyIncome)}/saat</div></div>
+      <div class="building-category-row">${['Gelir','Prestij','Güvenlik','Eğlence','VIP'].map(label=>`<span>${label}</span>`).join('')}</div>
+      <div class="empire-building-grid">${BUILDINGS.map(buildingCard).join('')}</div>
+      <p class="authority-note">Fiyat, gelir ve yükseltme sonucu gerçek oyunda yalnız sunucu yanıtından gelir. Demo kartları kalıcı değildir.</p>`;
+  }
+
+  function taskCard(task) {
+    const progress = Math.min(task.goal, metricValue(task));
+    const percent = Math.round(progress / task.goal * 100);
+    const claimed = state.claimed.has(task.id);
+    const ready = taskReady(task);
+    const disabled = !preview() || !ready;
+    return `<article class="empire-task-card ${claimed?'is-complete':''}"><div class="task-point">${task.points}<small>MRP</small></div><div class="task-copy"><h4>${escape(task.title)}</h4><p>${escape(task.description)}</p><div class="task-progress"><i style="width:${percent}%"></i></div><span>${fmt(progress)} / ${fmt(task.goal)}</span></div><button type="button" data-claim-task="${task.id}" ${disabled?'disabled':''}>${claimed?'ALINDI':ready?'AL':'DEVAM'}</button>${!preview()?'<em class="demo-label">DEMO</em>':''}</article>`;
+  }
+
+  function dailyCalendar() {
+    const items = [['Coin','Sunucu sonucu'],['Enerji','Sunucu sonucu'],['MRP','Demo'],['Tap Boost','Sunucu sonucu'],['MRP','Demo'],['Kozmetik','Sunucu sonucu'],['Sanal Free Spin','Demo']];
+    const streak = Number(state.snapshot?.streak || 0);
+    return `<section class="retention-card"><header><div><span>7 GÜNLÜK RİTİM</span><h3>Empire Check-in</h3></div><button type="button" data-open-daily>Takvimi aç</button></header><div class="retention-days">${items.map((item,index)=>`<div class="${index<streak?'done':index===streak?'today':'missed'}"><b>${index+1}</b><span>${item[0]}</span><small>${item[1]}</small></div>`).join('')}</div><p>Kalıcı ödüller yalnız sunucu onayıyla verilir. Kaçırılan günler otomatik tamamlanmaz.</p></section>`;
+  }
+
+  function renderTasks() {
+    const list = document.querySelector('#listTasks');
+    if (!list || !state.snapshot) return;
+    if (!preview() && !list.querySelector('.phase2b-task-root')) state.serverTasksMarkup = list.innerHTML;
+    const tasks = TASKS.filter(task => task.category === state.category);
+    list.innerHTML = `<div class="phase2b-task-root"><div class="task-summary"><div><span>MARINO REWARD POINT</span><strong>${preview()?fmt(state.rewardPoints):'—'}</strong><small>${preview()?'Yalnız bu oturumda demo':'Sunucu desteği bekleniyor'}</small></div><div><span>OTURUM</span><strong id="sessionDuration">0 dk</strong><small>Uzun oturumlarda mola ver.</small></div></div>
+      ${dailyCalendar()}<div class="task-tabs" role="tablist">${Object.entries(CATEGORY_LABELS).map(([key,label])=>`<button type="button" role="tab" data-task-category="${key}" aria-selected="${key===state.category}">${label}</button>`).join('')}</div>
+      <div class="empire-task-list">${tasks.map(taskCard).join('')}</div>
+      ${!preview()&&state.serverTasksMarkup?`<details class="server-task-archive"><summary>Mevcut sunucu görevleri</summary>${state.serverTasksMarkup}</details>`:''}</div>`;
+  }
+
+  function installHomePulse() {
+    if (document.querySelector('#empireLoopPulse')) return;
+    const hub = document.querySelector('#btnEmpireHub');
+    if (!hub) return;
+    const pulse = document.createElement('button');
+    pulse.type='button'; pulse.id='empireLoopPulse'; pulse.className='empire-loop-pulse';
+    pulse.setAttribute('aria-label','Casino empire ilerlemesini aç');
+    hub.insertAdjacentElement('afterend', pulse);
+    pulse.addEventListener('click', () => document.querySelector('.nav-btn[data-tab="tasks"]')?.click());
+  }
+
+  function renderHomePulse() {
+    installHomePulse();
+    const pulse = document.querySelector('#empireLoopPulse');
+    if (!pulse || !state.snapshot) return;
+    const ready = TASKS.filter(taskReady).length;
+    pulse.innerHTML = `<span><small>SAATLİK</small><b>+${fmt(state.snapshot.hourlyIncome)}</b></span><span><small>GÖREV</small><b>${ready} hazır</b></span><span><small>MRP</small><b>${preview()?fmt(state.rewardPoints):'Demo'}</b></span><i aria-hidden="true">›</i>`;
+  }
+
+  async function upgradeBuilding(button) {
+    if (!state.snapshot) return;
+    const definition = BUILDINGS.find(item => item.key === button.dataset.upgrade);
+    if (!definition) return;
+    button.disabled = true;
+    const result = await window.MarinoPhase2BBridge?.upgradeBuilding?.(definition.key, Number(button.dataset.cost), Number(button.dataset.income));
+    if (preview() && result?.ok) {
+      state.previewLevels.set(definition.key, (state.previewLevels.get(definition.key) || (definition.key==='casino_lobby'?3:0)) + 1);
+      state.metrics.upgrades += 1;
+      state.snapshot = window.MarinoPhase2BBridge.snapshot();
+      renderBuildings(); renderTasks(); renderHomePulse();
+      window.MarinoPhase2A?.syncScene?.({ level: state.snapshot.level, buildingLevel: Math.max(...state.previewLevels.values()) });
+    } else if (preview()) {
+      button.disabled = false;
+      document.querySelector('#toast') && (document.querySelector('#toast').textContent='Demo coin bakiyesi yetersiz.');
+    }
+  }
+
+  function claimTask(id) {
+    if (!preview()) return;
+    const task = TASKS.find(item => item.id === id);
+    if (!task || !taskReady(task)) return;
+    state.claimed.add(id); state.rewardPoints += task.points;
+    renderTasks(); renderHomePulse();
+    document.dispatchEvent(new CustomEvent('marino:reward-points', { detail:{ balance:state.rewardPoints } }));
+  }
+
+  function track(metric, amount=1) {
+    if (!preview() || !(metric in state.metrics)) return;
+    state.metrics[metric] += amount;
+    if (document.querySelector('#view-tasks')?.classList.contains('active')) renderTasks();
+    renderHomePulse();
+  }
+
+  function bindEvents() {
+    document.addEventListener('pointerdown', event => { if (event.target.closest('#btnTap')) { track('taps'); track('energy'); } }, { capture:true });
+    document.addEventListener('marino:collect-success', () => track('collects'));
+    document.addEventListener('click', event => {
+      const upgrade = event.target.closest('[data-upgrade]'); if (upgrade) return void upgradeBuilding(upgrade);
+      const claim = event.target.closest('[data-claim-task]'); if (claim) return claimTask(claim.dataset.claimTask);
+      const category = event.target.closest('[data-task-category]'); if (category) { state.category=category.dataset.taskCategory; return renderTasks(); }
+      if (event.target.closest('[data-open-daily]')) return window.openDaily?.();
+      if (event.target.closest('#btnDailyCombo')) track('combo');
+      if (event.target.closest('#btnDailyCipher')) track('cipher');
+      const nav = event.target.closest('.nav-btn');
+      if (nav?.dataset.tab === 'casino' || nav?.dataset.tab === 'store') track('casino');
+      if (nav?.dataset.tab === 'friends') track('friends');
+      if (nav?.dataset.tab === 'buildings') window.setTimeout(renderBuildings,0);
+      if (nav?.dataset.tab === 'tasks') window.setTimeout(renderTasks,0);
+    });
+  }
+
+  function sync(snapshot) {
+    if (!snapshot) return;
+    state.snapshot = snapshot;
+    TASKS.forEach(task => { if (snapshot.completedTasks?.includes(task.id)) state.claimed.add(task.id); });
+    renderBuildings(); renderTasks(); renderHomePulse();
+  }
+
+  function init() {
+    bindEvents(); installHomePulse(); sync(window.MarinoPhase2BBridge?.snapshot?.());
+    window.setInterval(() => { const el=document.querySelector('#sessionDuration'); if(el) el.textContent=`${Math.floor((Date.now()-state.startedAt)/60000)} dk`; },30000);
+    if (preview()) state.regenTimer=window.setInterval(()=>window.MarinoPhase2BBridge?.regeneratePreviewEnergy?.(),3000);
+  }
+
+  window.MarinoPhase2B = Object.freeze({ sync, BUILDINGS, TASKS, getDemoState:() => ({ rewardPoints:state.rewardPoints, claimed:[...state.claimed], metrics:{...state.metrics} }) });
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+})();
