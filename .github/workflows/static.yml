@@ -52,6 +52,10 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+      - name: Type-check content operations function
+        run: deno check supabase/functions/content-ops/index.ts
+      - name: Test content operations helpers
+        run: deno test supabase/functions/content-ops/*_test.ts
       - name: Type-check Telegram auth function
         run: deno check supabase/functions/telegram-auth/index.ts
       - name: Test Telegram auth helpers
