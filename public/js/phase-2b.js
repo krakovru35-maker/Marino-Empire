@@ -255,6 +255,8 @@
   }
 
   function consumeDemoEntitlement(type){if(!preview()||!['spin','bet'].includes(type)||state.entitlements[type]<=0)return false;state.entitlements[type]-=1;renderHomePulse();renderRewardStore();return true;}
-  window.MarinoPhase2B = Object.freeze({ sync, BUILDINGS, TASKS, REWARDS, openRewardStore, consumeDemoEntitlement, getDemoState:() => ({ rewardPoints:state.rewardPoints, claimed:[...state.claimed], metrics:{...state.metrics}, entitlements:{...state.entitlements} }) });
+  function grantDemoRewardPoints(amount){amount=Number(amount);if(!preview()||!Number.isFinite(amount)||amount<=0)return false;state.rewardPoints+=amount;renderHomePulse();renderRewardStore();document.dispatchEvent(new CustomEvent('marino:reward-points',{detail:{balance:state.rewardPoints}}));return true;}
+  function grantDemoEntitlement(type,amount=1){amount=Number(amount);if(!preview()||!['spin','bet'].includes(type)||!Number.isInteger(amount)||amount<=0)return false;state.entitlements[type]+=amount;renderHomePulse();renderRewardStore();return true;}
+  window.MarinoPhase2B = Object.freeze({ sync, BUILDINGS, TASKS, REWARDS, openRewardStore, consumeDemoEntitlement, grantDemoRewardPoints, grantDemoEntitlement, getDemoState:() => ({ rewardPoints:state.rewardPoints, claimed:[...state.claimed], metrics:{...state.metrics}, entitlements:{...state.entitlements} }) });
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
 })();
