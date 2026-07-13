@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "policy": {
+    "authority": "UI catalogue only; never an economy, reward or entitlement authority.",
+    "externalDownloads": false,
+    "criticalPreload": [],
+    "nonCriticalLoading": "lazy"
+  },
+  "assets": [
+    {
+      "id": "marino_reward_icons",
+      "file": "ui/rewards/marino-reward-icons.svg",
+      "type": "svg-sprite",
+      "usage": "Daily reward, reward store and entitlement status icons",
+      "source": "Original Marino Empire vector artwork created in-repository",
+      "license": "Project-owned original",
+      "sizeBytes": 1978,
+      "fallback": "Inline SVG paths embedded in daily-rewards.js",
+      "available": true
+    },
+    {
+      "id": "marino_building_icons",
+      "file": "ui/buildings/marino-building-icons.svg",
+      "type": "svg-sprite",
+      "usage": "Future building catalogue icon asset",
+      "source": "Pending original Marino Empire vector artwork",
+      "license": "Not yet supplied; do not distribute",
+      "sizeBytes": 0,
+      "fallback": "Inline original SVG paths in phase-2b.js",
+      "available": false
+    },
+    {
+      "id": "marino_task_icons",
+      "file": "ui/tasks/marino-task-icons.svg",
+      "type": "svg-sprite",
+      "usage": "Future task category and progress icons",
+      "source": "Pending original Marino Empire vector artwork",
+      "license": "Not yet supplied; do not distribute",
+      "sizeBytes": 0,
+      "fallback": "CSS and text task markers",
+      "available": false
+    },
+    {
+      "id": "marino_casino_icons",
+      "file": "ui/casino/marino-casino-icons.svg",
+      "type": "svg-sprite",
+      "usage": "Future casino mini-game icon asset",
+      "source": "Pending original Marino Empire vector artwork",
+      "license": "Not yet supplied; do not distribute",
+      "sizeBytes": 0,
+      "fallback": "Existing inline casino UI symbols",
+      "available": false
+    },
+    {
+      "id": "legacy_background_secondary",
+      "file": "backgrounds/bg_portal_vertical_secondary.png",
+      "type": "png",
+      "usage": "Home scene background",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 2068360,
+      "fallback": "CSS navy/cyan gradient",
+      "available": true,
+      "optimization": "Generate responsive WebP and AVIF variants; retain PNG only as fallback"
+    },
+    {
+      "id": "legacy_marino_character",
+      "file": "illustrations/marino-character.png",
+      "type": "png",
+      "usage": "Critical home character",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 771564,
+      "fallback": "CSS silhouette",
+      "available": true,
+      "optimization": "Create lossless WebP and AVIF variants after visual approval"
+    },
+    {
+      "id": "music_legacy_fon",
+      "file": "audio/fon.mp3",
+      "type": "mp3",
+      "usage": "Legacy background music, loaded only after user interaction",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before release",
+      "sizeBytes": 20016771,
+      "fallback": "Silence",
+      "available": true,
+      "optimization": "Replace with licensed looped OGG/AAC stems below 2 MB"
+    },
+    {
+      "id": "intro_legacy",
+      "file": "intro.mp4",
+      "type": "mp4",
+      "usage": "Optional first-run intro",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before release",
+      "sizeBytes": 25180550,
+      "fallback": "Immediate prepared home screen",
+      "available": true,
+      "optimization": "Re-encode short mobile WebM/MP4 renditions and preserve preload=none"
+    },
+    {
+      "id": "legacy_brand_logo",
+      "file": "brand/logo.png",
+      "type": "png",
+      "usage": "Brand surfaces",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 2175142,
+      "fallback": "Text logotype",
+      "available": true,
+      "optimization": "Convert to SVG or tightly cropped WebP"
+    },
+    {
+      "id": "legacy_reward_token",
+      "file": "currency/reward-token.png",
+      "type": "png",
+      "usage": "Legacy reward token displays",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 2040321,
+      "fallback": "marino_reward_icons SVG",
+      "available": true,
+      "optimization": "Do not render at source size; replace UI usage with SVG sprite"
+    },
+    {
+      "id": "legacy_marino_avatar",
+      "file": "illustrations/marino-avatar.png",
+      "type": "png",
+      "usage": "Profile avatar",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 1310790,
+      "fallback": "Initials avatar",
+      "available": true,
+      "optimization": "Create 64px and 128px WebP variants with lazy loading outside home"
+    },
+    {
+      "id": "ui_open", "file": "audio/sfx/ui_open.ogg", "type": "audio/ogg", "usage": "UI open", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "ui_close", "file": "audio/sfx/ui_close.ogg", "type": "audio/ogg", "usage": "UI close", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "ui_confirm", "file": "audio/sfx/ui_confirm.ogg", "type": "audio/ogg", "usage": "UI confirmation", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "ui_error", "file": "audio/sfx/ui_error.ogg", "type": "audio/ogg", "usage": "UI error", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "tap_light", "file": "audio/sfx/tap_light.ogg", "type": "audio/ogg", "usage": "Light tap", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Rate-limited procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "tap_combo", "file": "audio/sfx/tap_combo.ogg", "type": "audio/ogg", "usage": "Tap combo", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Rate-limited procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "collect_vault", "file": "audio/sfx/collect_vault.ogg", "type": "audio/ogg", "usage": "Vault collect", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "building_upgrade", "file": "audio/sfx/building_upgrade.ogg", "type": "audio/ogg", "usage": "Building upgrade", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "task_complete", "file": "audio/sfx/task_complete.ogg", "type": "audio/ogg", "usage": "Task completion", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "daily_reward", "file": "audio/sfx/daily_reward.ogg", "type": "audio/ogg", "usage": "Daily reward success", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "reward_purchase", "file": "audio/sfx/reward_purchase.ogg", "type": "audio/ogg", "usage": "Reward purchase", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "free_spin_unlock", "file": "audio/sfx/free_spin_unlock.ogg", "type": "audio/ogg", "usage": "Free Spin unlock", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "free_bet_unlock", "file": "audio/sfx/free_bet_unlock.ogg", "type": "audio/ogg", "usage": "Free Bet unlock", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "league_up", "file": "audio/sfx/league_up.ogg", "type": "audio/ogg", "usage": "League promotion", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "empire_rush", "file": "audio/sfx/empire_rush.ogg", "type": "audio/ogg", "usage": "Empire Rush milestone", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "music_empire_lounge", "file": "audio/music/empire_lounge_loop.ogg", "type": "audio/ogg", "usage": "Loopable premium casino music bed", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Legacy audio/fon.mp3 after user interaction or silence", "available": false
+    }
+  ]
+}

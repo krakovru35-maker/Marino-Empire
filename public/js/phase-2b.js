@@ -166,8 +166,8 @@
   function cancelReward(){state.pendingReward=null;const modal=document.querySelector('#rewardConfirm');if(modal)modal.hidden=true}
   function confirmReward(){
     const reward=state.pendingReward;if(!preview()||!reward)return cancelReward();
-    if(state.rewardPoints<reward.cost){cancelReward();return showRewardNotice('Puan yetersiz','failed')}
-    state.rewardPoints-=reward.cost;state.entitlements[reward.type]=(state.entitlements[reward.type]||0)+reward.amount;cancelReward();renderRewardStore();renderHomePulse();showRewardNotice(`${reward.name} demo cüzdanına eklendi`,'success');
+    if(state.rewardPoints<reward.cost){cancelReward();window.MarinoAudio?.play?.('ui_error');return showRewardNotice('Puan yetersiz','failed')}
+    state.rewardPoints-=reward.cost;state.entitlements[reward.type]=(state.entitlements[reward.type]||0)+reward.amount;cancelReward();renderRewardStore();renderHomePulse();window.MarinoAudio?.play?.('reward_purchase');if(reward.type==='spin')window.MarinoAudio?.play?.('free_spin_unlock');if(reward.type==='bet')window.MarinoAudio?.play?.('free_bet_unlock');showRewardNotice(`${reward.name} demo cüzdanına eklendi`,'success');
   }
   function showRewardNotice(message,status){let notice=document.querySelector('#rewardNotice');if(!notice){notice=document.createElement('div');notice.id='rewardNotice';notice.className='reward-notice';document.querySelector('#app')?.appendChild(notice)}notice.textContent=message;notice.dataset.status=status;notice.classList.add('show');clearTimeout(notice.timer);notice.timer=setTimeout(()=>notice.classList.remove('show'),2400)}
 
@@ -191,6 +191,7 @@
     if (preview() && result?.ok) {
       state.previewLevels.set(definition.key, (state.previewLevels.get(definition.key) || (definition.key==='casino_lobby'?3:0)) + 1);
       state.metrics.upgrades += 1;
+      window.MarinoAudio?.play?.('building_upgrade');
       state.snapshot = window.MarinoPhase2BBridge.snapshot();
       renderBuildings(); renderTasks(); renderHomePulse();
       window.MarinoPhase2A?.syncScene?.({ level: state.snapshot.level, buildingLevel: Math.max(...state.previewLevels.values()) });
@@ -205,6 +206,7 @@
     const task = TASKS.find(item => item.id === id);
     if (!task || !taskReady(task)) return;
     state.claimed.add(id); state.rewardPoints += task.points;
+    window.MarinoAudio?.play?.('task_complete');
     renderTasks(); renderHomePulse();
     document.dispatchEvent(new CustomEvent('marino:reward-points', { detail:{ balance:state.rewardPoints } }));
   }

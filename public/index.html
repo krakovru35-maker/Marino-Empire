@@ -17,10 +17,13 @@
   <link href="./styles/phase-1b.css" rel="stylesheet">
   <link href="./styles/phase-2a.css" rel="stylesheet">
   <link href="./styles/phase-2b.css" rel="stylesheet">
+  <link href="./styles/daily-rewards.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
   <script src="./js/phase-1b.js" defer></script>
   <script src="./js/phase-2a.js" defer></script>
   <script src="./js/phase-2b.js" defer></script>
+  <script src="./js/audio-manager.js" defer></script>
+  <script src="./js/daily-rewards.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
    MARINO EMPIRE — HAMSTER COMBAT STYLE UI
@@ -1953,18 +1956,22 @@
       </div>
     </div>
 
-    <!-- DAILY LOGIN FS OVERLAY -->
-    <div id="fsDaily" class="fs-overlay" style="z-index:250; background:rgba(4,15,28,0.98)">
-      <div class="fs-header">
-        <h2 style="margin:0; font-size:26px; font-weight:900" class="gold-text">Günlük Ödül</h2>
-        <p style="color:var(--text-muted); font-size:14px; margin-top:8px">Her gün oyuna girerek ödül havuzunu katla.
-        </p>
-      </div>
-      <div class="fs-body" style="align-items:start; padding:0 20px">
-        <div class="cal-grid" id="calGrid" style="width:100%"></div>
-        <button class="action-btn gold" id="btnClaimDaily"
-          style="width:100%;height:54px;font-size:18px;margin-top:20px">Al</button>
-      </div>
+    <!-- DAILY REWARD SHEET -->
+    <div id="fsDaily" class="sheet-overlay daily-reward-overlay" role="dialog" aria-modal="true" aria-labelledby="dailyRewardTitle">
+      <section class="daily-reward-sheet">
+        <header class="daily-reward-header">
+          <div><span>MARINO EMPIRE</span><h2 id="dailyRewardTitle">Günlük Ödül</h2></div>
+          <button type="button" id="closeDaily" class="daily-reward-close" aria-label="Günlük Ödülü kapat">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </header>
+        <div class="daily-reward-body">
+          <p class="daily-reward-intro">Her gün casino imparatorluğuna dön; koşulları açık, kontrollü ödülleri takip et.</p>
+          <div class="cal-grid daily-reward-grid" id="calGrid"></div>
+          <button type="button" class="daily-claim-anchor" id="btnClaimDaily">AL</button>
+          <p class="daily-reward-authority">Kalıcı ödüller yalnız sunucu sonucu ile verilir. Sanal Free Spin ve Free Bet nakit değeri taşımaz.</p>
+        </div>
+      </section>
     </div>
 
     <!-- MINI GAME FULLSCREEN OVERLAY -->
@@ -2063,7 +2070,7 @@
       </section>
     </div>
     <!-- Background Music -->
-    <audio id="bgMusic" src="./assets/audio/fon.mp3" loop preload="auto"></audio>
+    <audio id="bgMusic" src="./assets/audio/fon.mp3" loop preload="none"></audio>
   </div>
 
   <script>
@@ -2236,8 +2243,8 @@
         q('#swSfx').classList.toggle('on', S.settings.sfx);
         q('#swMus').classList.toggle('on', S.settings.mus);
         const bg = q('#bgMusic');
-        if (S.settings.mus) bg.play().catch(() => document.body.addEventListener('click', () => { if (S.settings.mus) bg.play(); }, { once: true }));
-        else bg.pause();
+        if (!S.settings.mus) bg.pause();
+        window.MarinoAudio?.setMusicEnabled?.(S.settings.mus);
       };
       applySet();
       q('#swSfx').onclick = () => { S.settings.sfx = !S.settings.sfx; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
@@ -2263,7 +2270,7 @@
         state: { coin: 125000, chips: 750, token: 25, en: 480, maxEn: 500, tap: 12, inc: 2400, lvl: 8, xp: 2750, pres: 0, cap: 8 },
         upgrades: [{ building_key: 'casino_lobby', building_name: 'Casino Lobisi', unlock_level: 1, level: 3, current_income_per_hour: 2400, next_cost_coin: 15000 }],
         store: [], reward_status: { weekly_used: 0, daily_used: 0 },
-        daily_login: { current_streak: 3, mini_games_played: 0, can_claim_today: false },
+        daily_login: { current_streak: 3, mini_games_played: 0, can_claim_today: true },
         completed_tasks: ['soc_tg', 'soc_tw', 'daily_tap', 'daily_collect', 'daily_mini']
       };
       const badge = document.createElement('div');
@@ -3575,27 +3582,30 @@
     }
 
     function openDaily() {
-      au.click(); q('#fsDaily').classList.add('show');
-
-      let strk = S.game.daily_login?.current_streak || 0;
-      let html = '';
-      // Show 8 days logic
-      for (let i = 1; i <= 8; i++) {
-        const val = i <= 7 ? i * 500 : 5000;
-        const claimed = i <= strk;
-        const active = i === strk + 1;
-        html += `<div class="cal-day ${claimed ? 'claimed' : ''} ${active ? 'active' : ''}"><div class="cal-day-num">Gün ${i}</div><div class="cal-day-val"><img src="./assets/currency/marino-coin.png">${fmt(val)}</div></div>`;
-      }
-      q('#calGrid').innerHTML = html;
+      au.click();
+      window.MarinoDailyRewards?.open?.({
+        streak: Number(S.game?.daily_login?.current_streak || 0),
+        canClaim: Boolean(S.game?.daily_login?.can_claim_today),
+        preview: isLocalPreview
+      });
     }
 
     async function claimDaily() {
       if (S.busy) return; S.busy = true; q('#btnClaimDaily').disabled = true; au.click();
+      if (isLocalPreview) {
+        S.game.daily_login.current_streak = Math.min(7, Number(S.game.daily_login.current_streak || 0) + 1);
+        S.game.daily_login.can_claim_today = false;
+        window.MarinoDailyRewards?.claimSuccess?.({ streak: S.game.daily_login.current_streak, preview: true });
+        toast('Demo günlük ödül alındı!');
+        S.busy = false;
+        return;
+      }
       try {
         const d = await rpc('marino_claim_daily_login', { p_telegram_id: String(S.user.id), p_request_id: uid() });
         processState(d); toast('Günlük ödül alındı!'); au.win(); renderTop();
-        setTimeout(() => { q('#fsDaily').classList.remove('show'); q('#btnClaimDaily').disabled = false; S.busy = false; }, 1000);
-      } catch (e) { toast(e.message); au.fail(); q('#btnClaimDaily').disabled = false; S.busy = false; }
+        window.MarinoDailyRewards?.claimSuccess?.({ streak: Number(S.game?.daily_login?.current_streak || 0) });
+        q('#btnClaimDaily').disabled = false; S.busy = false;
+      } catch (e) { toast(e.message); au.fail(); window.MarinoDailyRewards?.claimFailure?.(); q('#btnClaimDaily').disabled = false; S.busy = false; }
     }
 
     /* ════════════════════════════════════════════════════

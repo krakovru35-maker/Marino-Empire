@@ -111,6 +111,7 @@
     marino?.classList.add('empire-collect-success');
     window.setTimeout(() => marino?.classList.remove('empire-collect-success'), 700);
     successHaptic();
+    window.MarinoAudio?.play?.('collect_vault');
     document.dispatchEvent(new CustomEvent('marino:collect-success', { detail: { amount: Number(result.amount || 0) } }));
   }
 
