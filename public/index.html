@@ -10,6 +10,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="./__MARINO_RUNTIME_CONFIG_SCRIPT__"></script>
   <script src="./runtime-config-loader.js"></script>
+  <script src="./js/local-preview.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link href="./styles/phase-1a.css" rel="stylesheet">
@@ -1728,18 +1729,26 @@
         <span class="upgrade-target-arrow" aria-hidden="true">›</span>
       </button>
 
-      <div class="empire-hub-backdrop" id="empireHubBackdrop" hidden></div>
-      <details class="empire-hub" id="empireHub">
-        <summary><span>EMPIRE HUB</span><small>İstatistikler</small></summary>
+      <div class="quick-bar home-quick-actions">
+        <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
+          <span class="ico">🚀</span><span data-i18n="boost">BOOST</span>
+        </button>
+        <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
+          <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
+        </button>
+      </div>
+      <button class="empire-hub-trigger" id="btnEmpireHub" type="button" aria-label="Empire Hub'ı aç">
+        <span>EMPIRE HUB</span><small>İstatistikler ve günlük şifreler</small><span aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    <!-- EMPIRE HUB SHEET -->
+    <div id="sheetEmpireHub" class="sheet-overlay">
+      <div class="sheet empire-hub-sheet">
+        <div class="sheet-handle"></div>
+        <button class="sheet-close" data-close="sheetEmpireHub" aria-label="Empire Hub'ı kapat">✕</button>
+        <h3>Empire Hub</h3>
         <div class="empire-hub-panel">
-          <div class="quick-bar">
-            <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
-              <span class="ico">🚀</span><span data-i18n="boost">BOOST</span>
-            </button>
-            <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
-              <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
-            </button>
-          </div>
           <div class="hk-floats empire-hub-actions">
             <button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
               <div class="hk-float-ico">🎴</div>
@@ -1757,7 +1766,7 @@
             <div class="card"><div class="card-lbl">Casino</div><div class="card-val"><img src="./assets/currency/chip_spade_black_gold.png" alt=""><span id="valChips">0</span></div></div>
           </div>
         </div>
-      </details>
+      </div>
     </div>
 
     <!-- OTHER VIEWS (Using standard list design) -->
@@ -2059,7 +2068,7 @@
     }
 
     const tg = window.Telegram?.WebApp;
-    const isTest = new URLSearchParams(location.search).has('testmode');
+    const isLocalPreview = window.MarinoLocalPreview.detect(location, tg);
 
     const q = s => document.querySelector(s);
     const fmt = n => new Intl.NumberFormat('en-US').format(Number(n || 0));
@@ -2168,8 +2177,71 @@
       fail() { this.play(200, 0.2, 'sawtooth'); }
     };
 
+    let uiEventsBound = false;
+    function bindUiEvents() {
+      if (uiEventsBound) return;
+      uiEventsBound = true;
+      document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { au.click(); showTab(b.dataset.tab); });
+      document.querySelectorAll('.sheet-close').forEach(b => b.onclick = () => { au.click(); q('#' + b.dataset.close).classList.remove('show'); });
+      document.querySelectorAll('.sheet-overlay').forEach(overlay => overlay.addEventListener('pointerdown', e => {
+        if (e.target === overlay) overlay.classList.remove('show');
+      }));
+      q('#btnSettings').onclick = () => { au.click(); q('#sheetSettings').classList.add('show'); };
+      q('#btnProfile').onclick = () => { au.click(); renderProfile(); q('#sheetProfile').classList.add('show'); };
+      q('#btnEmpireHub').onclick = () => { au.click(); q('#sheetEmpireHub').classList.add('show'); };
+      q('#btnPrestige').onclick = handlePrestige;
+      q('#closeMini').onclick = () => {
+        au.click(); q('#fsMini').classList.remove('show');
+        if (typeof sportsInterval !== 'undefined' && sportsInterval) clearInterval(sportsInterval);
+        if (window.rouletteInterval) clearInterval(window.rouletteInterval);
+      };
+      q('#btnClaimDaily').onclick = claimDaily;
+      const applySet = () => {
+        q('#swSfx').classList.toggle('on', S.settings.sfx);
+        q('#swMus').classList.toggle('on', S.settings.mus);
+        const bg = q('#bgMusic');
+        if (S.settings.mus) bg.play().catch(() => document.body.addEventListener('click', () => { if (S.settings.mus) bg.play(); }, { once: true }));
+        else bg.pause();
+      };
+      applySet();
+      q('#swSfx').onclick = () => { S.settings.sfx = !S.settings.sfx; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
+      q('#swMus').onclick = () => { S.settings.mus = !S.settings.mus; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
+      document.addEventListener('focusout', e => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') setTimeout(() => {
+          window.scrollTo(0, 0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0;
+          document.querySelectorAll('.fs-body').forEach(el => el.scrollTop = 0);
+          if (window.Telegram?.WebApp) window.Telegram.WebApp.expand();
+        }, 50);
+      });
+      q('#btnTap').onpointerdown = e => {
+        if (S.settings.sfx) au.setup();
+        (window.MarinoPhase1B?.tapFeedback || window.MarinoPhase1A?.tapFeedback)?.(e);
+        handleTap(e);
+      };
+      q('#btnCollect').onclick = handleCollect;
+    }
+
+    function startLocalPreview() {
+      S.user = { id: 'local-preview', name: 'Local Marino', user: 'preview' };
+      S.game = {
+        state: { coin: 125000, chips: 750, token: 25, en: 480, maxEn: 500, tap: 12, inc: 2400, lvl: 8, xp: 2750, pres: 0, cap: 8 },
+        upgrades: [{ building_key: 'casino_lobby', building_name: 'Casino Lobisi', unlock_level: 1, level: 3, current_income_per_hour: 2400, next_cost_coin: 15000 }],
+        store: [], reward_status: { weekly_used: 0, daily_used: 0 },
+        daily_login: { current_streak: 3, mini_games_played: 0, can_claim_today: false },
+        completed_tasks: ['soc_tg', 'soc_tw', 'daily_tap', 'daily_collect', 'daily_mini']
+      };
+      const badge = document.createElement('div');
+      badge.id = 'localPreviewBadge'; badge.className = 'local-preview-badge'; badge.textContent = 'LOCAL UI PREVIEW';
+      q('#app').appendChild(badge);
+      bindUiEvents(); renderAll(); renderPreviewRank(); finishIntro();
+    }
+
     /* ── Bootstrap ── */
     async function init() {
+      if (isLocalPreview) {
+        startLocalPreview();
+        return;
+      }
       // Video Intro Logic
       const v = q('#introVid');
       let introSeen = false;
@@ -2222,60 +2294,7 @@
         return;
       }
 
-      // Bind UI
-      document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { au.click(); showTab(b.dataset.tab); });
-      document.querySelectorAll('.sheet-close').forEach(b => b.onclick = () => { au.click(); q('#' + b.dataset.close).classList.remove('show'); });
-
-      q('#btnSettings').onclick = () => { au.click(); q('#sheetSettings').classList.add('show'); };
-      q('#btnProfile').onclick = () => { au.click(); renderProfile(); q('#sheetProfile').classList.add('show'); };
-      q('#btnPrestige').onclick = handlePrestige;
-      q('#closeMini').onclick = () => {
-        au.click();
-        q('#fsMini').classList.remove('show');
-        if (typeof sportsInterval !== 'undefined' && sportsInterval) clearInterval(sportsInterval);
-        if (window.rouletteInterval) clearInterval(window.rouletteInterval);
-      };
-      q('#btnClaimDaily').onclick = claimDaily;
-
-      // Settings
-      const applySet = () => {
-        q('#swSfx').classList.toggle('on', S.settings.sfx);
-        q('#swMus').classList.toggle('on', S.settings.mus);
-        const bg = q('#bgMusic');
-        if (S.settings.mus) {
-          bg.play().catch(e => {
-            // Browser autplay blocked, bind to next click
-            document.body.addEventListener('click', () => { if (S.settings.mus) bg.play(); }, { once: true });
-          });
-        } else {
-          bg.pause();
-        }
-      };
-      applySet();
-
-      q('#swSfx').onclick = () => { S.settings.sfx = !S.settings.sfx; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
-      q('#swMus').onclick = () => { S.settings.mus = !S.settings.mus; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
-
-      // Keyboard scroll bug fix for Telegram Mobile
-      document.addEventListener('focusout', (e) => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
-          setTimeout(() => {
-            window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
-            document.querySelectorAll('.fs-body').forEach(el => el.scrollTop = 0);
-            if (window.Telegram?.WebApp) window.Telegram.WebApp.expand();
-          }, 50);
-        }
-      });
-
-      // Actions
-      q('#btnTap').onpointerdown = e => {
-        if (S.settings.sfx) au.setup();
-        (window.MarinoPhase1B?.tapFeedback || window.MarinoPhase1A?.tapFeedback)?.(e);
-        handleTap(e);
-      };
-      q('#btnCollect').onclick = handleCollect;
+      bindUiEvents();
 
       // Initial load
       await fetchGame();
@@ -2355,6 +2374,7 @@
     ]);
     const inFlightActions = new Set();
     async function rpc(name, p) {
+      if (isLocalPreview) throw new Error('local_preview_rpc_blocked');
       if (!S.authenticated || S.authBlockedReason) throw new Error('authentication_required');
       const payload = { ...(p || {}) };
       delete payload.p_telegram_id;
@@ -2453,6 +2473,13 @@
       flt.style.left = x + 'px'; flt.style.top = y + 'px';
       btn.appendChild(flt); setTimeout(() => flt.remove(), 800);
 
+      if (isLocalPreview) {
+        s.coin += s.tap;
+        s.en = Math.max(0, s.en - 1);
+        renderTop();
+        return;
+      }
+
       // Buffer and sync (simplified for stability, sending 1 hit)
       try {
         const d = await rpc('tap_coin', { p_taps: 1 });
@@ -2462,6 +2489,12 @@
     }
 
     async function handleCollect() {
+      if (isLocalPreview) {
+        const collected = Math.max(100, Math.round(S.game.state.inc / 6));
+        S.game.state.coin += collected;
+        toast('Yerel kasa toplandı! +' + fmt(collected)); renderTop();
+        return;
+      }
       if (S.busy) return; S.busy = true; au.click();
       try {
         const d = await rpc('collect_income', { p_telegram_id: String(S.user.id), p_request_id: uid() });
@@ -2471,6 +2504,7 @@
     }
 
     async function doAction(cmd, p) {
+      if (isLocalPreview) { toast('Yerel önizleme: ' + cmd); return; }
       if (S.busy) return; S.busy = true; au.click();
       try {
         p.p_telegram_id = String(S.user.id);
@@ -2484,7 +2518,12 @@
     }
 
     /* ── UI Rendering ── */
-    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); renderRank(); }
+    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); if (!isLocalPreview) renderRank(); }
+
+    function renderPreviewRank() {
+      q('#listRank').innerHTML = '<div class="sec-title">Yerel Önizleme Sıralaması</div><div class="item-row"><div class="item-ico">1</div><div class="item-info"><div class="item-title">Local Marino</div><div class="item-sub">Sv. 8 • XP: 2,750</div></div></div>';
+      q('#listRef').innerHTML = '<div class="alert-box green">Yerel önizlemede davet ve sıralama verisi ağdan yüklenmez.</div>';
+    }
 
     function renderTop() {
       if (!S.game) return; const s = S.game.state;
@@ -2612,6 +2651,7 @@
     }
 
     async function renderRank() {
+      if (isLocalPreview) { renderPreviewRank(); return; }
       const scope = S.rankTab || 'global';
       const lg = getLeague(S.game.state.lvl);
       const title = scope === 'global' ? 'Küresel Sıralama' : `${lg.name} Ligi Sıralaması`;
@@ -2640,6 +2680,7 @@
     }
 
     async function renderReferrals() {
+      if (isLocalPreview) { renderPreviewRank(); return; }
       const link = `t.me/MarinoEmpireBot?startapp=ref_${S.user.id}`;
       let html = `<div style="text-align:center; margin-bottom:15px">
     <p style="color:var(--text-muted);font-size:13px">Sahte davetleri engellemek için kurallar değişti!<br>Davet ettiğin arkadaşın <b>5. Seviyeye</b> ulaşınca <b>50.000 Coin ve 5 Bilet</b> kazanırsın.</p>
@@ -3453,6 +3494,7 @@
 
     /* ── Notification System ── */
     async function checkNotifications() {
+      if (isLocalPreview) return;
       if (!S.user || !S.game) return;
       try {
         const n = await rpc('marino_get_my_notifications', { p_telegram_id: String(S.user.id) });
@@ -3639,6 +3681,7 @@
     // S.hk holds the latest server state for HK features
     S.hk = null;
     async function hkRpc(name, args) {
+      if (isLocalPreview) return { _failed: true, preview: true };
       try {
         return await rpc(name, args);
       } catch (e) {
@@ -3647,6 +3690,7 @@
       }
     }
     async function hkRefreshState() {
+      if (isLocalPreview) return;
       if (!S.user || !S.user.id) return;
       const r = await hkRpc('marino_hk_state', { p_telegram_id: String(S.user.id) });
       if (r && !r._failed) {
@@ -4155,9 +4199,11 @@
       });
       // Refresh badges every 1s (live countdown)
       setInterval(refreshCombocipherBadges, 1000);
-      // Fetch server state once on init, then every 60s
-      hkRefreshState().then(() => { refreshCombocipherBadges(); });
-      setInterval(() => { hkRefreshState(); }, 60000);
+      // Fetch server state once on init, then every 60s (never in local preview).
+      if (!isLocalPreview) {
+        hkRefreshState().then(() => { refreshCombocipherBadges(); });
+        setInterval(() => { hkRefreshState(); }, 60000);
+      }
     }
     // Run after main init() has bound DOM
     const _origInit = init;

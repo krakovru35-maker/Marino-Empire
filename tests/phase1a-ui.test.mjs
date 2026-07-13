@@ -25,11 +25,11 @@ test('intro finish is idempotent and supports ended plus maximum timeout', () =>
   assert.match(phaseCss, /--intro-duration:\s*4\.5s/);
 });
 
-test('Empire Hub backdrop consumes outside interaction before closing', () => {
-  assert.match(html, /id="empireHubBackdrop"[^>]*hidden/);
-  assert.match(phaseJs, /backdrop\?\.addEventListener\('pointerdown'[\s\S]*?preventDefault\(\)[\s\S]*?stopPropagation\(\)[\s\S]*?closeEmpireHub\(\)/);
-  assert.doesNotMatch(phaseJs, /backdrop\?\.addEventListener\('click'/);
-  assert.doesNotMatch(phaseJs, /document\.addEventListener\('pointerdown'/);
+test('Empire Hub uses the shared bottom-sheet system', () => {
+  assert.doesNotMatch(html, /<details[^>]*id="empireHub"/);
+  assert.match(html, /id="btnEmpireHub"/);
+  assert.match(html, /id="sheetEmpireHub" class="sheet-overlay"/);
+  assert.match(html, /class="sheet empire-hub-sheet"/);
 });
 
 test('Combo and Cipher controls retain unique stable IDs', () => {
