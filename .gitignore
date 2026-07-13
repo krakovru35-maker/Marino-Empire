@@ -6,3 +6,7 @@ credentials.json
 *.key
 .credentials
 dist/
+node_modules/
+supabase/.temp/
+.supabase/
+*.log
