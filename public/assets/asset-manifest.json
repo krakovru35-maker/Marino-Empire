@@ -218,6 +218,18 @@
     },
     {
       "id": "roulette_result", "file": "audio/sfx/roulette_[win|lose].ogg", "type": "audio/ogg", "usage": "European Roulette demo result", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tones", "available": false
+    },
+    {
+      "id": "reel_loop", "file": "audio/sfx/reel_loop.ogg", "type": "audio/ogg", "usage": "Fortune Slots layered reel motion bed", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio sweep", "available": false
+    },
+    {
+      "id": "anticipation_ping", "file": "audio/sfx/anticipation_ping.ogg", "type": "audio/ogg", "usage": "Fortune Slots near-miss anticipation", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio ping", "available": false
+    },
+    {
+      "id": "free_spin_trigger", "file": "audio/sfx/free_spin_trigger.ogg", "type": "audio/ogg", "usage": "Fortune Slots free spin ceremony", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio rise", "available": false
+    },
+    {
+      "id": "ball_roll", "file": "audio/sfx/ball_roll.ogg", "type": "audio/ogg", "usage": "European Roulette ball roll", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio roll", "available": false
     }
   ]
 }
