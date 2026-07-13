@@ -73,10 +73,16 @@ export function buildArtifact({ rootDir, publicDir, distDir, input }) {
   };
   fs.writeFileSync(path.join(distDir, configFile), `window.MARINO_CONFIG = ${JSON.stringify(runtimeConfig)};\n`, 'utf8');
 
-  const htmlPath = path.join(distDir, 'index.html');
-  const sourceHtml = fs.readFileSync(htmlPath, 'utf8');
-  if (!sourceHtml.includes(HTML_TOKEN)) throw new Error('runtime config HTML token is missing');
-  fs.writeFileSync(htmlPath, sourceHtml.replace(HTML_TOKEN, configFile), 'utf8');
+  const htmlFiles = fs.readdirSync(distDir).filter((name) => name.endsWith('.html'));
+  let replacedIndex = false;
+  for (const name of htmlFiles) {
+    const htmlPath = path.join(distDir, name);
+    const sourceHtml = fs.readFileSync(htmlPath, 'utf8');
+    if (!sourceHtml.includes(HTML_TOKEN)) continue;
+    fs.writeFileSync(htmlPath, sourceHtml.replaceAll(HTML_TOKEN, configFile), 'utf8');
+    if (name === 'index.html') replacedIndex = true;
+  }
+  if (!replacedIndex) throw new Error('runtime config HTML token is missing');
 
   const manifest = { targetEnvironment: config.targetEnvironment, projectRef: config.actualRef, commitSha: config.commitSha, buildTime: config.buildTime, configFile };
   fs.writeFileSync(path.join(distDir, 'build-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
