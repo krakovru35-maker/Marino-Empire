@@ -15,8 +15,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link href="./styles/phase-1a.css" rel="stylesheet">
   <link href="./styles/phase-1b.css" rel="stylesheet">
+  <link href="./styles/phase-2a.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
   <script src="./js/phase-1b.js" defer></script>
+  <script src="./js/phase-2a.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
    MARINO EMPIRE — HAMSTER COMBAT STYLE UI
@@ -1692,6 +1694,11 @@
       <div class="tap-container">
         <div class="casino-scene" aria-hidden="true">
           <div class="scene-glow"></div>
+          <div class="empire-depth empire-depth-city"></div>
+          <div class="empire-neon-bank"><i></i><i></i><i></i></div>
+          <div class="empire-crowd"><i></i><i></i><i></i></div>
+          <div class="empire-slot-lights"><i></i><i></i><i></i><i></i></div>
+          <div class="empire-dust"><i></i><i></i><i></i><i></i></div>
           <div class="scene-ambient scene-ambient-left"></div>
           <div class="scene-ambient scene-ambient-right"></div>
           <div class="scene-arch"></div>
@@ -1740,6 +1747,9 @@
       <button class="empire-hub-trigger" id="btnEmpireHub" type="button" aria-label="Empire Hub'ı aç">
         <span>EMPIRE HUB</span><small>İstatistikler ve günlük şifreler</small><span aria-hidden="true">›</span>
       </button>
+      <div class="empire-tier-transition" id="empireTierTransition" role="status" aria-live="polite" hidden>
+        <strong>İmparatorluğun büyüdü</strong><span id="empireTierName"></span>
+      </div>
     </div>
 
     <!-- EMPIRE HUB SHEET -->
@@ -2491,14 +2501,18 @@
     async function handleCollect() {
       if (isLocalPreview) {
         const collected = Math.max(100, Math.round(S.game.state.inc / 6));
+        const previousCoin = Number(S.game.state.coin || 0);
         S.game.state.coin += collected;
         toast('Yerel kasa toplandı! +' + fmt(collected)); renderTop();
+        window.MarinoPhase2A?.collectSuccess?.({ from: previousCoin, to: Number(S.game.state.coin), amount: collected });
         return;
       }
       if (S.busy) return; S.busy = true; au.click();
       try {
+        const previousCoin = Number(S.game.state.coin || 0);
         const d = await rpc('collect_income', { p_telegram_id: String(S.user.id), p_request_id: uid() });
         processState(d); toast('Kasa toplandı! +' + fmt(d.collected)); au.win(); renderAll();
+        window.MarinoPhase2A?.collectSuccess?.({ from: previousCoin, to: Number(S.game.state.coin), amount: Number(d.collected || 0) });
       } catch (e) { toast(e.message); au.fail(); }
       finally { S.busy = false; }
     }
@@ -2544,6 +2558,7 @@
       q('#leagueName').textContent = lg.name.toUpperCase() + ' LİGİ';
       q('#leagueName').style.color = lg.color;
       q('#leagueBadge').style.borderColor = lg.color;
+      window.MarinoPhase2A?.syncScene?.({ level: Number(s.lvl || 0) });
     }
 
     function renderBuildings() {
