@@ -27,9 +27,16 @@
     ['streak_3','weekly','Üç Günlük Ritim','3 günlük giriş serisine ulaş.',3,80,'streak']
   ].map(([id,category,title,description,goal,points,metric]) => ({ id,category,title,description,goal,points,metric }));
   const CATEGORY_LABELS = { daily:'Günlük', weekly:'Haftalık', progress:'İlerleme', social:'Sosyal' };
+  const REWARDS = [
+    ['spin_1','1 Sanal Free Spin','spin',25,1,'Bu oturum'],['spin_3','3 Sanal Free Spin','spin',65,3,'Bu oturum'],['spin_5','5 Sanal Free Spin','spin',95,5,'Bu oturum'],
+    ['bet_1','1 Sanal Free Bet','bet',30,1,'Bu oturum'],['bet_3','3 Sanal Free Bet','bet',75,3,'Bu oturum'],
+    ['energy_pack','Enerji Paketi','energy',40,1,'Sunucu aktivasyonu gerekir'],['tap_boost','Tap Boost','boost',55,1,'Sunucu aktivasyonu gerekir'],
+    ['income_boost','Geçici Saatlik Gelir Boost','income',80,1,'Sunucu aktivasyonu gerekir'],['badge','Marino Kozmetik Rozeti','cosmetic',70,1,'Bu oturum'],['decor','Casino Sahne Dekoru','decor',110,1,'Bu oturum']
+  ].map(([id,name,type,cost,amount,expiry])=>({id,name,type,cost,amount,expiry}));
   const state = {
     snapshot:null, category:'daily', metrics:{ taps:0,energy:0,collects:0,upgrades:0,combo:0,cipher:0,casino:0,friends:0 },
-    claimed:new Set(), rewardPoints:0, previewLevels:new Map(), serverTasksMarkup:'', startedAt:Date.now(), regenTimer:0
+    claimed:new Set(), rewardPoints:0, previewLevels:new Map(), serverTasksMarkup:'', startedAt:Date.now(), regenTimer:0,
+    entitlements:{ spin:0,bet:0,energy:0,boost:0,income:0,cosmetic:0,decor:0 }, pendingReward:null
   };
   const iconPaths = {
     income:'<path d="M4 19V8m5 11V5m6 14v-8m5 8V3M2 21h20"/>',
@@ -120,6 +127,7 @@
     pulse.setAttribute('aria-label','Casino empire ilerlemesini aç');
     hub.insertAdjacentElement('afterend', pulse);
     pulse.addEventListener('click', () => document.querySelector('.nav-btn[data-tab="tasks"]')?.click());
+    const rewardButton=document.createElement('button');rewardButton.type='button';rewardButton.id='btnRewardVault';rewardButton.className='reward-vault-trigger';rewardButton.setAttribute('aria-label','Ödül Kasasını aç');rewardButton.innerHTML='<span>ÖDÜL KASASI</span><small id="homeEntitlementSummary">Sanal haklar • nakit değeri yoktur</small><i>›</i>';pulse.insertAdjacentElement('afterend',rewardButton);rewardButton.addEventListener('click',openRewardStore);
   }
 
   function renderHomePulse() {
@@ -128,6 +136,50 @@
     if (!pulse || !state.snapshot) return;
     const ready = TASKS.filter(taskReady).length;
     pulse.innerHTML = `<span><small>SAATLİK</small><b>+${fmt(state.snapshot.hourlyIncome)}</b></span><span><small>GÖREV</small><b>${ready} hazır</b></span><span><small>MRP</small><b>${preview()?fmt(state.rewardPoints):'Demo'}</b></span><i aria-hidden="true">›</i>`;
+    const summary=document.querySelector('#homeEntitlementSummary');if(summary)summary.textContent=`${state.entitlements.spin} Spin • ${state.entitlements.bet} Bet • Sanal`;
+  }
+
+  function rewardCard(reward){
+    const enough=state.rewardPoints>=reward.cost, canBuy=preview()&&enough;
+    const count=state.entitlements[reward.type]||0;
+    return `<article class="reward-card"><div class="reward-symbol ${reward.type}">${reward.type==='spin'?'S':reward.type==='bet'?'B':'M'}</div><div class="reward-copy"><h4>${escape(reward.name)}</h4><p>Sanal oyun hakkı • nakit değeri yoktur • transfer edilemez</p><span>Kalan kullanım: <b>${count}</b></span><small>Koşul / süre: ${escape(reward.expiry)}</small></div><button type="button" data-buy-reward="${reward.id}" ${canBuy?'':'disabled'}><b>${fmt(reward.cost)} MRP</b><small>${preview()?(enough?'SATIN AL':'PUAN YETERSİZ'):'SUNUCU GEREKLİ'}</small></button></article>`;
+  }
+
+  function walletMarkup(){return `<section class="virtual-wallet"><header><div><span>SANAL HAK CÜZDANI</span><h3>Casino avantajların</h3></div><b>${preview()?'DEMO':'SUNUCU BEKLİYOR'}</b></header><div class="wallet-grid"><div><strong>${state.entitlements.spin}</strong><span>Free Spin</span><small>Aktif • oturum sonu</small></div><div><strong>${state.entitlements.bet}</strong><span>Free Bet</span><small>Demo kupon • nakit yok</small></div><div><strong>${state.entitlements.energy}</strong><span>Enerji Paketi</span><small>${state.entitlements.energy?'Kullanılmadı':'Yok'}</small></div><div><strong>${state.entitlements.boost+state.entitlements.income}</strong><span>Aktif Boost</span><small>Sunucu aktivasyonu gerekir</small></div></div></section>`}
+
+  function installRewardUi(){
+    if(document.querySelector('#sheetRewardVault'))return;
+    const overlay=document.createElement('div');overlay.id='sheetRewardVault';overlay.className='sheet-overlay reward-vault-overlay';overlay.innerHTML=`<div class="sheet reward-vault-sheet"><div class="sheet-handle"></div><button type="button" class="sheet-close reward-close" aria-label="Ödül Kasasını kapat">✕</button><div class="reward-vault-title"><span>MARINO EMPIRE</span><h2>Ödül Kasası</h2><p>Görev puanlarını yalnız sanal, nakit değeri olmayan oyun haklarına dönüştür.</p></div><div id="rewardVaultBody"></div><div class="responsible-note"><b>18+ görsel alanı</b><span>Garanti kazanç yoktur. Para yatırma, çekim ve transfer bulunmaz. Oturumuna ara vermeyi unutma.</span></div></div>`;
+    const confirm=document.createElement('div');confirm.id='rewardConfirm';confirm.className='reward-confirm';confirm.hidden=true;confirm.innerHTML='<div role="dialog" aria-modal="true" aria-labelledby="rewardConfirmTitle"><span>SANAL ÖDÜL ONAYI</span><h3 id="rewardConfirmTitle">Ödülü aç</h3><p id="rewardConfirmText"></p><small>Nakit değeri yoktur; çekilemez ve transfer edilemez.</small><div><button type="button" data-cancel-reward>Vazgeç</button><button type="button" data-confirm-reward>Onayla</button></div></div>';
+    document.querySelector('#app')?.append(overlay,confirm);
+    overlay.addEventListener('pointerdown',event=>{if(event.target===overlay)closeRewardStore()});overlay.querySelector('.reward-close').addEventListener('click',closeRewardStore);
+    confirm.addEventListener('pointerdown',event=>{if(event.target===confirm)cancelReward()});confirm.querySelector('[data-cancel-reward]').addEventListener('click',cancelReward);confirm.querySelector('[data-confirm-reward]').addEventListener('click',confirmReward);
+  }
+
+  function renderRewardStore(){
+    installRewardUi();const body=document.querySelector('#rewardVaultBody');if(!body)return;
+    body.innerHTML=`<div class="reward-point-balance"><span>MARINO REWARD POINT</span><strong>${preview()?fmt(state.rewardPoints):'—'}</strong><small>${preview()?'Geçici demo bakiyesi • yenilenince sıfırlanır':'Gerçek hak için server-side entitlement gerekir'}</small></div>${walletMarkup()}<div class="reward-store-grid">${REWARDS.map(rewardCard).join('')}</div>`;
+  }
+  function openRewardStore(){renderRewardStore();document.querySelector('#sheetRewardVault')?.classList.add('show')}
+  function closeRewardStore(){document.querySelector('#sheetRewardVault')?.classList.remove('show')}
+  function requestReward(id){if(!preview())return;const reward=REWARDS.find(item=>item.id===id);if(!reward)return;state.pendingReward=reward;document.querySelector('#rewardConfirmTitle').textContent=reward.name;document.querySelector('#rewardConfirmText').textContent=`${reward.cost} MRP karşılığında ${reward.amount} demo hak açılacak.`;document.querySelector('#rewardConfirm').hidden=false}
+  function cancelReward(){state.pendingReward=null;const modal=document.querySelector('#rewardConfirm');if(modal)modal.hidden=true}
+  function confirmReward(){
+    const reward=state.pendingReward;if(!preview()||!reward)return cancelReward();
+    if(state.rewardPoints<reward.cost){cancelReward();return showRewardNotice('Puan yetersiz','failed')}
+    state.rewardPoints-=reward.cost;state.entitlements[reward.type]=(state.entitlements[reward.type]||0)+reward.amount;cancelReward();renderRewardStore();renderHomePulse();showRewardNotice(`${reward.name} demo cüzdanına eklendi`,'success');
+  }
+  function showRewardNotice(message,status){let notice=document.querySelector('#rewardNotice');if(!notice){notice=document.createElement('div');notice.id='rewardNotice';notice.className='reward-notice';document.querySelector('#app')?.appendChild(notice)}notice.textContent=message;notice.dataset.status=status;notice.classList.add('show');clearTimeout(notice.timer);notice.timer=setTimeout(()=>notice.classList.remove('show'),2400)}
+
+  function injectDemoEntitlement(id){
+    if(!preview()||(id!=='slot'&&id!=='sports'))return;const body=document.querySelector('#miniBody');if(!body)return;const type=id==='slot'?'spin':'bet',label=id==='slot'?'Sanal Free Spin Kullan':'Sanal Free Bet Kuponu';
+    const panel=document.createElement('section');panel.className='demo-entitlement-panel';panel.innerHTML=`<div><b>${label}</b><span>Nakit değeri yoktur • gerçek bahis gönderilmez</span></div><button type="button" ${state.entitlements[type]>0?'':'disabled'}>${state.entitlements[type]} hak</button><p aria-live="polite"></p>`;body.prepend(panel);panel.querySelector('button').addEventListener('click',()=>useDemoEntitlement(type,panel));
+  }
+  function useDemoEntitlement(type,panel){if(!preview()||state.entitlements[type]<=0)return;state.entitlements[type]-=1;const isSpin=type==='spin';panel.querySelector('button').textContent=`${state.entitlements[type]} hak`;panel.querySelector('button').disabled=state.entitlements[type]<=0;panel.querySelector('p').textContent=isSpin?'Sanal sonuç: Marino yıldızı • bakiye veya coin ödülü yoktur.':'Demo kupon işaretlendi • hiçbir bahis gönderilmedi, kazanç oluşturulmadı.';renderHomePulse();renderRewardStore()}
+
+  function wrapMiniGames(){
+    if(!preview()||window.openMini?.__phase2bWrapped)return;const original=window.openMini;if(typeof original!=='function')return;
+    const wrapped=function(id,title){original(id,title);window.setTimeout(()=>injectDemoEntitlement(id),0)};wrapped.__phase2bWrapped=true;window.openMini=wrapped;
   }
 
   async function upgradeBuilding(button) {
@@ -171,6 +223,7 @@
       const upgrade = event.target.closest('[data-upgrade]'); if (upgrade) return void upgradeBuilding(upgrade);
       const claim = event.target.closest('[data-claim-task]'); if (claim) return claimTask(claim.dataset.claimTask);
       const category = event.target.closest('[data-task-category]'); if (category) { state.category=category.dataset.taskCategory; return renderTasks(); }
+      const reward=event.target.closest('[data-buy-reward]');if(reward)return requestReward(reward.dataset.buyReward);
       if (event.target.closest('[data-open-daily]')) return window.openDaily?.();
       if (event.target.closest('#btnDailyCombo')) track('combo');
       if (event.target.closest('#btnDailyCipher')) track('cipher');
@@ -190,11 +243,11 @@
   }
 
   function init() {
-    bindEvents(); installHomePulse(); sync(window.MarinoPhase2BBridge?.snapshot?.());
+    bindEvents(); installHomePulse(); installRewardUi(); wrapMiniGames(); sync(window.MarinoPhase2BBridge?.snapshot?.());
     window.setInterval(() => { const el=document.querySelector('#sessionDuration'); if(el) el.textContent=`${Math.floor((Date.now()-state.startedAt)/60000)} dk`; },30000);
     if (preview()) state.regenTimer=window.setInterval(()=>window.MarinoPhase2BBridge?.regeneratePreviewEnergy?.(),3000);
   }
 
-  window.MarinoPhase2B = Object.freeze({ sync, BUILDINGS, TASKS, getDemoState:() => ({ rewardPoints:state.rewardPoints, claimed:[...state.claimed], metrics:{...state.metrics} }) });
+  window.MarinoPhase2B = Object.freeze({ sync, BUILDINGS, TASKS, REWARDS, openRewardStore, getDemoState:() => ({ rewardPoints:state.rewardPoints, claimed:[...state.claimed], metrics:{...state.metrics}, entitlements:{...state.entitlements} }) });
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
 })();
