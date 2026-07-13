@@ -60,3 +60,18 @@ test('premium home polish keeps the target viewport matrix and fallbacks', () =>
   assert.match(css, /\.quality-lite \.tap-btn img\{animation:none/);
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)[\s\S]*?\.tap-btn img\{animation:none!important\}/);
 });
+
+test('home energy, target and quick-action icons are singular and consistent', () => {
+  const energyMarkup = html.match(/<div class="energy-box">([\s\S]*?)<\/div>/)?.[1] || '';
+  const arrowMarkup = html.match(/<span class="upgrade-target-arrow"[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? 'missing';
+  assert.doesNotMatch(energyMarkup, /⚡/);
+  assert.equal([...js.matchAll(/svg\('energy'\)/g)].length, 1);
+  assert.equal(arrowMarkup.trim(), '');
+  assert.equal([...js.matchAll(/svg\('arrow'\)/g)].length, 1);
+  assert.equal([...html.matchAll(/id="btnEmpireHub"/g)].length, 1);
+  assert.equal([...html.matchAll(/id="btnOpenBoost"/g)].length, 1);
+  assert.equal([...html.matchAll(/id="btnOpenAirdrop"/g)].length, 1);
+  assert.equal([...js.matchAll(/svg\('boost'\)/g)].length, 1);
+  assert.equal([...js.matchAll(/svg\('airdrop'\)/g)].length, 1);
+  assert.equal([...js.matchAll(/svg\('hub'\)/g)].length, 1);
+});
