@@ -230,6 +230,15 @@
     },
     {
       "id": "ball_roll", "file": "audio/sfx/ball_roll.ogg", "type": "audio/ogg", "usage": "European Roulette ball roll", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio roll", "available": false
+    },
+    {
+      "id": "blackjack_card_actions", "file": "audio/sfx/card_[deal|flip].ogg", "type": "audio/ogg", "usage": "Blackjack card deal and reveal", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Distinct procedural Web Audio card tones", "available": false
+    },
+    {
+      "id": "blackjack_results", "file": "audio/sfx/[blackjack_win|normal_win|push|bust].ogg", "type": "audio/ogg", "usage": "Blackjack demo result ceremonies", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio result tones", "available": false
+    },
+    {
+      "id": "dealer_reveal", "file": "audio/sfx/dealer_reveal.ogg", "type": "audio/ogg", "usage": "Blackjack dealer hole-card reveal", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio reveal tone", "available": false
     }
   ]
 }

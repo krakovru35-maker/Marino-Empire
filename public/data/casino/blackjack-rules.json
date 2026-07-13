@@ -1,0 +1,13 @@
+{
+  "authority": "Demo presentation rules only; never an economy, wager or entitlement authority.",
+  "decks": 6,
+  "dealerSoft17": "hit",
+  "blackjackPayout": "3:2",
+  "normalPayout": "1:1",
+  "insurance": false,
+  "surrender": false,
+  "maxHands": 4,
+  "splitAcesOneCard": true,
+  "cutCardPenetration": 0.72,
+  "notice": "Sanal demo oyunu; nakit değeri yoktur."
+}
