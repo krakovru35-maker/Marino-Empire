@@ -114,7 +114,11 @@
   function renderTasks() {
     const list = document.querySelector('#listTasks');
     if (!list || !state.snapshot) return;
-    if (!preview() && !list.querySelector('.phase2b-task-root')) state.serverTasksMarkup = list.innerHTML;
+    if (!preview()) {
+      if (!list.querySelector('.phase2b-task-root')) state.serverTasksMarkup = list.innerHTML;
+      if (state.serverTasksMarkup) list.innerHTML = state.serverTasksMarkup;
+      return;
+    }
     const tasks = TASKS.filter(task => task.category === state.category);
     list.innerHTML = `<div class="phase2b-task-root"><div class="task-summary"><div><span>MARINO REWARD POINT</span><strong>${preview()?fmt(state.rewardPoints):'—'}</strong><small>${preview()?'Yalnız bu oturumda demo':'Sunucu desteği bekleniyor'}</small></div><div><span>OTURUM</span><strong id="sessionDuration">0 dk</strong><small>Uzun oturumlarda mola ver.</small></div></div>
       ${dailyCalendar()}<div class="task-tabs" role="tablist">${Object.entries(CATEGORY_LABELS).map(([key,label])=>`<button type="button" role="tab" data-task-category="${key}" aria-selected="${key===state.category}">${spriteIcon('tasks',CATEGORY_ICONS[key])}<span>${label}</span></button>`).join('')}</div>

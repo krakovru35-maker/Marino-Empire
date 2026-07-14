@@ -38,9 +38,9 @@ test('physical pocket variation remains within twenty percent of a pocket',()=>{
 });
 
 test('real ball dot, detached marker layer and precision hit zones are present',()=>{
-  assert.match(js,/class="roulette-ball-dot"/);assert.match(js,/class="roulette-bet-layer"/);assert.match(js,/class="roulette-marker-layer"/);assert.match(js,/ResizeObserver/);assert.match(js,/orientationchange/);assert.match(js,/viewportChanged/);assert.match(css,/\.roulette-ball-dot\{[^}]*translate:-50% 0/);assert.match(css,/\.roulette-hit-zone\{[^}]*min-width:14px/);assert.match(css,/\.roulette-marker-layer\{position:absolute/);assert.match(css,/translate:-50% -50%/);
+  assert.match(js,/class="roulette-ball-dot"/);assert.match(js,/class="roulette-bet-layer"/);assert.match(js,/class="roulette-marker-layer"/);assert.match(js,/orientationchange/);assert.match(js,/viewportChanged/);assert.match(js,/getBoundingClientRect/);assert.match(css,/\.roulette-ball-dot\{[^}]*translate:-50% 0/);assert.match(css,/\.roulette-hit-zone\{[^}]*min-width:14px/);assert.match(css,/\.roulette-marker-layer\{position:absolute/);assert.match(css,/translate:-50% -50%/);
 });
 
 test('precision betting stays isolated from protected economy contracts',()=>{
-  assert.doesNotMatch(js,/marino_coin|casino_chips|tap_coin|marino_secure_rpc|\brpc\s*\(/);assert.match(js,/MarinoDemoWallet/);
+  assert.doesNotMatch(js,/marino_coin|casino_chips|tap_coin|marino_secure_rpc|\brpc\s*\(/);assert.match(js,/MarinoEconomyBridge/);assert.doesNotMatch(js,/MarinoDemoWallet\.(debit|credit)/);
 });

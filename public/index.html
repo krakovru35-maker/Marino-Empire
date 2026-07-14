@@ -2670,6 +2670,49 @@
       }
     };
 
+    window.MarinoEconomyBridge = {
+      preview: isLocalPreview,
+      ready: () => !isLocalPreview && appPhase === APP_PHASE.READY && S.authenticated && !S.authBlockedReason && !!S.game?.state,
+      snapshot: () => ({
+        coin: Number(S.game?.state?.coin || 0),
+        chips: Number(S.game?.state?.chips || 0),
+        freeSpins: 0,
+        freeBets: 0
+      }),
+      refresh: () => { renderAll(); return window.MarinoEconomyBridge.snapshot(); },
+      toast: message => toast(message),
+      playSlot: async (betAmount) => {
+        const d = await rpc('marino_play_slot', { p_bet_amount: Number(betAmount || 0) });
+        if (d?.state) processState(d);
+        renderAll();
+        return d;
+      },
+      playRoulette: async (bets) => {
+        const d = await rpc('marino_play_roulette_v2', { p_bets: bets || {} });
+        if (d?.state) processState(d);
+        renderAll();
+        return d;
+      },
+      blackjackDeal: async (betAmount) => {
+        const d = await rpc('marino_bj_deal', { p_bet_amount: Number(betAmount || 0) });
+        if (d?.player) processState({ state: d.player });
+        renderAll();
+        return d;
+      },
+      blackjackHit: async () => {
+        const d = await rpc('marino_bj_hit', {});
+        if (d?.player) processState({ state: d.player });
+        renderAll();
+        return d;
+      },
+      blackjackStand: async () => {
+        const d = await rpc('marino_bj_stand', {});
+        if (d?.player) processState({ state: d.player });
+        renderAll();
+        return d;
+      }
+    };
+
     function processState(d) {
       if (d.state) S.game.state = {
         coin: Number(d.state.marino_coin || 0), chips: Number(d.state.casino_chips || 0), token: Number(d.state.reward_token || 0),
