@@ -5,3 +5,8 @@ credentials.json
 *.pem
 *.key
 .credentials
+dist/
+node_modules/
+supabase/.temp/
+.supabase/
+*.log

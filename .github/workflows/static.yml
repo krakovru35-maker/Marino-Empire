@@ -2,18 +2,15 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  pull_request:
+    branches: ["main"]
+    types: [opened, synchronize, reopened]
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -22,8 +19,55 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check changed-line whitespace
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then BASE_SHA="$(git rev-parse HEAD^)"; fi
+          git diff --check "$BASE_SHA"..HEAD
+      - name: Build synthetic staging artifact
+        env:
+          MARINO_TARGET_ENV: staging
+          MARINO_SUPABASE_URL: https://stagingref0000000001.supabase.co
+          MARINO_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder_not_secret
+          MARINO_EXPECTED_PROJECT_REF: stagingref0000000001
+          MARINO_STAGING_PROJECT_REF: stagingref0000000001
+          MARINO_PRODUCTION_PROJECT_REF: productionref0000000
+          MARINO_COMMIT_SHA: ${{ github.sha }}
+          MARINO_BUILD_TIME: "2026-01-01T00:00:00.000Z"
+        run: node scripts/build-runtime-config.mjs
+      - name: Test runtime config artifact
+        run: node --test tests/runtime-config.test.mjs
+      - name: Validate static security invariants
+        run: node scripts/validate-security.mjs
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check content operations function
+        run: deno check supabase/functions/content-ops/index.ts
+      - name: Test content operations helpers
+        run: deno test supabase/functions/content-ops/*_test.ts
+      - name: Type-check Telegram auth function
+        run: deno check supabase/functions/telegram-auth/index.ts
+      - name: Test Telegram auth helpers
+        run: deno test supabase/functions/telegram-auth/*_test.ts
+
   deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -31,12 +75,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Build production runtime artifact
+        env:
+          MARINO_TARGET_ENV: production
+          MARINO_SUPABASE_URL: ${{ vars.PRODUCTION_SUPABASE_URL }}
+          MARINO_SUPABASE_PUBLISHABLE_KEY: ${{ vars.PRODUCTION_SUPABASE_PUBLISHABLE_KEY }}
+          MARINO_EXPECTED_PROJECT_REF: ${{ vars.PRODUCTION_SUPABASE_PROJECT_REF }}
+          MARINO_PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_SUPABASE_PROJECT_REF }}
+          MARINO_STAGING_PROJECT_REF: ${{ vars.STAGING_SUPABASE_PROJECT_REF }}
+          MARINO_COMMIT_SHA: ${{ github.sha }}
+        run: node scripts/build-runtime-config.mjs
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Verify public artifact contains no admin console
+        shell: bash
+        run: |
+          test ! -e dist/admin.html
+          ! grep -RIE --include='*.html' --include='*.js' \
+            '(admin_token|marino_authorized|type=.password)' dist
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './public'
+          path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

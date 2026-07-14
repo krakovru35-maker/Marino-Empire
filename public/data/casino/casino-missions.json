@@ -1,0 +1,23 @@
+{
+  "authority": "UI catalogue only; never an economy, wager, reward or entitlement authority.",
+  "categories": ["daily", "weekly", "mastery", "event"],
+  "missions": [
+    {"id":"slot_spin_5","category":"daily","game":"slots","title":"Beş Spin","description":"Marino Fortune Slots'ta 5 demo spin tamamla.","metric":"slot_spin","goal":5,"points":20,"expires":"Günlük yenileme"},
+    {"id":"slot_bets_3","category":"daily","game":"slots","title":"Bahis Yelpazesi","description":"3 farklı demo bahis seviyesi dene.","metric":"slot_bet_levels","goal":3,"points":20,"expires":"Günlük yenileme"},
+    {"id":"slot_payline","category":"mastery","game":"slots","title":"Kazanan Hat","description":"Bir demo payline sonucu gör.","metric":"slot_payline_win","goal":1,"points":30,"expires":"Süre sınırı yok"},
+    {"id":"roulette_spin_3","category":"daily","game":"roulette","title":"Üç Çark","description":"3 demo rulet turu tamamla.","metric":"roulette_spin","goal":3,"points":20,"expires":"Günlük yenileme"},
+    {"id":"roulette_split","category":"daily","game":"roulette","title":"Split Noktası","description":"Bir Split bahis noktası kullan.","metric":"roulette_split","goal":1,"points":20,"expires":"Günlük yenileme"},
+    {"id":"roulette_mix","category":"weekly","game":"roulette","title":"Masa Bilgisi","description":"Bir inside ve bir outside demo bahis kullan.","metric":"roulette_mix","goal":1,"points":35,"expires":"Haftalık yenileme"},
+    {"id":"blackjack_hands_3","category":"daily","game":"blackjack","title":"Üç El","description":"Blackjack Lounge'da 3 demo el başlat.","metric":"blackjack_hand","goal":3,"points":20,"expires":"Günlük yenileme"},
+    {"id":"blackjack_double","category":"mastery","game":"blackjack","title":"Double Down","description":"Geçerli bir Double hamlesi kullan.","metric":"blackjack_double","goal":1,"points":30,"expires":"Süre sınırı yok"},
+    {"id":"blackjack_split","category":"mastery","game":"blackjack","title":"Split Ustası","description":"Geçerli bir Split hamlesi kullan.","metric":"blackjack_split","goal":1,"points":35,"expires":"Süre sınırı yok"},
+    {"id":"casino_triple_visit","category":"event","game":"casino","title":"Üçlü Casino","description":"Üç ana casino oyununu aynı oturumda ziyaret et.","metric":"games_visited","goal":3,"points":40,"expires":"Etkinlik süresi"},
+    {"id":"casino_rules","category":"weekly","game":"casino","title":"Kuralları Bil","description":"Herhangi bir oyunun kurallarını aç.","metric":"rules_open","goal":1,"points":15,"expires":"Haftalık yenileme"},
+    {"id":"casino_session","category":"event","game":"casino","title":"Mola Bilinci","description":"Casino alanında 10 dakika geçir; 20 dakikada mola ver.","metric":"session_minutes","goal":10,"points":25,"expires":"Bu oturum"}
+  ],
+  "chains": [
+    {"id":"slot_chain","game":"slots","title":"Slot Yolculuğu","reward":{"points":45,"entitlement":"spin"},"steps":[{"title":"İlk Spin","event":"slot_spin"},{"title":"Beş Spin","metric":"slot_spin","goal":5},{"title":"Kazanan Payline","event":"slot_payline_win"}]},
+    {"id":"roulette_chain","game":"roulette","title":"Rulet Yolculuğu","reward":{"points":45,"entitlement":"bet"},"steps":[{"title":"İlk Bahis","event":"roulette_bet"},{"title":"Split Bahis","event":"roulette_split"},{"title":"Kazanan Sonuç","event":"roulette_win"}]},
+    {"id":"blackjack_chain","game":"blackjack","title":"Blackjack Yolculuğu","reward":{"points":45,"entitlement":"bet"},"steps":[{"title":"İlk El","event":"blackjack_hand"},{"title":"Double veya Split","events":["blackjack_double","blackjack_split"]},{"title":"Kazanan El","event":"blackjack_win"}]}
+  ]
+}

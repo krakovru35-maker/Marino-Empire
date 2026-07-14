@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <style>.base{fill:rgba(255,209,59,.1);stroke:#f2c75b;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}.cyan{stroke:#65dced}.locked{stroke:#68778a;fill:rgba(104,119,138,.08)}</style>
+  <symbol id="reward-coin" viewBox="0 0 24 24"><g class="base"><circle cx="12" cy="12" r="8"/><path d="M9 8.5h5a2 2 0 0 1 0 4H10a2 2 0 0 0 0 4h5M12 6v12"/></g></symbol>
+  <symbol id="reward-energy" viewBox="0 0 24 24"><path class="base" d="m13 2-7 11h6l-1 9 7-12h-6z"/></symbol>
+  <symbol id="reward-point" viewBox="0 0 24 24"><path class="base" d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></symbol>
+  <symbol id="reward-tap-boost" viewBox="0 0 24 24"><path class="base" d="M8 12V7a2 2 0 0 1 4 0v4-2a2 2 0 0 1 4 0v5c0 4-2.3 7-6.5 7-3 0-5-1.8-6-4.5L3 15a2 2 0 0 1 3.5-1.8L8 15"/></symbol>
+  <symbol id="reward-income" viewBox="0 0 24 24"><path class="base" d="M4 19V9m5 10v-6m5 6V8m5 11V4M2 21h20m-6-16 4-2 2 4"/></symbol>
+  <symbol id="reward-cosmetic" viewBox="0 0 24 24"><path class="base" d="m12 3 3 3 4 .5-.5 4 2 3.5-3.5 2-1.5 4-3.5-1.5L8.5 20 7 16l-3.5-2 2-3.5-.5-4L9 6l3-3Z"/></symbol>
+  <symbol id="reward-free-spin" viewBox="0 0 24 24"><g class="base cyan"><circle cx="12" cy="12" r="8"/><path d="M12 4v3m0 10v3M4 12h3m10 0h3"/></g></symbol>
+  <symbol id="reward-free-bet" viewBox="0 0 24 24"><g class="base cyan"><path d="M5 6h14v12H5zM8 10h8M8 14h5"/><circle cx="18" cy="18" r="3"/></g></symbol>
+  <symbol id="reward-streak" viewBox="0 0 24 24"><path class="base" d="M12 3c3 4 5 6 5 10a5 5 0 0 1-10 0c0-2 1-4 3-6 0 3 1 4 2 5 1-3 1-6 0-9Z"/></symbol>
+  <symbol id="reward-lock" viewBox="0 0 24 24"><g class="base locked"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></symbol>
+  <symbol id="reward-complete" viewBox="0 0 24 24"><g class="base cyan"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></g></symbol>
+</svg>

@@ -8,8 +8,39 @@
   <meta name="theme-color" content="#030b14">
   <title>Marino Empire</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="./__MARINO_RUNTIME_CONFIG_SCRIPT__"></script>
+  <script src="./runtime-config-loader.js"></script>
+  <script src="./js/local-preview.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="./styles/phase-1a.css" rel="stylesheet">
+  <link href="./styles/phase-1b.css" rel="stylesheet">
+  <link href="./styles/phase-2a.css" rel="stylesheet">
+  <link href="./styles/phase-2b.css" rel="stylesheet">
+  <link href="./styles/daily-rewards.css" rel="stylesheet">
+  <link href="./styles/daily-content-adapter.css" rel="stylesheet">
+  <link href="./styles/casino/game-shell.css" rel="stylesheet">
+  <link href="./styles/casino/slot.css" rel="stylesheet">
+  <link href="./styles/casino/roulette.css" rel="stylesheet">
+  <link href="./styles/casino/blackjack.css" rel="stylesheet">
+  <link href="./styles/casino/casino-progression.css" rel="stylesheet">
+  <script src="./js/phase-1a.js" defer></script>
+  <script src="./js/phase-1b.js" defer></script>
+  <script src="./js/phase-2a.js" defer></script>
+  <script src="./js/phase-2b.js" defer></script>
+  <script src="./js/audio-manager.js" defer></script>
+  <script src="./js/daily-rewards.js" defer></script>
+  <script src="./js/daily-content-adapter.js" defer></script>
+  <script src="./js/casino/demo-wallet.js" defer></script>
+  <script src="./js/casino/rng-adapter.js" defer></script>
+  <script src="./js/casino/game-shell.js" defer></script>
+  <script src="./js/casino/slot.js" defer></script>
+  <script src="./js/casino/roulette.js" defer></script>
+  <script src="./js/casino/blackjack.js" defer></script>
+  <script src="./js/casino/casino-missions.js" defer></script>
+  <script src="./js/casino/casino-mastery.js" defer></script>
+  <script src="./js/casino/casino-tournament.js" defer></script>
+  <script src="./js/casino/casino-lobby.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
    MARINO EMPIRE — HAMSTER COMBAT STYLE UI
@@ -1614,14 +1645,14 @@
 
 <body>
   <div id="introAnim" class="intro-overlay">
-    <video id="introVid" src="./assets/intro.mp4" muted playsinline autoplay
+    <video id="introVid" data-src="./assets/intro.mp4" preload="none" muted playsinline
       style="position:absolute; width:100%; height:100%; object-fit:cover; z-index:1"></video>
     <div class="intro-content">
       <div style="font-size: 14px; font-weight: 800; color: #ffd13b; letter-spacing: 2px; margin-bottom: 5px">PRESENTING
       </div>
       <h1 class="intro-title" style="font-size:36px">MARINO EMPIRE</h1>
       <div class="intro-bar">
-        <div class="intro-progress" style="animation-duration: 8s"></div>
+      <div class="intro-progress"></div>
       </div>
       <div id="skipIntro" onclick="finishIntro()"
         style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 900; background:rgba(255,255,255,0.1); padding:8px 20px; border-radius:99px; cursor:pointer; display:inline-block; border:1px solid rgba(255,255,255,0.1); z-index:10; position:relative">
@@ -1631,19 +1662,19 @@
 
   <div id="app">
 
-    <!-- HOME VIEW (Default Hamster Kombat Style Dashboard) -->
+    <!-- HOME VIEW (Phase 1A premium mobile composition) -->
     <div id="view-home" class="page" style="display: flex; flex-direction: column; height: 100%; flex: 1;">
       <!-- Header -->
       <header class="header">
-        <div class="profile-area" id="btnProfile" style="cursor:pointer" data-testid="profile-area">
+        <button type="button" class="profile-area" id="btnProfile" data-testid="profile-area" aria-label="Oyuncu profilini aç">
           <div class="avatar"><img src="./assets/illustrations/marino-avatar.png"
               onerror="this.onerror=null; this.src=''; this.parentElement.innerHTML='🧑'"></div>
           <div class="p-info">
             <span class="p-name" id="userName">Oyuncu</span>
             <span class="p-role" data-i18n="role_emperor">İmparator</span>
           </div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center">
+        </button>
+        <div class="header-actions">
           <div class="lang-toggle" data-testid="lang-toggle">
             <button id="langTR" class="active" data-lang="tr">TR</button>
             <button id="langEN" data-lang="en">EN</button>
@@ -1652,35 +1683,16 @@
         </div>
       </header>
 
-      <!-- Info Row -->
-      <div class="info-row" style="grid-template-columns: repeat(4, 1fr);">
-        <div class="card">
-          <div class="card-lbl">Güç</div>
-          <div class="card-val"><span id="valTap">1</span></div>
-        </div>
-        <div class="card">
-          <div class="card-lbl">Kasa</div>
-          <div class="card-val"><span id="valCap">8s</span></div>
-        </div>
-        <div class="card">
-          <div class="card-lbl">Saatlik</div>
-          <div class="card-val"><span id="valInc">0</span></div>
-        </div>
-        <div class="card">
-          <div class="card-lbl">Casino</div>
-          <div class="card-val"><img src="./assets/currency/chip_spade_black_gold.png" alt="Chip"> <span id="valChips">0</span></div>
-        </div>
-      </div>
-
       <!-- Balance -->
       <div class="balance-area">
+        <span class="balance-eyebrow">MARINO COIN</span>
         <div class="bal-coin"><img src="./assets/currency/marino-coin.png" alt="Coin" onerror="this.src=null;">
           <span id="valCoin">0</span>
         </div>
       </div>
 
       <!-- League Badge -->
-      <div style="display:flex; justify-content:center; margin-bottom:10px; position:relative; z-index:10">
+      <div class="league-wrap">
         <div onclick="openLeagues()" id="leagueBadge"
           style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.6); padding:8px 16px; border-radius:99px; border:1px solid #ffd13b; cursor:pointer; transition:0.2s; box-shadow:0 4px 15px rgba(0,0,0,0.5)">
           <span id="leagueIcon">🥉</span>
@@ -1690,34 +1702,34 @@
       </div>
 
       <!-- Rank / Level -->
-      <div class="rank-row">
-        <span class="rank-name">Seviye <span id="valLvl">1</span></span>
-        <span class="rank-lvl">XP <span id="valXp">0</span></span>
-      </div>
-      <div class="progress-bg">
-        <div class="progress-fill" id="valProg" style="width: 5%;"></div>
+      <div class="rank-shell">
+        <div class="rank-row">
+          <span class="rank-name">SEVİYE <strong id="valLvl">1</strong></span>
+          <span class="rank-lvl"><span id="valXp">0</span> XP</span>
+        </div>
+        <div class="progress-bg">
+          <div class="progress-fill" id="valProg" style="width: 5%;"></div>
+        </div>
       </div>
 
       <!-- Tap Area -->
       <div class="tap-container">
-        <!-- Daily Combo & Cipher floating pills -->
-        <div class="hk-floats">
-          <button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
-            <div class="hk-float-ico">🎴</div>
-            <div class="hk-float-meta">
-              <span class="lbl" data-i18n="daily_combo">Daily Combo</span>
-              <span class="val" id="comboReward">+5M</span>
-            </div>
-          </button>
-          <button class="hk-float-btn" id="btnDailyCipher" data-testid="daily-cipher-btn">
-            <div class="hk-float-ico">🔐</div>
-            <div class="hk-float-meta">
-              <span class="lbl" data-i18n="daily_cipher">Daily Cipher</span>
-              <span class="val" id="cipherReward">+1M</span>
-            </div>
-          </button>
+        <div class="casino-scene" aria-hidden="true">
+          <div class="scene-glow"></div>
+          <div class="empire-depth empire-depth-city"></div>
+          <div class="empire-neon-bank"><i></i><i></i><i></i></div>
+          <div class="empire-crowd"><i></i><i></i><i></i></div>
+          <div class="empire-slot-lights"><i></i><i></i><i></i><i></i></div>
+          <div class="empire-dust"><i></i><i></i><i></i><i></i></div>
+          <div class="scene-ambient scene-ambient-left"></div>
+          <div class="scene-ambient scene-ambient-right"></div>
+          <div class="scene-arch"></div>
+          <div class="scene-marino-sign">M</div>
+          <div class="scene-floor"></div>
+          <div class="scene-table"></div>
+          <div class="scene-reflection"></div>
         </div>
-
+        <output class="visual-combo" id="visualCombo" aria-live="polite"></output>
         <div class="tap-target">
           <button class="tap-btn" id="btnTap">
             <!-- Hamster Combat style big round character in middle -->
@@ -1730,22 +1742,63 @@
       <!-- Bottom Controls -->
       <div class="bottom-controls">
         <div class="energy-box">
-          ⚡ <span id="valEn">0 / 0</span>
+          <span id="valEn">0 / 0</span>
         </div>
         <!-- Right Boost button can open buildings/upgrades -->
         <button class="boost-btn" id="btnCollect" data-testid="collect-btn">
-          <span data-i18n="collect_vault">KASAYI TOPLA</span>
+          <span class="collect-glint" aria-hidden="true"></span>
+          <span class="collect-copy"><small>HAZIR GELİR</small><strong data-i18n="collect_vault">KASAYI TOPLA</strong></span>
         </button>
       </div>
 
-      <!-- Quick action pills -->
-      <div class="quick-bar">
+      <button class="upgrade-target" id="btnUpgradeTarget" type="button">
+        <span class="upgrade-target-kicker">SIRADAKİ HEDEF</span>
+        <span class="upgrade-target-title">İmparatorluğunu büyüt</span>
+        <span class="upgrade-target-sub">Yeni gelir kaynaklarını aç</span>
+        <span class="upgrade-target-arrow" aria-hidden="true"></span>
+      </button>
+
+      <div class="quick-bar home-quick-actions">
         <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
           <span class="ico">🚀</span><span data-i18n="boost">BOOST</span>
         </button>
         <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
           <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
         </button>
+      </div>
+      <button class="empire-hub-trigger" id="btnEmpireHub" type="button" aria-label="Empire Hub'ı aç">
+        <span>EMPIRE HUB</span><small>İstatistikler ve günlük şifreler</small><span aria-hidden="true">›</span>
+      </button>
+      <div class="empire-tier-transition" id="empireTierTransition" role="status" aria-live="polite" hidden>
+        <strong>İmparatorluğun büyüdü</strong><span id="empireTierName"></span>
+      </div>
+    </div>
+
+    <!-- EMPIRE HUB SHEET -->
+    <div id="sheetEmpireHub" class="sheet-overlay">
+      <div class="sheet empire-hub-sheet">
+        <div class="sheet-handle"></div>
+        <button class="sheet-close" data-close="sheetEmpireHub" aria-label="Empire Hub'ı kapat">✕</button>
+        <h3>Empire Hub</h3>
+        <div class="empire-hub-panel">
+          <div class="hk-floats empire-hub-actions">
+            <article class="content-hub-card"><button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
+              <div class="hk-float-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="10" height="14" rx="2"/><path d="m9 9 2 3-2 3-2-3 2-3Zm6-2 5 3v10H9"/></svg></div>
+              <div class="hk-float-meta"><span class="lbl" id="comboContentTitle">Daily Combo</span><span class="val" id="comboReward">—</span><small id="comboContentReset"></small></div>
+            </button><span class="content-status" id="comboContentStatus">Yükleniyor</span><button type="button" class="content-claim" data-content-claim="daily_combo" hidden>CLAIM</button></article>
+            <article class="content-hub-card"><button class="hk-float-btn" id="btnDailyCipher" data-testid="daily-cipher-btn">
+              <div class="hk-float-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg></div>
+              <div class="hk-float-meta"><span class="lbl" id="cipherContentTitle">Daily Cipher</span><span class="val" id="cipherReward">—</span><small id="cipherContentReset"></small></div>
+            </button><span class="content-status" id="cipherContentStatus">Yükleniyor</span><button type="button" class="content-claim" data-content-claim="daily_cipher" hidden>CLAIM</button></article>
+            <button type="button" id="contentAdapterRetry" class="content-adapter-retry" hidden>İçeriği tekrar yükle</button>
+          </div>
+          <div class="info-row empire-hub-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="card"><div class="card-lbl">Güç</div><div class="card-val"><span id="valTap">1</span></div></div>
+            <div class="card"><div class="card-lbl">Kasa</div><div class="card-val"><span id="valCap">8s</span></div></div>
+            <div class="card"><div class="card-lbl">Saatlik</div><div class="card-val"><span id="valInc">0</span></div></div>
+            <div class="card"><div class="card-lbl">Casino</div><div class="card-val"><img src="./assets/currency/chip_spade_black_gold.png" alt=""><span id="valChips">0</span></div></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1921,18 +1974,22 @@
       </div>
     </div>
 
-    <!-- DAILY LOGIN FS OVERLAY -->
-    <div id="fsDaily" class="fs-overlay" style="z-index:250; background:rgba(4,15,28,0.98)">
-      <div class="fs-header">
-        <h2 style="margin:0; font-size:26px; font-weight:900" class="gold-text">Günlük Ödül</h2>
-        <p style="color:var(--text-muted); font-size:14px; margin-top:8px">Her gün oyuna girerek ödül havuzunu katla.
-        </p>
-      </div>
-      <div class="fs-body" style="align-items:start; padding:0 20px">
-        <div class="cal-grid" id="calGrid" style="width:100%"></div>
-        <button class="action-btn gold" id="btnClaimDaily"
-          style="width:100%;height:54px;font-size:18px;margin-top:20px">Al</button>
-      </div>
+    <!-- DAILY REWARD SHEET -->
+    <div id="fsDaily" class="sheet-overlay daily-reward-overlay" role="dialog" aria-modal="true" aria-labelledby="dailyRewardTitle">
+      <section class="daily-reward-sheet">
+        <header class="daily-reward-header">
+          <div><span>MARINO EMPIRE</span><h2 id="dailyRewardTitle">Günlük Ödül</h2></div>
+          <button type="button" id="closeDaily" class="daily-reward-close" aria-label="Günlük Ödülü kapat">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </header>
+        <div class="daily-reward-body">
+          <p class="daily-reward-intro">Her gün casino imparatorluğuna dön; koşulları açık, kontrollü ödülleri takip et.</p>
+          <div class="cal-grid daily-reward-grid" id="calGrid"></div>
+          <button type="button" class="daily-claim-anchor" id="btnClaimDaily">AL</button>
+          <p class="daily-reward-authority">Kalıcı ödüller yalnız sunucu sonucu ile verilir. Sanal Free Spin ve Free Bet nakit değeri taşımaz.</p>
+        </div>
+      </section>
     </div>
 
     <!-- MINI GAME FULLSCREEN OVERLAY -->
@@ -1951,7 +2008,7 @@
       <div class="sheet">
         <div class="sheet-handle"></div>
         <button class="sheet-close" data-close="sheetCombo">✕</button>
-        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_combo_title">🎴 Daily Combo</h3>
+        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_combo_title">Daily Combo</h3>
         <p style="margin:0 0 14px; text-align:center; color:var(--text-muted); font-size:12px" data-i18n="daily_combo_desc">
           Doğru 3 kartı bul, <b style="color:#ffd13b">+5.000.000 Coin</b> kazan. Günde 6 deneme.
         </p>
@@ -1972,7 +2029,7 @@
       <div class="sheet">
         <div class="sheet-handle"></div>
         <button class="sheet-close" data-close="sheetCipher">✕</button>
-        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_cipher_title">🔐 Daily Cipher</h3>
+        <h3 style="margin:0 0 6px; font-size:20px; text-align:center" data-i18n="daily_cipher_title">Daily Cipher</h3>
         <p style="margin:0 0 14px; text-align:center; color:var(--text-muted); font-size:12px" data-i18n="daily_cipher_desc">
           Mors kodunu çöz, <b style="color:#ffd13b">+1.000.000 Coin</b> kazan.
         </p>
@@ -2021,25 +2078,42 @@
     </div>
 
     <div id="toast" class="toast"></div>
+    <div id="onboardingOverlay" class="onboarding-overlay" hidden aria-live="polite">
+      <div class="onboarding-shade"></div>
+      <section class="onboarding-card" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+        <span class="onboarding-step" id="onboardingStep">1 / 3</span>
+        <h2 id="onboardingTitle">Marino'ya dokun</h2>
+        <p id="onboardingText">İmparatorluğunun enerjisini uyandırmak için Marino'ya bir kez dokun.</p>
+        <button type="button" id="onboardingSkip" class="onboarding-skip">Turu atla</button>
+      </section>
+    </div>
     <!-- Background Music -->
-    <audio id="bgMusic" src="./assets/audio/fon.mp3" loop preload="auto"></audio>
+    <audio id="bgMusic" src="./assets/audio/fon.mp3" loop preload="none"></audio>
   </div>
 
   <script>
     /* ── Engine / Config ── */
-    const SUPABASE_URL = 'https://vxfjprvahjtfhvtuvsoy.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_SBHJItuINBdgrtXXFYZ2GQ_eVbag3KU';
-    const db = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const runtimeConfigResult = window.MarinoRuntimeConfig?.read(window.MARINO_CONFIG);
+    const runtimeConfig = runtimeConfigResult?.ok ? runtimeConfigResult.config : null;
+    let db = null;
+    if (runtimeConfig && window.supabase?.createClient) {
+      db = window.supabase.createClient(
+        runtimeConfig.supabaseUrl,
+        runtimeConfig.supabasePublishableKey,
+        { auth: { persistSession: false, autoRefreshToken: true, detectSessionInUrl: false } }
+      );
+    }
 
     const tg = window.Telegram?.WebApp;
-    const isTest = new URLSearchParams(location.search).has('testmode');
+    const isLocalPreview = window.MarinoLocalPreview.detect(location, tg);
 
     const q = s => document.querySelector(s);
     const fmt = n => new Intl.NumberFormat('en-US').format(Number(n || 0));
-    const uid = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+    const uid = () => crypto.randomUUID();
 
     let S = {
-      user: null, game: null, busy: false, rankTab: 'global',
+      user: null, game: null, busy: false, authenticated: false, authBlockedReason: null,
+      sessionExpiresAt: 0, startParam: '', rankTab: 'global',
       settings: JSON.parse(localStorage.getItem('m_set') || '{"sfx":true,"mus":true}')
     };
 
@@ -2084,10 +2158,20 @@
     `).join('');
     }
 
+    let introFinished = false;
+    let introFinishTimer = null;
     function finishIntro() {
+      if (introFinished) return;
       const intro = q('#introAnim');
       if (!intro) return;
+      introFinished = true;
+      if (introFinishTimer) {
+        clearTimeout(introFinishTimer);
+        introFinishTimer = null;
+      }
+      try { localStorage.setItem('marino_intro_seen_v1', '1'); } catch (e) { }
       intro.style.opacity = '0';
+      intro.style.pointerEvents = 'none';
       setTimeout(() => intro.remove(), 1000);
     }
 
@@ -2125,22 +2209,135 @@
         o.connect(g); g.connect(this.ctx.destination);
         o.start(); g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + d); o.stop(this.ctx.currentTime + d + 0.1);
       },
-      tap() { this.play(800, 0.05); }, click() { this.play(500, 0.05, 'triangle'); },
+      tap() { if (!window.MarinoPhase1B) this.play(800, 0.05); }, click() { this.play(500, 0.05, 'triangle'); },
       win() { this.play(600, 0.1, 'triangle'); setTimeout(() => this.play(900, 0.15, 'triangle'), 100); },
       fail() { this.play(200, 0.2, 'sawtooth'); }
     };
 
+    window.MarinoPhase2BBridge = Object.freeze({
+      isPreview: () => isLocalPreview,
+      snapshot: () => S.game?.state ? {
+        level: Number(S.game.state.lvl || 1), coin: Number(S.game.state.coin || 0),
+        energy: Number(S.game.state.en || 0), maxEnergy: Number(S.game.state.maxEn || 0),
+        hourlyIncome: Number(S.game.state.inc || 0), upgrades: (S.game.upgrades || []).map(item => ({ ...item })),
+        completedTasks: [...(S.game.completed_tasks || [])], streak: Number(S.game.daily_login?.current_streak || 0)
+      } : null,
+      upgradeBuilding: async (buildingKey, previewCost = 0, previewIncome = 0) => {
+        if (!isLocalPreview) return doAction('upgrade_building', { p_building_key: buildingKey });
+        if (!S.game?.state || Number(S.game.state.coin) < Number(previewCost)) return { ok: false, reason: 'insufficient' };
+        S.game.state.coin -= Number(previewCost);
+        S.game.state.inc += Number(previewIncome);
+        renderTop();
+        return { ok: true, state: window.MarinoPhase2BBridge.snapshot() };
+      },
+      regeneratePreviewEnergy: () => {
+        if (!isLocalPreview || !S.game?.state || S.game.state.en >= S.game.state.maxEn) return false;
+        S.game.state.en = Math.min(S.game.state.maxEn, S.game.state.en + 1);
+        renderTop();
+        return true;
+      }
+    });
+
+    let uiEventsBound = false;
+    function bindUiEvents() {
+      if (uiEventsBound) return;
+      uiEventsBound = true;
+      document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { au.click(); showTab(b.dataset.tab); });
+      document.querySelectorAll('.sheet-close').forEach(b => b.onclick = () => { au.click(); q('#' + b.dataset.close).classList.remove('show'); });
+      document.querySelectorAll('.sheet-overlay').forEach(overlay => overlay.addEventListener('pointerdown', e => {
+        if (e.target === overlay) overlay.classList.remove('show');
+      }));
+      q('#btnSettings').onclick = () => { au.click(); q('#sheetSettings').classList.add('show'); };
+      q('#btnProfile').onclick = () => { au.click(); renderProfile(); q('#sheetProfile').classList.add('show'); };
+      q('#btnEmpireHub').onclick = () => { au.click(); q('#sheetEmpireHub').classList.add('show'); };
+      q('#btnPrestige').onclick = handlePrestige;
+      q('#closeMini').onclick = () => {
+        au.click(); q('#fsMini').classList.remove('show');
+        if (typeof sportsInterval !== 'undefined' && sportsInterval) clearInterval(sportsInterval);
+        if (window.rouletteInterval) clearInterval(window.rouletteInterval);
+      };
+      q('#btnClaimDaily').onclick = claimDaily;
+      const applySet = () => {
+        q('#swSfx').classList.toggle('on', S.settings.sfx);
+        q('#swMus').classList.toggle('on', S.settings.mus);
+        const bg = q('#bgMusic');
+        if (!S.settings.mus) bg.pause();
+        window.MarinoAudio?.setMusicEnabled?.(S.settings.mus);
+      };
+      applySet();
+      q('#swSfx').onclick = () => { S.settings.sfx = !S.settings.sfx; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
+      q('#swMus').onclick = () => { S.settings.mus = !S.settings.mus; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
+      document.addEventListener('focusout', e => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') setTimeout(() => {
+          window.scrollTo(0, 0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0;
+          document.querySelectorAll('.fs-body').forEach(el => el.scrollTop = 0);
+          if (window.Telegram?.WebApp) window.Telegram.WebApp.expand();
+        }, 50);
+      });
+      q('#btnTap').onpointerdown = e => {
+        if (S.settings.sfx) au.setup();
+        (window.MarinoPhase1B?.tapFeedback || window.MarinoPhase1A?.tapFeedback)?.(e);
+        handleTap(e);
+      };
+      q('#btnCollect').onclick = handleCollect;
+    }
+
+    function startLocalPreview() {
+      S.user = { id: 'local-preview', name: 'Local Marino', user: 'preview' };
+      S.game = {
+        state: { coin: 125000, chips: 750, token: 25, en: 480, maxEn: 500, tap: 12, inc: 2400, lvl: 8, xp: 2750, pres: 0, cap: 8 },
+        upgrades: [{ building_key: 'casino_lobby', building_name: 'Casino Lobisi', unlock_level: 1, level: 3, current_income_per_hour: 2400, next_cost_coin: 15000 }],
+        store: [], reward_status: { weekly_used: 0, daily_used: 0 },
+        daily_login: { current_streak: 3, mini_games_played: 0, can_claim_today: true },
+        completed_tasks: ['soc_tg', 'soc_tw', 'daily_tap', 'daily_collect', 'daily_mini']
+      };
+      const badge = document.createElement('div');
+      badge.id = 'localPreviewBadge'; badge.className = 'local-preview-badge'; badge.textContent = 'LOCAL UI PREVIEW';
+      q('#app').appendChild(badge);
+      bindUiEvents(); renderAll(); renderPreviewRank(); finishIntro();
+    }
+
     /* ── Bootstrap ── */
     async function init() {
+      if (isLocalPreview) {
+        startLocalPreview();
+        return;
+      }
       // Video Intro Logic
       const v = q('#introVid');
-      if (v) {
-        v.onended = () => finishIntro();
-        // Fallback if video fails
-        setTimeout(() => finishIntro(), 9000);
+      let introSeen = false;
+      try { introSeen = localStorage.getItem('marino_intro_seen_v1') === '1'; } catch (e) { }
+      if (introSeen) {
+        q('#introAnim')?.remove();
+        introFinished = true;
+      } else if (v) {
+        const videoSrc = v.dataset.src;
+        if (videoSrc) {
+          v.src = videoSrc;
+          v.load();
+          const playAttempt = v.play();
+          if (playAttempt?.catch) playAttempt.catch(() => { });
+        }
+        v.onended = finishIntro;
+        // Phase 1A: shared CSS duration keeps progress and dismissal synchronized.
+        const introDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--intro-duration')) || 4.5;
+        introFinishTimer = setTimeout(finishIntro, introDuration * 1000);
+      }
+
+      if (!runtimeConfig || !db) {
+        S.authBlockedReason = runtimeConfigResult?.error || 'runtime_config_unavailable';
+        S.user = { id: null, name: 'Yapılandırma hatası', user: '' };
+        toast('Güvenli ortam yapılandırması doğrulanamadı. Oyun başlatılmadı.');
+        finishIntro();
+        return;
+      }
+
+      if (runtimeConfig.targetEnvironment === 'staging') {
+        window.MarinoRuntimeConfig.showStagingDiagnostic(runtimeConfig);
       }
 
       try { tg?.ready(); tg?.expand(); tg?.disableVerticalSwipes?.(); } catch (e) { }
+      setupAuthStateListener();
       
       // Telegram Dinamik Boyut Sabitleyici (Tüm Cihazlar İçin)
     if (window.Telegram?.WebApp) {
@@ -2151,76 +2348,115 @@
       setTgHeight();
     }
       
-      S.user = tg?.initDataUnsafe?.user ? { id: tg.initDataUnsafe.user.id, name: tg.initDataUnsafe.user.first_name, user: tg.initDataUnsafe.user.username } :
-        (isTest ? { id: '999123', name: 'Test User', user: 'tester' } : { id: '0000', name: 'Misafir', user: '' });
+      if (!await authenticateTelegram()) {
+        S.user = { id: null, name: 'Kimlik doğrulanamadı', user: '' };
+        toast('Güvenli Telegram oturumu kurulamadı. Lütfen oyunu Telegram içinden yeniden açın.');
+        finishIntro();
+        return;
+      }
 
-      // Bind UI
-      document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { au.click(); showTab(b.dataset.tab); });
-      document.querySelectorAll('.sheet-close').forEach(b => b.onclick = () => { au.click(); q('#' + b.dataset.close).classList.remove('show'); });
-
-      q('#btnSettings').onclick = () => { au.click(); q('#sheetSettings').classList.add('show'); };
-      q('#btnProfile').onclick = () => { au.click(); renderProfile(); q('#sheetProfile').classList.add('show'); };
-      q('#btnPrestige').onclick = handlePrestige;
-      q('#closeMini').onclick = () => {
-        au.click();
-        q('#fsMini').classList.remove('show');
-        if (typeof sportsInterval !== 'undefined' && sportsInterval) clearInterval(sportsInterval);
-        if (window.rouletteInterval) clearInterval(window.rouletteInterval);
-      };
-      q('#btnClaimDaily').onclick = claimDaily;
-
-      // Settings
-      const applySet = () => {
-        q('#swSfx').classList.toggle('on', S.settings.sfx);
-        q('#swMus').classList.toggle('on', S.settings.mus);
-        const bg = q('#bgMusic');
-        if (S.settings.mus) {
-          bg.play().catch(e => {
-            // Browser autplay blocked, bind to next click
-            document.body.addEventListener('click', () => { if (S.settings.mus) bg.play(); }, { once: true });
-          });
-        } else {
-          bg.pause();
-        }
-      };
-      applySet();
-
-      q('#swSfx').onclick = () => { S.settings.sfx = !S.settings.sfx; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
-      q('#swMus').onclick = () => { S.settings.mus = !S.settings.mus; localStorage.setItem('m_set', JSON.stringify(S.settings)); applySet(); au.click(); };
-
-      // Keyboard scroll bug fix for Telegram Mobile
-      document.addEventListener('focusout', (e) => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
-          setTimeout(() => {
-            window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
-            document.querySelectorAll('.fs-body').forEach(el => el.scrollTop = 0);
-            if (window.Telegram?.WebApp) window.Telegram.WebApp.expand();
-          }, 50);
-        }
-      });
-
-      // Actions
-      q('#btnTap').onpointerdown = e => { au.setup(); handleTap(e); };
-      q('#btnCollect').onclick = handleCollect;
+      bindUiEvents();
 
       // Initial load
       await fetchGame();
+      window.MarinoPhase1B?.maybeStartOnboarding();
 
       // Energy Regen Loop (1 per min)
-      setInterval(() => {
-        if (S.game?.state && S.game.state.energy < S.game.state.max_energy) {
-          S.game.state.energy++; renderTop();
-        }
-      }, 60000);
     }
 
     /* ── API & Data ── */
+    async function authenticateTelegram() {
+      if (!db || !tg?.initData) return false;
+      const { data, error } = await db.functions.invoke('telegram-auth', {
+        body: { initData: tg.initData }
+      });
+      if (error || !data?.access_token || !data?.refresh_token || !data?.user?.id) {
+        console.error('Telegram authentication failed');
+        return false;
+      }
+      const { data: sessionData, error: sessionError } = await db.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token
+      });
+      if (sessionError || !sessionData?.session) return false;
+      scheduleSessionRefresh(sessionData.session);
+      S.user = {
+        id: String(data.user.id),
+        name: data.user.first_name || 'Oyuncu',
+        user: data.user.username || ''
+      };
+      S.startParam = typeof data.start_param === 'string' ? data.start_param : '';
+      S.authenticated = true;
+      S.authBlockedReason = null;
+      return true;
+    }
+
+    let authRefreshTimer = null;
+    function lockEconomicRpc(reason = 'session_refresh_failed') {
+      S.authenticated = false;
+      S.authBlockedReason = reason;
+      S.sessionExpiresAt = 0;
+      inFlightActions.clear();
+      if (authRefreshTimer) clearTimeout(authRefreshTimer);
+      authRefreshTimer = null;
+      toast('Oturum yenilenemedi. Lütfen oyunu Telegram üzerinden yeniden açın.');
+    }
+
+    function scheduleSessionRefresh(session) {
+      if (authRefreshTimer) clearTimeout(authRefreshTimer);
+      const expiresAtMs = Number(session?.expires_at || 0) * 1000;
+      S.sessionExpiresAt = expiresAtMs;
+      if (!expiresAtMs) return lockEconomicRpc('missing_session_expiry');
+      const delay = Math.max(1000, expiresAtMs - Date.now() - 60000);
+      authRefreshTimer = setTimeout(async () => {
+        const { data, error } = await db.auth.refreshSession();
+        if (error || !data?.session) lockEconomicRpc('session_refresh_failed');
+      }, delay);
+    }
+
+    function setupAuthStateListener() {
+      db?.auth.onAuthStateChange((event, session) => {
+        if (event === 'TOKEN_REFRESHED') {
+          if (!session) return lockEconomicRpc('token_refresh_missing_session');
+          S.authenticated = true;
+          S.authBlockedReason = null;
+          scheduleSessionRefresh(session);
+        } else if (event === 'SIGNED_IN' && session) {
+          scheduleSessionRefresh(session);
+        } else if (event === 'SIGNED_OUT') {
+          lockEconomicRpc('signed_out');
+        }
+      });
+    }
+
+    const READ_ONLY_ACTIONS = new Set([
+      'marino_get_leaderboard', 'marino_get_referrals', 'marino_get_live_matches',
+      'marino_get_my_notifications', 'marino_hk_state'
+    ]);
+    const inFlightActions = new Set();
     async function rpc(name, p) {
-      const { data, error } = await db.rpc(name, p);
-      if (error) throw error;
-      return data;
+      if (isLocalPreview) throw new Error('local_preview_rpc_blocked');
+      if (!S.authenticated || S.authBlockedReason) throw new Error('authentication_required');
+      const payload = { ...(p || {}) };
+      delete payload.p_telegram_id;
+      delete payload.telegram_id;
+      delete payload.p_admin_id;
+      const suppliedRequestId = payload.p_request_id;
+      delete payload.p_request_id;
+      const isReadOnly = READ_ONLY_ACTIONS.has(name);
+      if (!isReadOnly && inFlightActions.has(name)) throw new Error('operation_in_progress');
+      if (!isReadOnly) inFlightActions.add(name);
+      try {
+        const { data, error } = await db.rpc('marino_secure_rpc', {
+          p_action: name,
+          p_payload: payload,
+          p_request_id: isReadOnly ? null : (suppliedRequestId || uid())
+        });
+        if (error) throw error;
+        return data;
+      } finally {
+        if (!isReadOnly) inFlightActions.delete(name);
+      }
     }
 
     function processState(d) {
@@ -2244,7 +2480,7 @@
 
     async function fetchGame() {
       try {
-        const sp = tg && tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
+        const sp = S.startParam;
         const refBy = (sp && sp.startsWith('ref_')) ? sp.replace('ref_', '') : '';
 
         const res = await rpc('start_game', {
@@ -2285,9 +2521,8 @@
       const s = S.game.state;
       if (s.en <= 0) { toast('Enerji bitti!'); au.fail(); return; }
 
-      // Optimistic UI updates
-      s.coin += s.tap; s.en -= 1;
-      renderTop(); au.tap();
+      // Economic state changes only after the authenticated server acknowledges them.
+      au.tap();
 
       // Float Animation
       const btn = q('#btnTap');
@@ -2299,23 +2534,42 @@
       flt.style.left = x + 'px'; flt.style.top = y + 'px';
       btn.appendChild(flt); setTimeout(() => flt.remove(), 800);
 
+      if (isLocalPreview) {
+        s.coin += s.tap;
+        s.en = Math.max(0, s.en - 1);
+        renderTop();
+        return;
+      }
+
       // Buffer and sync (simplified for stability, sending 1 hit)
       try {
-        const d = await rpc('tap_coin', { p_telegram_id: String(S.user.id), p_taps: 1 });
-        // Don't fully overwrite state continuously to avoid flicker, just sync if needed
-      } catch (err) { /* silent fail on tap */ }
+        const d = await rpc('tap_coin', { p_taps: 1 });
+        if (d?.state) processState(d);
+        renderTop();
+      } catch (err) { toast('İşlem sunucu tarafından onaylanmadı.'); }
     }
 
     async function handleCollect() {
+      if (isLocalPreview) {
+        const collected = Math.max(100, Math.round(S.game.state.inc / 6));
+        const previousCoin = Number(S.game.state.coin || 0);
+        S.game.state.coin += collected;
+        toast('Yerel kasa toplandı! +' + fmt(collected)); renderTop();
+        window.MarinoPhase2A?.collectSuccess?.({ from: previousCoin, to: Number(S.game.state.coin), amount: collected });
+        return;
+      }
       if (S.busy) return; S.busy = true; au.click();
       try {
+        const previousCoin = Number(S.game.state.coin || 0);
         const d = await rpc('collect_income', { p_telegram_id: String(S.user.id), p_request_id: uid() });
         processState(d); toast('Kasa toplandı! +' + fmt(d.collected)); au.win(); renderAll();
+        window.MarinoPhase2A?.collectSuccess?.({ from: previousCoin, to: Number(S.game.state.coin), amount: Number(d.collected || 0) });
       } catch (e) { toast(e.message); au.fail(); }
       finally { S.busy = false; }
     }
 
     async function doAction(cmd, p) {
+      if (isLocalPreview) { toast('Yerel önizleme: ' + cmd); return; }
       if (S.busy) return; S.busy = true; au.click();
       try {
         p.p_telegram_id = String(S.user.id);
@@ -2329,7 +2583,12 @@
     }
 
     /* ── UI Rendering ── */
-    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); renderRank(); }
+    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); if (!isLocalPreview) renderRank(); window.MarinoPhase2B?.sync?.(window.MarinoPhase2BBridge.snapshot()); }
+
+    function renderPreviewRank() {
+      q('#listRank').innerHTML = '<div class="sec-title">Yerel Önizleme Sıralaması</div><div class="item-row"><div class="item-ico">1</div><div class="item-info"><div class="item-title">Local Marino</div><div class="item-sub">Sv. 8 • XP: 2,750</div></div></div>';
+      q('#listRef').innerHTML = '<div class="alert-box green">Yerel önizlemede davet ve sıralama verisi ağdan yüklenmez.</div>';
+    }
 
     function renderTop() {
       if (!S.game) return; const s = S.game.state;
@@ -2350,6 +2609,7 @@
       q('#leagueName').textContent = lg.name.toUpperCase() + ' LİGİ';
       q('#leagueName').style.color = lg.color;
       q('#leagueBadge').style.borderColor = lg.color;
+      window.MarinoPhase2A?.syncScene?.({ level: Number(s.lvl || 0) });
     }
 
     function renderBuildings() {
@@ -2457,6 +2717,7 @@
     }
 
     async function renderRank() {
+      if (isLocalPreview) { renderPreviewRank(); return; }
       const scope = S.rankTab || 'global';
       const lg = getLeague(S.game.state.lvl);
       const title = scope === 'global' ? 'Küresel Sıralama' : `${lg.name} Ligi Sıralaması`;
@@ -2485,6 +2746,7 @@
     }
 
     async function renderReferrals() {
+      if (isLocalPreview) { renderPreviewRank(); return; }
       const link = `t.me/MarinoEmpireBot?startapp=ref_${S.user.id}`;
       let html = `<div style="text-align:center; margin-bottom:15px">
     <p style="color:var(--text-muted);font-size:13px">Sahte davetleri engellemek için kurallar değişti!<br>Davet ettiğin arkadaşın <b>5. Seviyeye</b> ulaşınca <b>50.000 Coin ve 5 Bilet</b> kazanırsın.</p>
@@ -2709,28 +2971,25 @@
     function addRouletteBet(key) {
       if (S.busy) return;
       const current = window.rouletteBets[key] || 0;
+      const pendingTotal = Object.values(window.rouletteBets).reduce((a, b) => a + b, 0);
       // Optmistic check
-      if (S.game.state.chips < window.selChip) {
+      if (S.game.state.chips - pendingTotal < window.selChip) {
         toast("Yetersiz Çip! Vezneden alabilirsin.");
         return;
       }
       window.rouletteBets[key] = current + window.selChip;
-      S.game.state.chips -= window.selChip; // Deduct immediately for UI feedback
 
       // Visual update
       const container = q('#bet-' + key);
       if (container) {
         container.innerHTML = `<div class="chip-marker">${window.rouletteBets[key]}</div>`;
       }
-      if (q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips);
+      if (q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips - pendingTotal - window.selChip);
       au.tap();
     }
 
     function clearRBets() {
       if (S.busy) return;
-      // Refund locally
-      const total = Object.values(window.rouletteBets).reduce((a, b) => a + b, 0);
-      S.game.state.chips += total;
       window.rouletteBets = {};
       document.querySelectorAll('[id^="bet-"]').forEach(el => el.innerHTML = '');
       if (q('#chipsInMini')) q('#chipsInMini').textContent = fmt(S.game.state.chips);
@@ -3115,15 +3374,6 @@
 
         let activeMl = ml ? ml.filter(m => !m.is_finished) : [];
 
-        // AUTO-GENERATE MATCHES IF EMPTY (Autonomous Engine)
-        if (activeMl.length === 0) {
-          try {
-            await rpc('marino_generate_matches', { p_match_count: 15 });
-            ml = await rpc('marino_get_live_matches', {});
-            activeMl = ml ? ml.filter(m => !m.is_finished) : [];
-          } catch (e) { console.error("Auto-generate failed", e); }
-        }
-
         if (activeMl.length === 0) {
           b.innerHTML = '<div class="alert-box" style="margin-top:20px">Şu an aktif canlı maç bulunmuyor. Yeni bülten yakında açılacak.</div>';
           return;
@@ -3310,6 +3560,7 @@
 
     /* ── Notification System ── */
     async function checkNotifications() {
+      if (isLocalPreview) return;
       if (!S.user || !S.game) return;
       try {
         const n = await rpc('marino_get_my_notifications', { p_telegram_id: String(S.user.id) });
@@ -3349,27 +3600,30 @@
     }
 
     function openDaily() {
-      au.click(); q('#fsDaily').classList.add('show');
-
-      let strk = S.game.daily_login?.current_streak || 0;
-      let html = '';
-      // Show 8 days logic
-      for (let i = 1; i <= 8; i++) {
-        const val = i <= 7 ? i * 500 : 5000;
-        const claimed = i <= strk;
-        const active = i === strk + 1;
-        html += `<div class="cal-day ${claimed ? 'claimed' : ''} ${active ? 'active' : ''}"><div class="cal-day-num">Gün ${i}</div><div class="cal-day-val"><img src="./assets/currency/marino-coin.png">${fmt(val)}</div></div>`;
-      }
-      q('#calGrid').innerHTML = html;
+      au.click();
+      window.MarinoDailyRewards?.open?.({
+        streak: Number(S.game?.daily_login?.current_streak || 0),
+        canClaim: Boolean(S.game?.daily_login?.can_claim_today),
+        preview: isLocalPreview
+      });
     }
 
     async function claimDaily() {
       if (S.busy) return; S.busy = true; q('#btnClaimDaily').disabled = true; au.click();
+      if (isLocalPreview) {
+        S.game.daily_login.current_streak = Math.min(7, Number(S.game.daily_login.current_streak || 0) + 1);
+        S.game.daily_login.can_claim_today = false;
+        window.MarinoDailyRewards?.claimSuccess?.({ streak: S.game.daily_login.current_streak, preview: true });
+        toast('Demo günlük ödül alındı!');
+        S.busy = false;
+        return;
+      }
       try {
         const d = await rpc('marino_claim_daily_login', { p_telegram_id: String(S.user.id), p_request_id: uid() });
         processState(d); toast('Günlük ödül alındı!'); au.win(); renderTop();
-        setTimeout(() => { q('#fsDaily').classList.remove('show'); q('#btnClaimDaily').disabled = false; S.busy = false; }, 1000);
-      } catch (e) { toast(e.message); au.fail(); q('#btnClaimDaily').disabled = false; S.busy = false; }
+        window.MarinoDailyRewards?.claimSuccess?.({ streak: Number(S.game?.daily_login?.current_streak || 0) });
+        q('#btnClaimDaily').disabled = false; S.busy = false;
+      } catch (e) { toast(e.message); au.fail(); window.MarinoDailyRewards?.claimFailure?.(); q('#btnClaimDaily').disabled = false; S.busy = false; }
     }
 
     /* ════════════════════════════════════════════════════
@@ -3382,10 +3636,10 @@
         role_emperor: 'İmparator', collect_vault: 'KASAYI TOPLA',
         daily_combo: 'Daily Combo', daily_cipher: 'Daily Cipher',
         boost: 'BOOST', airdrop: 'AIRDROP',
-        daily_combo_title: '🎴 Günlük Kombo',
-        daily_combo_desc_html: 'Doğru 3 kartı bul, <b style="color:#ffd13b">+5.000.000 Coin</b> kazan. Günde 6 deneme.',
-        daily_cipher_title: '🔐 Günlük Şifre',
-        daily_cipher_desc_html: 'Mors kodunu çöz, <b style="color:#ffd13b">+1.000.000 Coin</b> kazan.',
+        daily_combo_title: 'Günlük Kombo',
+        daily_combo_desc_html: 'Üç kartı seç; doğru sıra ve sanal ödül sunucu tarafından doğrulanır.',
+        daily_cipher_title: 'Günlük Şifre',
+        daily_cipher_desc_html: 'Mors kodunu çöz; cevap ve sanal ödül sunucu tarafından doğrulanır.',
         boost_title: '🚀 Boost Merkezi',
         boost_desc: 'Güçlendir, daha fazla coin kazan. Bazı boostlar günlük yenilenir.',
         airdrop_sub: 'İmparatorluğunu büyüt, listeleme günü token\'larını topla.',
@@ -3419,10 +3673,10 @@
         role_emperor: 'Emperor', collect_vault: 'COLLECT VAULT',
         daily_combo: 'Daily Combo', daily_cipher: 'Daily Cipher',
         boost: 'BOOST', airdrop: 'AIRDROP',
-        daily_combo_title: '🎴 Daily Combo',
-        daily_combo_desc_html: 'Find the 3 right cards, win <b style="color:#ffd13b">+5,000,000 Coin</b>. 6 tries per day.',
-        daily_cipher_title: '🔐 Daily Cipher',
-        daily_cipher_desc_html: 'Decode the Morse code, win <b style="color:#ffd13b">+1,000,000 Coin</b>.',
+        daily_combo_title: 'Daily Combo',
+        daily_combo_desc_html: 'Select three cards; the order and virtual reward are verified by the server.',
+        daily_cipher_title: 'Daily Cipher',
+        daily_cipher_desc_html: 'Decode the Morse message; the answer and virtual reward are verified by the server.',
         boost_title: '🚀 Boost Center',
         boost_desc: 'Power up, earn more. Some boosts refresh daily.',
         airdrop_sub: 'Grow your empire, claim tokens on listing day.',
@@ -3496,73 +3750,28 @@
     // S.hk holds the latest server state for HK features
     S.hk = null;
     async function hkRpc(name, args) {
+      if (isLocalPreview) return { _failed: true, preview: true };
       try {
-        if (typeof db === 'undefined' || !db || typeof db.rpc !== 'function') return { _offline: true };
-        const { data, error } = await db.rpc(name, args);
-        if (error) { console.warn('hkRpc err', name, error.message); return { _offline: true, _err: error.message }; }
-        return data;
-      } catch (e) { console.warn('hkRpc throw', name, e); return { _offline: true, _err: String(e) }; }
+        return await rpc(name, args);
+      } catch (e) {
+        console.warn('hkRpc rejected', name, e?.message || 'request_failed');
+        return { _failed: true };
+      }
     }
     async function hkRefreshState() {
+      if (isLocalPreview) return;
       if (!S.user || !S.user.id) return;
       const r = await hkRpc('marino_hk_state', { p_telegram_id: String(S.user.id) });
-      // Always try to fetch authoritative daily word/combo (deterministic, public)
-      const wRes = await hkRpc('marino_get_today_cipher', {});
-      if (wRes && !wRes._offline && typeof wRes === 'string') {
-        localStorage.setItem('m_cipher_today_' + todayKey(), wRes);
-      }
-      const cRes = await hkRpc('marino_get_today_combo', {});
-      if (cRes && !cRes._offline && Array.isArray(cRes)) {
-        localStorage.setItem('m_combo_today_' + todayKey(), JSON.stringify(cRes));
-      }
-      if (r && !r._offline) {
+      if (r && !r._failed) {
         S.hk = r;
-        // Sync server combo/cipher into localStorage-backed state so UI is consistent
-        const cs = { attempts: r.combo.attempts_left, won: r.combo.won, selected: [] };
-        localStorage.setItem('m_combo_' + todayKey(), JSON.stringify(cs));
-        const ci = { won: r.cipher.won, input: '' };
-        localStorage.setItem('m_cipher_' + todayKey(), JSON.stringify(ci));
-        // Permanent boost levels mirror
-        const perm = {
-          multitap_lvl: r.boosts.multitap_lvl || 0,
-          energy_lvl: r.boosts.energy_lvl || 0,
-          auto_tap_end: r.boosts.auto_tap_until ? new Date(r.boosts.auto_tap_until).getTime() : 0
-        };
-        localStorage.setItem('m_perm_boost', JSON.stringify(perm));
-        // Daily boost usage mirror
-        const bs = {
-          full_energy: r.boosts.full_energy_left,
-          tap_boost: r.boosts.tap_boost_left,
-          auto_tap_done: r.boosts.auto_tap_active
-        };
-        localStorage.setItem('m_boosts_' + todayKey(), JSON.stringify(bs));
-        // Airdrop wallet
-        const a = { wallet_connected: !!r.airdrop.wallet_connected, ton_address: r.airdrop.ton_address };
-        localStorage.setItem('m_airdrop', JSON.stringify(a));
       }
       return r;
     }
 
     // Award coin client-side optimistically; persist accumulated client bonus
-    function awardCoin(n) {
-      if (!S.game || !S.game.state) return;
-      S.game.state.coin = (Number(S.game.state.coin) || 0) + n;
-      // Track client bonuses (so user knows + plus syncable later)
-      const k = 'm_clientBonus';
-      const cur = Number(localStorage.getItem(k) || 0);
-      localStorage.setItem(k, String(cur + n));
-      // Try server sync via existing claim_task RPC (fail silent)
-      renderTop();
-    }
-    function awardChips(n) {
-      if (!S.game || !S.game.state) return;
-      S.game.state.chips = (Number(S.game.state.chips) || 0) + n;
-      renderTop();
-    }
-    function awardEnergy(n) {
-      if (!S.game || !S.game.state) return;
-      S.game.state.en = Math.min(S.game.state.maxEn, (Number(S.game.state.en) || 0) + n);
-      renderTop();
+    async function refreshAuthoritativeEconomy() {
+      await fetchGame();
+      await hkRefreshState();
     }
 
     // ─── DAILY COMBO ──────────────────────────────────────────
@@ -3581,18 +3790,21 @@
       { id: 'slot', emo: '🎰', nm: 'Slot', img: 'card_slot' }
     ];
     function getTodayCombo() {
-      // Prefer server-cached combo (deterministic, fetched on init)
-      const srv = localStorage.getItem('m_combo_today_' + todayKey());
-      if (srv) { try { return JSON.parse(srv); } catch (e) { } }
-      const seed = seedFromDate('combo_' + todayKey());
-      const shuffled = seededShuffle(COMBO_DECK.map(c => c.id), seed);
-      return shuffled.slice(0, 3).sort();
+      return [];
     }
     function getComboState() {
-      const k = 'm_combo_' + todayKey();
-      return JSON.parse(localStorage.getItem(k) || '{"attempts":6,"won":false,"selected":[]}');
+      return {
+        attempts: Number(S.hk?.combo?.attempts_left ?? 0),
+        won: !!S.hk?.combo?.won,
+        selected: comboSel || []
+      };
     }
-    function saveComboState(s) { localStorage.setItem('m_combo_' + todayKey(), JSON.stringify(s)); }
+    function saveComboState(s) {
+      if (S.hk?.combo) {
+        S.hk.combo.attempts_left = s.attempts;
+        S.hk.combo.won = !!s.won;
+      }
+    }
     let comboSel = [];
     function openCombo() {
       au.click();
@@ -3654,13 +3866,22 @@
       const s = getComboState();
       if (s.won || s.attempts <= 0 || comboSel.length !== 3) return;
 
+      const stagedContent = await window.MarinoDailyContent?.submitAndClaim?.('daily_combo', comboSel.slice());
+      if (stagedContent?.handled) {
+        s.attempts = Number(stagedContent.attempts_remaining ?? Math.max(0, s.attempts - 1));
+        if (S.hk?.combo) { S.hk.combo.attempts_left = s.attempts; S.hk.combo.won = !!stagedContent.won; }
+        if (stagedContent.won) { s.won = true; saveComboState(s); au.win(); toast('İçerik ödülü sunucu tarafından claim edildi.'); }
+        else { au.fail(); toast(stagedContent.error ? 'Sunucu isteği reddetti.' : t('combo_wrong')); comboSel = []; }
+        renderComboSheet(); refreshCombocipherBadges(); return;
+      }
+
       // SERVER-FIRST: try Supabase RPC
       const res = await hkRpc('marino_claim_combo', {
         p_telegram_id: String(S.user?.id || 'guest'),
         p_picks: comboSel.slice()
       });
 
-      if (res && !res._offline) {
+      if (res && !res._failed) {
         // Server is authoritative
         s.attempts = Number(res.attempts_left ?? Math.max(0, s.attempts - 1));
         s.selected = comboSel.slice();
@@ -3669,8 +3890,7 @@
         if (res.won) {
           s.won = true;
           saveComboState(s);
-          // Server already added reward to marino_coin; reflect in UI
-          awardCoin(Number(res.reward || 5000000));
+          await refreshAuthoritativeEconomy();
           au.win(); toast(t('combo_success'));
           renderComboSheet();
           refreshCombocipherBadges();
@@ -3688,44 +3908,23 @@
         }
       }
 
-      // OFFLINE FALLBACK: localStorage-only
-      const target = getTodayCombo();
-      const picked = comboSel.slice().sort();
-      const ok = JSON.stringify(picked) === JSON.stringify(target);
-      s.attempts -= 1; s.selected = comboSel;
-      if (ok) {
-        s.won = true; saveComboState(s);
-        awardCoin(5000000); au.win(); toast(t('combo_success') + ' (offline)');
-        renderComboSheet(); refreshCombocipherBadges();
-      } else {
-        saveComboState(s); au.fail();
-        toast(t('combo_wrong') + ` (${s.attempts}/6)`);
-        document.querySelectorAll('#comboSlots .combo-slot').forEach(el => {
-          el.style.animation = 'shake 0.3s'; setTimeout(() => el.style.animation = '', 320);
-        });
-        comboSel = []; renderComboSheet();
-      }
+      au.fail();
+      toast('Sunucu onayı alınamadı. Ödül veya hak kullanımı yapılmadı.');
     }
 
     // ─── DAILY CIPHER ──────────────────────────────────────────
-    const CIPHER_WORDS = ['MARINO', 'CASINO', 'JACKPOT', 'EMPIRE', 'ROULETTE', 'POKER', 'VEGAS', 'CHIPS', 'WINNER', 'FORTUNE', 'BANKROLL', 'BLACKJACK'];
     const MORSE = {
       A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---',
       K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-',
       U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..'
     };
     function getTodayCipher() {
-      // Prefer server-cached word (deterministic, fetched on init)
-      const srv = localStorage.getItem('m_cipher_today_' + todayKey());
-      if (srv) return srv;
-      const seed = seedFromDate('cipher_' + todayKey());
-      return CIPHER_WORDS[seed % CIPHER_WORDS.length];
+      return '';
     }
     function cipherState() {
-      const k = 'm_cipher_' + todayKey();
-      return JSON.parse(localStorage.getItem(k) || '{"won":false,"input":""}');
+      return { won: !!S.hk?.cipher?.won, input: '' };
     }
-    function saveCipherState(s) { localStorage.setItem('m_cipher_' + todayKey(), JSON.stringify(s)); }
+    function saveCipherState(s) { if (S.hk?.cipher) S.hk.cipher.won = !!s.won; }
     let cipherInput = '';
     function openCipher() {
       au.click();
@@ -3735,11 +3934,9 @@
     }
     function renderCipherSheet() {
       const s = cipherState();
-      // Prefer server-stored winning word, fallback to local seed
-      const storedWord = localStorage.getItem('m_cipher_word_' + todayKey());
-      const word = (s.won && storedWord) ? storedWord : getTodayCipher();
-      // Morse display
-      const morse = word.split('').map(c => MORSE[c] || '').join('   ');
+      const stagedCipher = window.MarinoDailyContent?.content?.('daily_cipher');
+      const wordLength = Number(stagedCipher?.payload?.word_length ?? S.hk?.cipher_hint?.word_length ?? 0);
+      const morse = String(stagedCipher?.payload?.morse ?? S.hk?.cipher_hint?.morse ?? '');
       // Visual dot/dash
       const visual = morse.split('').map(ch => {
         if (ch === '.') return '<span class="morse-dot"></span>';
@@ -3749,10 +3946,10 @@
       q('#morseDisplay').innerHTML = visual;
       // Boxes
       const boxesEl = q('#cipherBoxes'); boxesEl.innerHTML = '';
-      for (let i = 0; i < word.length; i++) {
+      for (let i = 0; i < wordLength; i++) {
         const div = document.createElement('div');
         div.className = 'cipher-box' + (cipherInput[i] ? ' filled' : '') + (s.won ? ' correct' : '');
-        div.textContent = (s.won ? word[i] : (cipherInput[i] || ''));
+        div.textContent = cipherInput[i] || '';
         boxesEl.appendChild(div);
       }
       // Keys
@@ -3761,7 +3958,7 @@
       letters.split('').forEach(L => {
         const b = document.createElement('button');
         b.className = 'key-btn'; b.textContent = L;
-        b.onclick = () => { if (s.won || cipherInput.length >= word.length) return; cipherInput += L; au.tap(); renderCipherSheet(); };
+        b.onclick = () => { if (s.won || cipherInput.length >= wordLength) return; cipherInput += L; au.tap(); renderCipherSheet(); };
         keysEl.appendChild(b);
       });
       // Submit state
@@ -3775,19 +3972,24 @@
     async function cipherSubmit() {
       const s = cipherState(); if (s.won) return;
 
+      const stagedContent = await window.MarinoDailyContent?.submitAndClaim?.('daily_cipher', cipherInput);
+      if (stagedContent?.handled) {
+        if (stagedContent.won) { s.won = true; s.input = cipherInput; saveCipherState(s); if (S.hk?.cipher) S.hk.cipher.won = true; au.win(); toast('İçerik ödülü sunucu tarafından claim edildi.'); }
+        else { au.fail(); toast(stagedContent.error ? 'Sunucu isteği reddetti.' : t('cipher_wrong')); cipherInput = ''; }
+        renderCipherSheet(); refreshCombocipherBadges(); return;
+      }
+
       // SERVER-FIRST
       const res = await hkRpc('marino_claim_cipher', {
         p_telegram_id: String(S.user?.id || 'guest'),
         p_word: cipherInput.toUpperCase()
       });
 
-      if (res && !res._offline) {
+      if (res && !res._failed) {
         if (res.won) {
           s.won = true; s.input = cipherInput; saveCipherState(s);
           if (S.hk && S.hk.cipher) { S.hk.cipher.won = true; S.hk.cipher.reward = res.reward; }
-          // Store winning word for display (server-authoritative)
-          localStorage.setItem('m_cipher_word_' + todayKey(), cipherInput.toUpperCase());
-          awardCoin(Number(res.reward || 1000000));
+          await refreshAuthoritativeEconomy();
           au.win(); toast(t('cipher_correct'));
           renderCipherSheet(); refreshCombocipherBadges();
         } else {
@@ -3800,19 +4002,8 @@
         return;
       }
 
-      // OFFLINE FALLBACK
-      const word = getTodayCipher();
-      if (cipherInput.toUpperCase() === word) {
-        s.won = true; s.input = cipherInput; saveCipherState(s);
-        awardCoin(1000000); au.win(); toast(t('cipher_correct') + ' (offline)');
-        renderCipherSheet(); refreshCombocipherBadges();
-      } else {
-        au.fail(); toast(t('cipher_wrong'));
-        document.querySelectorAll('#cipherBoxes .cipher-box').forEach(el => {
-          el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 400);
-        });
-        cipherInput = ''; renderCipherSheet();
-      }
+      au.fail();
+      toast('Sunucu onayı alınamadı. Ödül veya hak kullanımı yapılmadı.');
     }
 
     function refreshCombocipherBadges() {
@@ -3820,12 +4011,13 @@
       const comboBtn = q('#btnDailyCombo'), cipherBtn = q('#btnDailyCipher');
       if (comboBtn) {
         comboBtn.classList.toggle('done', cs.won);
-        q('#comboReward').textContent = cs.won ? '✓' : '+5M';
+        if (!window.MarinoDailyContent?.content?.('daily_combo')) q('#comboReward').textContent = cs.won ? '✓' : '—';
       }
       if (cipherBtn) {
         cipherBtn.classList.toggle('done', ci.won);
-        q('#cipherReward').textContent = ci.won ? '✓' : '+1M';
+        if (!window.MarinoDailyContent?.content?.('daily_cipher')) q('#cipherReward').textContent = ci.won ? '✓' : '—';
       }
+      window.MarinoDailyContent?.syncHub?.();
       // Live countdown
       const tEl = q('#comboTimer');
       if (tEl) {
@@ -3841,14 +4033,32 @@
 
     // ─── BOOSTS ──────────────────────────────────────────
     function boostState() {
-      const k = 'm_boosts_' + todayKey();
-      return JSON.parse(localStorage.getItem(k) || '{"full_energy":3,"tap_boost":3,"auto_tap_done":false}');
+      return {
+        full_energy: Number(S.hk?.boosts?.full_energy_left ?? 0),
+        tap_boost: Number(S.hk?.boosts?.tap_boost_left ?? 0),
+        auto_tap_done: !!S.hk?.boosts?.auto_tap_active
+      };
     }
-    function saveBoostState(s) { localStorage.setItem('m_boosts_' + todayKey(), JSON.stringify(s)); }
+    function saveBoostState(s) {
+      if (S.hk?.boosts) {
+        S.hk.boosts.full_energy_left = s.full_energy;
+        S.hk.boosts.tap_boost_left = s.tap_boost;
+      }
+    }
     function permBoostState() {
-      return JSON.parse(localStorage.getItem('m_perm_boost') || '{"multitap_lvl":0,"energy_lvl":0,"auto_tap_end":0}');
+      return {
+        multitap_lvl: Number(S.hk?.boosts?.multitap_lvl ?? 0),
+        energy_lvl: Number(S.hk?.boosts?.energy_lvl ?? 0),
+        auto_tap_end: S.hk?.boosts?.auto_tap_until ? new Date(S.hk.boosts.auto_tap_until).getTime() : 0
+      };
     }
-    function savePermBoostState(s) { localStorage.setItem('m_perm_boost', JSON.stringify(s)); }
+    function savePermBoostState(s) {
+      if (S.hk?.boosts) {
+        S.hk.boosts.multitap_lvl = s.multitap_lvl;
+        S.hk.boosts.energy_lvl = s.energy_lvl;
+        S.hk.boosts.auto_tap_until = s.auto_tap_end ? new Date(s.auto_tap_end).toISOString() : null;
+      }
+    }
 
     function openBoost() { au.click(); q('#sheetBoost').classList.add('show'); renderBoosts(); }
 
@@ -3868,13 +4078,12 @@
           action: async () => {
             const s = boostState(); if (s.full_energy <= 0) return;
             const res = await hkRpc('marino_use_full_energy', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               s.full_energy = Number(res.left ?? s.full_energy - 1); saveBoostState(s);
               if (S.game?.state) { S.game.state.en = Number(res.energy ?? S.game.state.maxEn); renderTop(); }
             } else {
-              s.full_energy -= 1; saveBoostState(s);
-              if (S.game?.state) { S.game.state.en = S.game.state.maxEn; renderTop(); }
+              return toast('Sunucu onayı alınamadı. Hak kullanılmadı.');
             }
             toast(t('full_energy_done')); au.win(); renderBoosts();
           }
@@ -3888,11 +4097,11 @@
           action: async () => {
             const s = boostState(); if (s.tap_boost <= 0) return;
             const res = await hkRpc('marino_use_tap_boost', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               s.tap_boost = Number(res.left ?? s.tap_boost - 1);
             } else {
-              s.tap_boost -= 1;
+              return toast('Sunucu onayı alınamadı. Hak kullanılmadı.');
             }
             saveBoostState(s);
             window._tapMultiplierUntil = Date.now() + 20000;
@@ -3914,15 +4123,13 @@
           action: async () => {
             if (!S.game?.state || (Number(S.game.state.coin) || 0) < multitapCost) return toast(t('insufficient_coin'));
             const res = await hkRpc('marino_upgrade_multitap', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               const p2 = permBoostState(); p2.multitap_lvl = Number(res.new_level ?? p2.multitap_lvl + 1); savePermBoostState(p2);
               S.game.state.coin -= Number(res.cost || multitapCost);
               S.game.state.tap = Number(res.new_tap_power ?? (S.game.state.tap || 1) + 1);
             } else {
-              const p2 = permBoostState(); p2.multitap_lvl += 1; savePermBoostState(p2);
-              S.game.state.coin -= multitapCost;
-              S.game.state.tap = (Number(S.game.state.tap) || 1) + 1;
+              return toast('Sunucu onayı alınamadı. Bakiye değiştirilmedi.');
             }
             renderTop(); toast(t('boost_activated')); au.win(); renderBoosts();
           }
@@ -3935,17 +4142,14 @@
           action: async () => {
             if (!S.game?.state || (Number(S.game.state.coin) || 0) < energyCost) return toast(t('insufficient_coin'));
             const res = await hkRpc('marino_upgrade_energy_limit', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               const p2 = permBoostState(); p2.energy_lvl = Number(res.new_level ?? p2.energy_lvl + 1); savePermBoostState(p2);
               S.game.state.coin -= Number(res.cost || energyCost);
               S.game.state.maxEn = Number(res.new_max_energy ?? S.game.state.maxEn + 500);
               S.game.state.en = S.game.state.maxEn;
             } else {
-              const p2 = permBoostState(); p2.energy_lvl += 1; savePermBoostState(p2);
-              S.game.state.coin -= energyCost;
-              S.game.state.maxEn = (Number(S.game.state.maxEn) || 500) + 500;
-              S.game.state.en = S.game.state.maxEn;
+              return toast('Sunucu onayı alınamadı. Bakiye değiştirilmedi.');
             }
             renderTop(); toast(t('boost_activated')); au.win(); renderBoosts();
           }
@@ -3960,15 +4164,14 @@
             if (autoActive) return;
             if (!S.game?.state || (Number(S.game.state.coin) || 0) < 5000) return toast(t('insufficient_coin'));
             const res = await hkRpc('marino_activate_auto_tap', { p_telegram_id: String(S.user?.id || 'guest') });
-            if (res && !res._offline) {
+            if (res && !res._failed) {
               if (!res.ok) return toast('❌ ' + (res.error || 'fail'));
               const p2 = permBoostState();
               p2.auto_tap_end = res.until ? new Date(res.until).getTime() : (Date.now() + 12*3600*1000);
               savePermBoostState(p2);
               S.game.state.coin -= Number(res.cost || 5000);
             } else {
-              const p2 = permBoostState(); p2.auto_tap_end = Date.now() + 12 * 3600 * 1000; savePermBoostState(p2);
-              S.game.state.coin -= 5000;
+              return toast('Sunucu onayı alınamadı. Bakiye değiştirilmedi.');
             }
             renderTop();
             toast(t('auto_tap_active')); au.win(); renderBoosts();
@@ -3997,21 +4200,19 @@
       });
     }
 
-    // Auto-tap loop (when active, 1 tap/sec)
-    setInterval(() => {
-      const p = permBoostState();
-      if (p.auto_tap_end > Date.now() && S.game?.state) {
-        const tap = Number(S.game.state.tap) || 1;
-        S.game.state.coin = (Number(S.game.state.coin) || 0) + tap;
-        renderTop();
-      }
-    }, 1000);
-
     // ─── AIRDROP ──────────────────────────────────────────
     function airdropState() {
-      return JSON.parse(localStorage.getItem('m_airdrop') || '{"wallet_connected":false}');
+      return {
+        wallet_connected: !!S.hk?.airdrop?.wallet_connected,
+        ton_address: S.hk?.airdrop?.ton_address || null
+      };
     }
-    function saveAirdropState(s) { localStorage.setItem('m_airdrop', JSON.stringify(s)); }
+    function saveAirdropState(s) {
+      if (S.hk?.airdrop) {
+        S.hk.airdrop.wallet_connected = !!s.wallet_connected;
+        S.hk.airdrop.ton_address = s.ton_address || null;
+      }
+    }
     function openAirdrop() { au.click(); q('#sheetAirdrop').classList.add('show'); renderAirdrop(); }
     function renderAirdrop() {
       if (!q('#airdropChecklist')) return;
@@ -4047,20 +4248,7 @@
     async function connectWallet() {
       const a = airdropState();
       if (a.wallet_connected) { toast('✅ ' + (LANG === 'tr' ? 'Zaten bağlı' : 'Already connected')); return; }
-      const res = await hkRpc('marino_connect_wallet', {
-        p_telegram_id: String(S.user?.id || 'guest'),
-        p_ton_address: null
-      });
-      if (res && !res._offline && res.ok) {
-        a.wallet_connected = true;
-        a.ton_address = res.ton_address;
-        saveAirdropState(a);
-        au.win();
-        toast('✅ ' + (LANG === 'tr' ? `Cüzdan bağlandı: ${String(res.ton_address).slice(0,8)}...` : `Wallet connected: ${String(res.ton_address).slice(0,8)}...`));
-      } else {
-        a.wallet_connected = true; saveAirdropState(a);
-        au.win(); toast(t('wallet_coming_soon'));
-      }
+      toast(t('wallet_coming_soon'));
       renderAirdrop();
     }
 
@@ -4080,52 +4268,21 @@
       }
     }
 
-    // ─── Hook into existing tap to apply tap boost multiplier + combo counter ──
-    let _tapCount = 0; let _tapLastTs = 0;
-    const _origHandleTap = handleTap;
-    handleTap = async function(e) {
-      if (!S.game) return _origHandleTap(e);
-      const now = Date.now();
-      const isBoost = (window._tapMultiplierUntil || 0) > now;
-      // combo streak: if tap within 600ms
-      if (now - _tapLastTs < 600) _tapCount++;
-      else _tapCount = 1;
-      _tapLastTs = now;
-
-      // Pre-apply 5x boost by mutating tap power temporarily (then restore)
-      const s = S.game.state;
-      const originalTap = s.tap;
-      if (isBoost) s.tap = originalTap * 5;
-      try {
-        await _origHandleTap(e);
-      } finally {
-        if (isBoost) s.tap = originalTap;
-      }
-
-      // Particle effect
-      const btn = q('#btnTap');
-      if (btn) {
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX ? (e.clientX - rect.left) : (rect.width / 2);
-        const y = e.clientY ? (e.clientY - rect.top) : (rect.height / 2);
-        spawnParticles(x, y, isBoost ? 10 : 4);
-      }
-
-      // Combo pop every 10 streaks
-      if (_tapCount > 0 && _tapCount % 10 === 0) {
-        const pop = document.createElement('div');
-        pop.className = 'combo-pop';
-        pop.textContent = `${_tapCount}x COMBO! 🔥`;
-        if (btn) btn.parentElement.appendChild(pop);
-        setTimeout(() => pop.remove(), 1000);
-        au.win();
-      }
-    };
-
     // ─── Wire up new buttons ──
     function initHK() {
       applyI18n();
       refreshCombocipherBadges();
+      window.MarinoDailyContent?.configure?.({
+        preview: isLocalPreview,
+        language: () => LANG,
+        invoke: async (name, args) => {
+          if (isLocalPreview) throw new Error('preview_network_blocked');
+          if (!db) throw new Error('content_client_unavailable');
+          const { data, error } = await db.rpc(name, args);
+          if (error) throw error;
+          return data;
+        }
+      })?.load?.();
       const wire = (sel, fn) => { const el = q(sel); if (el) el.onclick = fn; };
       wire('#btnDailyCombo', openCombo);
       wire('#btnDailyCipher', openCipher);
@@ -4140,9 +4297,11 @@
       });
       // Refresh badges every 1s (live countdown)
       setInterval(refreshCombocipherBadges, 1000);
-      // Fetch server state once on init, then every 60s
-      hkRefreshState().then(() => { refreshCombocipherBadges(); });
-      setInterval(() => { hkRefreshState(); }, 60000);
+      // Fetch server state once on init, then every 60s (never in local preview).
+      if (!isLocalPreview) {
+        hkRefreshState().then(() => { refreshCombocipherBadges(); });
+        setInterval(() => { hkRefreshState(); }, 60000);
+      }
     }
     // Run after main init() has bound DOM
     const _origInit = init;

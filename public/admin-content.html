@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Marino Content Operations</title>
+  <script src="./__MARINO_RUNTIME_CONFIG_SCRIPT__"></script>
+  <script src="./runtime-config-loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="./styles/admin/content-admin.css">
+  <script src="./js/admin/content-admin.js" defer></script>
+</head>
+<body>
+  <header class="ops-header">
+    <div><span>MARINO EMPIRE • STAGING</span><h1>Content Operations</h1></div>
+    <div class="ops-session"><b id="adminRole">Oturum gerekli</b><button type="button" id="adminSignOut" hidden>Çıkış</button></div>
+  </header>
+  <main>
+    <section id="adminGate" class="ops-gate" aria-live="polite">
+      <h2>Güvenli yönetici girişi</h2>
+      <p>Yetki sunucu rolünden doğrulanır. Bağlantı yalnız staging ortamında çalışır.</p>
+      <form id="adminLoginForm"><label>E-posta<input id="adminEmail" type="email" autocomplete="email" required></label><button type="submit">Giriş bağlantısı gönder</button></form>
+      <p id="adminGateMessage" role="status"></p>
+    </section>
+    <section id="adminWorkspace" hidden>
+      <nav class="ops-tabs" aria-label="İçerik görünümü">
+        <button type="button" data-admin-view="list" class="active">Liste</button>
+        <button type="button" data-admin-view="calendar">Takvim</button>
+        <button type="button" data-admin-view="audit">Audit</button>
+        <button type="button" id="adminNewContent">Yeni içerik</button>
+      </nav>
+      <section class="ops-dashboard">
+        <article><span>Toplam içerik</span><b id="statContent">0</b></article>
+        <article><span>Deneme</span><b id="statAttempts">0</b></article>
+        <article><span>Başarı</span><b id="statSuccess">0%</b></article>
+        <article><span>Claim</span><b id="statClaims">0</b></article>
+      </section>
+      <section id="adminList" class="ops-list"></section>
+      <section id="adminCalendar" class="ops-calendar" hidden></section>
+      <section id="adminAudit" class="ops-audit" hidden></section>
+    </section>
+  </main>
+
+  <div id="contentEditor" class="ops-dialog" hidden>
+    <button type="button" class="ops-backdrop" data-editor-close aria-label="Editörü kapat"></button>
+    <form id="contentForm" role="dialog" aria-modal="true" aria-labelledby="contentEditorTitle">
+      <header><div><span>STAGING CONTENT</span><h2 id="contentEditorTitle">Yeni içerik</h2></div><button type="button" data-editor-close aria-label="Kapat">×</button></header>
+      <input type="hidden" id="contentId"><input type="hidden" id="contentVersion">
+      <div class="ops-form-grid">
+        <label>Tür<select id="contentType" required><option value="daily_combo">Daily Combo</option><option value="daily_cipher">Daily Cipher</option><option value="daily_reward">Daily Reward</option><option value="casino_mission">Casino Mission</option><option value="special_event">Special Event</option></select></label>
+        <label>Durum<select id="contentStatus"><option value="draft">Taslak</option><option value="scheduled">Planlı</option></select></label>
+        <label>TR başlık<input id="titleTr" maxlength="160" required></label><label>EN başlık<input id="titleEn" maxlength="160" required></label>
+        <label>TR açıklama<textarea id="descriptionTr" maxlength="2000"></textarea></label><label>EN açıklama<textarea id="descriptionEn" maxlength="2000"></textarea></label>
+        <label>Başlangıç<input id="startsAt" type="datetime-local" required></label><label>Bitiş<input id="endsAt" type="datetime-local" required></label>
+        <label>Ödül<select id="rewardType"><option value="none">Yok</option><option value="reward_point">Reward Point</option><option value="demo_free_spin">Demo Free Spin</option><option value="demo_free_bet">Demo Free Bet</option><option value="cosmetic">Kozmetik</option></select></label>
+        <label>Miktar<input id="rewardAmount" type="number" min="0" max="1000000" value="0"></label>
+        <label>Doğru cevap <small>(sunucuda hashlenir)</small><input id="contentAnswer" autocomplete="off" maxlength="512"></label>
+        <label>Normalizasyon<select id="answerNormalization"><option value="nfkc_lower_trim">NFKC • küçük harf</option><option value="nfkc_upper_trim">NFKC • büyük harf</option><option value="json_exact">JSON exact</option></select></label>
+        <label class="ops-wide">Public payload JSON<textarea id="contentPayload" spellcheck="false">{}</textarea></label>
+      </div>
+      <footer><button type="button" data-editor-copy>Kopyala</button><button type="button" data-editor-preview>Önizle</button><button type="submit">Taslak/Plan Kaydet</button><button type="button" data-editor-publish>Yayınla</button><button type="button" data-editor-cancel>İptal Et</button></footer>
+      <p id="editorMessage" role="status"></p>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,247 @@
+{
+  "version": 1,
+  "policy": {
+    "authority": "UI catalogue only; never an economy, reward or entitlement authority.",
+    "externalDownloads": false,
+    "criticalPreload": [],
+    "nonCriticalLoading": "lazy"
+  },
+  "assets": [
+    {
+      "id": "marino_reward_icons",
+      "file": "ui/rewards/marino-reward-icons.svg",
+      "type": "svg-sprite",
+      "usage": "Daily reward, reward store and entitlement status icons",
+      "source": "Original Marino Empire vector artwork created in-repository",
+      "license": "Project-owned original",
+      "sizeBytes": 1978,
+      "fallback": "Inline SVG paths embedded in daily-rewards.js",
+      "available": true
+    },
+    {
+      "id": "marino_building_icons",
+      "file": "ui/buildings/marino-building-icons.svg",
+      "type": "svg-sprite",
+      "usage": "Building catalogue cards and upgrade states",
+      "source": "Original Marino Empire vector artwork created in-repository",
+      "license": "Project-owned original",
+      "sizeBytes": 2141,
+      "fallback": "Inline original SVG paths in phase-2b.js",
+      "available": true
+    },
+    {
+      "id": "marino_task_icons",
+      "file": "ui/tasks/marino-task-icons.svg",
+      "type": "svg-sprite",
+      "usage": "Task categories, progress signals and task states",
+      "source": "Original Marino Empire vector artwork created in-repository",
+      "license": "Project-owned original",
+      "sizeBytes": 2137,
+      "fallback": "CSS and text task markers",
+      "available": true
+    },
+    {
+      "id": "marino_casino_icons",
+      "file": "ui/casino/marino-casino-icons.svg",
+      "type": "svg-sprite",
+      "usage": "Casino catalogue, reward store and virtual entitlements",
+      "source": "Original Marino Empire vector artwork created in-repository",
+      "license": "Project-owned original",
+      "sizeBytes": 2624,
+      "fallback": "Existing inline casino UI symbols",
+      "available": true
+    },
+    {
+      "id": "legacy_background_secondary",
+      "file": "backgrounds/bg_portal_vertical_secondary.png",
+      "type": "png",
+      "usage": "Home scene background",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 2068360,
+      "fallback": "CSS navy/cyan gradient",
+      "available": true,
+      "optimization": "Generate responsive WebP and AVIF variants; retain PNG only as fallback"
+    },
+    {
+      "id": "legacy_marino_character",
+      "file": "illustrations/marino-character.png",
+      "type": "png",
+      "usage": "Critical home character",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 771564,
+      "fallback": "CSS silhouette",
+      "available": true,
+      "optimization": "Create lossless WebP and AVIF variants after visual approval"
+    },
+    {
+      "id": "music_legacy_fon",
+      "file": "audio/fon.mp3",
+      "type": "mp3",
+      "usage": "Legacy background music, loaded only after user interaction",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before release",
+      "sizeBytes": 20016771,
+      "fallback": "Silence",
+      "available": true,
+      "optimization": "Replace with licensed looped OGG/AAC stems below 2 MB"
+    },
+    {
+      "id": "intro_legacy",
+      "file": "intro.mp4",
+      "type": "mp4",
+      "usage": "Optional first-run intro",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before release",
+      "sizeBytes": 25180550,
+      "fallback": "Immediate prepared home screen",
+      "available": true,
+      "optimization": "Re-encode short mobile WebM/MP4 renditions and preserve preload=none"
+    },
+    {
+      "id": "legacy_brand_logo",
+      "file": "brand/logo.png",
+      "type": "png",
+      "usage": "Brand surfaces",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 2175142,
+      "fallback": "Text logotype",
+      "available": true,
+      "optimization": "Convert to SVG or tightly cropped WebP"
+    },
+    {
+      "id": "legacy_reward_token",
+      "file": "currency/reward-token.png",
+      "type": "png",
+      "usage": "Legacy reward token displays",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 2040321,
+      "fallback": "marino_reward_icons SVG",
+      "available": true,
+      "optimization": "Do not render at source size; replace UI usage with SVG sprite"
+    },
+    {
+      "id": "legacy_marino_avatar",
+      "file": "illustrations/marino-avatar.png",
+      "type": "png",
+      "usage": "Profile avatar",
+      "source": "Existing Marino Empire repository asset",
+      "license": "Existing project asset; provenance review required before redistribution",
+      "sizeBytes": 1310790,
+      "fallback": "Initials avatar",
+      "available": true,
+      "optimization": "Create 64px and 128px WebP variants with lazy loading outside home"
+    },
+    {
+      "id": "ui_open", "file": "audio/sfx/ui_open.ogg", "type": "audio/ogg", "usage": "UI open", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "ui_close", "file": "audio/sfx/ui_close.ogg", "type": "audio/ogg", "usage": "UI close", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "ui_confirm", "file": "audio/sfx/ui_confirm.ogg", "type": "audio/ogg", "usage": "UI confirmation", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "ui_error", "file": "audio/sfx/ui_error.ogg", "type": "audio/ogg", "usage": "UI error", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "tap_light", "file": "audio/sfx/tap_light.ogg", "type": "audio/ogg", "usage": "Light tap", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Rate-limited procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "tap_combo", "file": "audio/sfx/tap_combo.ogg", "type": "audio/ogg", "usage": "Tap combo", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Rate-limited procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "collect_vault", "file": "audio/sfx/collect_vault.ogg", "type": "audio/ogg", "usage": "Vault collect", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "building_upgrade", "file": "audio/sfx/building_upgrade.ogg", "type": "audio/ogg", "usage": "Building upgrade", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "task_complete", "file": "audio/sfx/task_complete.ogg", "type": "audio/ogg", "usage": "Task completion", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "daily_reward", "file": "audio/sfx/daily_reward.ogg", "type": "audio/ogg", "usage": "Daily reward success", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "reward_purchase", "file": "audio/sfx/reward_purchase.ogg", "type": "audio/ogg", "usage": "Reward purchase", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "free_spin_unlock", "file": "audio/sfx/free_spin_unlock.ogg", "type": "audio/ogg", "usage": "Free Spin unlock", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "free_bet_unlock", "file": "audio/sfx/free_bet_unlock.ogg", "type": "audio/ogg", "usage": "Free Bet unlock", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "league_up", "file": "audio/sfx/league_up.ogg", "type": "audio/ogg", "usage": "League promotion", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "empire_rush", "file": "audio/sfx/empire_rush.ogg", "type": "audio/ogg", "usage": "Empire Rush milestone", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "music_empire_lounge", "file": "audio/music/empire_lounge_loop.ogg", "type": "audio/ogg", "usage": "Loopable premium casino music bed", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Legacy audio/fon.mp3 after user interaction or silence", "available": false
+    },
+    {
+      "id": "reel_start", "file": "audio/sfx/reel_start.ogg", "type": "audio/ogg", "usage": "Fortune Slots reel start", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "reel_stop_1_to_5", "file": "audio/sfx/reel_stop_[1-5].ogg", "type": "audio/ogg", "usage": "Five sequential Fortune Slots reel stops", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Five pitched procedural Web Audio tones", "available": false
+    },
+    {
+      "id": "symbol_match", "file": "audio/sfx/symbol_match.ogg", "type": "audio/ogg", "usage": "Fortune Slots symbol match", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "scatter_anticipation", "file": "audio/sfx/scatter_anticipation.ogg", "type": "audio/ogg", "usage": "Fortune Slots scatter anticipation", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "small_win", "file": "audio/sfx/small_win.ogg", "type": "audio/ogg", "usage": "Fortune Slots small demo win", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "big_win", "file": "audio/sfx/big_win.ogg", "type": "audio/ogg", "usage": "Fortune Slots large demo win", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "free_spin_start", "file": "audio/sfx/free_spin_start.ogg", "type": "audio/ogg", "usage": "Fortune Slots free spin start", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "free_spin_end", "file": "audio/sfx/free_spin_end.ogg", "type": "audio/ogg", "usage": "Fortune Slots free spin end", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "roulette_chip_actions", "file": "audio/sfx/chip_[place|remove].ogg", "type": "audio/ogg", "usage": "European Roulette chip placement and removal", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Pitched procedural Web Audio tones", "available": false
+    },
+    {
+      "id": "roulette_wheel", "file": "audio/sfx/wheel_start.ogg", "type": "audio/ogg", "usage": "European Roulette wheel start", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+    },
+    {
+      "id": "roulette_ball", "file": "audio/sfx/ball_[tick|drop].ogg", "type": "audio/ogg", "usage": "European Roulette ball movement and pocket drop", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Pitched procedural Web Audio tones", "available": false
+    },
+    {
+      "id": "roulette_result", "file": "audio/sfx/roulette_[win|lose].ogg", "type": "audio/ogg", "usage": "European Roulette demo result", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tones", "available": false
+    },
+    {
+      "id": "reel_loop", "file": "audio/sfx/reel_loop.ogg", "type": "audio/ogg", "usage": "Fortune Slots layered reel motion bed", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio sweep", "available": false
+    },
+    {
+      "id": "anticipation_ping", "file": "audio/sfx/anticipation_ping.ogg", "type": "audio/ogg", "usage": "Fortune Slots near-miss anticipation", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio ping", "available": false
+    },
+    {
+      "id": "free_spin_trigger", "file": "audio/sfx/free_spin_trigger.ogg", "type": "audio/ogg", "usage": "Fortune Slots free spin ceremony", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio rise", "available": false
+    },
+    {
+      "id": "ball_roll", "file": "audio/sfx/ball_roll.ogg", "type": "audio/ogg", "usage": "European Roulette ball roll", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio roll", "available": false
+    },
+    {
+      "id": "blackjack_card_actions", "file": "audio/sfx/card_[deal|flip].ogg", "type": "audio/ogg", "usage": "Blackjack card deal and reveal", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Distinct procedural Web Audio card tones", "available": false
+    },
+    {
+      "id": "blackjack_player_actions", "file": "audio/sfx/blackjack_[hit|stand|double|split].ogg", "type": "audio/ogg", "usage": "Blackjack Hit, Stand, Double and Split feedback", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Four distinct procedural Web Audio action tones", "available": false
+    },
+    {
+      "id": "blackjack_results", "file": "audio/sfx/[blackjack_win|normal_win|push|bust].ogg", "type": "audio/ogg", "usage": "Blackjack demo result ceremonies", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio result tones", "available": false
+    },
+    {
+      "id": "dealer_reveal", "file": "audio/sfx/dealer_reveal.ogg", "type": "audio/ogg", "usage": "Blackjack dealer hole-card reveal", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio reveal tone", "available": false
+    }
+  ]
+}

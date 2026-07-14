@@ -1,0 +1,16 @@
+{
+  "authority": "Cosmetic UI catalogue only; badges have no monetary or economic value.",
+  "badges": [
+    {"id":"first_spin","title":"İlk Spin","event":"slot_spin","icon":"slot"},
+    {"id":"first_roulette","title":"İlk Rulet Bahsi","event":"roulette_bet","icon":"roulette"},
+    {"id":"first_blackjack","title":"İlk Blackjack","event":"blackjack_hand","icon":"blackjack"},
+    {"id":"split_master","title":"Split Ustası","event":"blackjack_split","icon":"card"},
+    {"id":"double_down","title":"Double Down","event":"blackjack_double","icon":"chip"},
+    {"id":"triple_casino","title":"Üçlü Casino","event":"triple_visit","icon":"vip"},
+    {"id":"seven_day","title":"Yedi Günlük Seri","event":"seven_day_streak","icon":"jackpot"},
+    {"id":"slot_master","title":"Slot Ustası","mastery":"slots","level":5,"icon":"slot"},
+    {"id":"roulette_master","title":"Rulet Ustası","mastery":"roulette","level":5,"icon":"roulette"},
+    {"id":"blackjack_master","title":"Blackjack Ustası","mastery":"blackjack","level":5,"icon":"blackjack"},
+    {"id":"casino_champion","title":"Marino Casino Şampiyonu","event":"cup_champion","icon":"win"}
+  ]
+}
