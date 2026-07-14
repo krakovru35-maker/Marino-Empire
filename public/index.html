@@ -2440,6 +2440,7 @@
     }
 
     let authRefreshTimer = null;
+    let authRefreshInFlight = null;
     function lockEconomicRpc(reason = 'session_refresh_failed') {
       S.authenticated = false;
       S.authBlockedReason = reason;
@@ -2450,6 +2451,37 @@
       toast('Oturum yenilenemedi. Lütfen oyunu Telegram üzerinden yeniden açın.');
     }
 
+    async function refreshAuthenticatedSession(reason = 'session_refresh_required') {
+      if (!db || !S.authenticated || S.authBlockedReason) return false;
+      if (authRefreshInFlight) return authRefreshInFlight;
+      authRefreshInFlight = (async () => {
+        const { data, error } = await db.auth.refreshSession();
+        if (error || !data?.session) {
+          lockEconomicRpc(reason);
+          return false;
+        }
+        S.authenticated = true;
+        S.authBlockedReason = null;
+        scheduleSessionRefresh(data.session);
+        return true;
+      })().finally(() => { authRefreshInFlight = null; });
+      return authRefreshInFlight;
+    }
+
+    async function ensureFreshSession() {
+      if (!S.authenticated || S.authBlockedReason) return false;
+      if (S.sessionExpiresAt > Date.now() + 45000) return true;
+      return refreshAuthenticatedSession('session_refresh_failed');
+    }
+
+    function isAuthRpcError(error) {
+      const code = String(error?.code || '');
+      const status = Number(error?.status || error?.statusCode || 0);
+      const message = String(error?.message || '');
+      return code === 'PGRST301' || status === 401
+        || /jwt|token\s*(?:is\s*)?(?:expired|invalid)|invalid\s+claim/i.test(message);
+    }
+
     function scheduleSessionRefresh(session) {
       if (authRefreshTimer) clearTimeout(authRefreshTimer);
       const expiresAtMs = Number(session?.expires_at || 0) * 1000;
@@ -2457,8 +2489,7 @@
       if (!expiresAtMs) return lockEconomicRpc('missing_session_expiry');
       const delay = Math.max(1000, expiresAtMs - Date.now() - 60000);
       authRefreshTimer = setTimeout(async () => {
-        const { data, error } = await db.auth.refreshSession();
-        if (error || !data?.session) lockEconomicRpc('session_refresh_failed');
+        await refreshAuthenticatedSession('session_refresh_failed');
       }, delay);
     }
 
@@ -2474,6 +2505,10 @@
         } else if (event === 'SIGNED_OUT') {
           lockEconomicRpc('signed_out');
         }
+      });
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible' || !S.authenticated || S.authBlockedReason) return;
+        ensureFreshSession().catch(() => lockEconomicRpc('session_resume_refresh_failed'));
       });
     }
 
@@ -2492,13 +2527,24 @@
       const suppliedRequestId = payload.p_request_id;
       delete payload.p_request_id;
       const isReadOnly = READ_ONLY_ACTIONS.has(name);
+      const requestId = isReadOnly ? null : (suppliedRequestId || uid());
       if (!isReadOnly && inFlightActions.has(name)) throw new Error('operation_in_progress');
       if (!isReadOnly) inFlightActions.add(name);
       try {
-        const { data, error } = await db.rpc('marino_secure_rpc', {
-          p_action: name,
-          p_payload: payload,
-          p_request_id: isReadOnly ? null : (suppliedRequestId || uid())
+        if (!await ensureFreshSession()) throw new Error('authentication_required');
+        const invoke = () => db.rpc('marino_secure_rpc', {
+          p_action: name, p_payload: payload, p_request_id: requestId
+        });
+        let { data, error } = await invoke();
+        if (error && isAuthRpcError(error)) {
+          const refreshed = await refreshAuthenticatedSession('rpc_auth_refresh_failed');
+          if (!refreshed) throw error;
+          ({ data, error } = await invoke());
+        }
+        if (error) console.error('Secure RPC rejected', {
+          action: name,
+          code: String(error.code || 'unknown'),
+          status: Number(error.status || error.statusCode || 0) || null
         });
         if (error) throw error;
         return data;
@@ -2594,7 +2640,9 @@
         const d = await rpc('tap_coin', { p_taps: 1 });
         if (d?.state) processState(d);
         renderTop();
-      } catch (err) { toast('İşlem sunucu tarafından onaylanmadı.'); }
+      } catch (err) {
+        if (!S.authBlockedReason) toast('İşlem sunucu tarafından onaylanmadı.');
+      }
     }
 
     async function handleCollect() {

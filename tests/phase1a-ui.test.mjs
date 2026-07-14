@@ -82,3 +82,14 @@ test('protected Auth, RPC and tap economy contracts remain present', () => {
   assert.match(html, /rpc\('tap_coin', \{ p_taps: 1 \}\)/);
   assert.match(html, /if \(d\?\.state\) processState\(d\);\s*renderTop\(\);/);
 });
+
+test('expired Telegram WebView sessions refresh once and preserve the economic request id', () => {
+  assert.match(html, /let authRefreshInFlight = null/);
+  assert.match(html, /S\.sessionExpiresAt > Date\.now\(\) \+ 45000/);
+  assert.match(html, /code === 'PGRST301' \|\| status === 401/);
+  assert.match(html, /document\.addEventListener\('visibilitychange'/);
+  assert.match(html, /const requestId = isReadOnly \? null : \(suppliedRequestId \|\| uid\(\)\)/);
+  assert.match(html, /let \{ data, error \} = await invoke\(\);[\s\S]*\(\{ data, error \} = await invoke\(\)\);/);
+  assert.match(html, /p_action: name, p_payload: payload, p_request_id: requestId/);
+  assert.match(html, /if \(!S\.authBlockedReason\) toast\('İşlem sunucu tarafından onaylanmadı\.'\)/);
+});
