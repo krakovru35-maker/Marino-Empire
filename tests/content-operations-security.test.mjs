@@ -53,7 +53,7 @@ test('request id and claim idempotency are enforced',()=>{
 test('concurrent claim is serialized and entitlement is transaction-bound',()=>{
   assert.match(rpc,/pg_advisory_xact_lock\(hashtextextended/);
   assert.match(schema,/unique \(user_id, source_type, source_id, entitlement_type\)/);
-  const claim=rpc.match(/create or replace function public\.claim_daily_content_reward[\s\S]*?end\n\$\$;/i)?.[0]||'';
+  const claim=rpc.match(/create or replace function public\.claim_daily_content_reward[\s\S]*?end\r?\n\$\$;/i)?.[0]||'';
   assert.match(claim,/insert into public\.virtual_entitlements/);
   assert.match(claim,/insert into public\.player_content_claims/);
   assert.doesNotMatch(claim,/commit|rollback/i);
