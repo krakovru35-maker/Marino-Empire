@@ -2078,7 +2078,7 @@
         <div class="key-grid" id="cipherKeys"></div>
         <div style="display:flex; gap:8px; margin-top:10px">
           <button class="action-btn" id="btnCipherBack" style="flex:1;background:#666" data-i18n="undo">SİL</button>
-          <button class="action-btn gold" id="btnCipherSubmit" style="flex:2" data-testid="cipher-submit-btn" data-i18n="solve">ÇÖZ</button>
+          <button class="action-btn gold" id="btnCipherSubmit" style="flex:2" data-testid="cipher-submit-btn" data-i18n="solve">ONAYLA</button>
         </div>
         <p style="text-align:center; color:var(--text-muted); font-size:11px; margin-top:10px">
           <span class="morse-dot"></span><span class="morse-dot"></span> = İ &nbsp;|&nbsp; <span class="morse-dash"></span> = T &nbsp;|&nbsp; <span class="morse-dot"></span><span class="morse-dash"></span> = A
@@ -2342,6 +2342,10 @@
         S.game.state.inc += Number(previewIncome);
         renderTop();
         return { ok: true, state: window.MarinoPhase2BBridge.snapshot() };
+      },
+      claimTask: async (taskId, levelNo = 1) => {
+        if (!isLocalPreview) return doAction('marino_claim_task', { p_task_id: taskId, p_level_no: Number(levelNo || 1) });
+        return { ok: true };
       },
       regeneratePreviewEnergy: () => {
         if (!isLocalPreview || !S.game?.state || S.game.state.en >= S.game.state.maxEn) return false;
@@ -4312,7 +4316,7 @@
         keysEl.appendChild(b);
       });
       // Submit state
-      q('#btnCipherSubmit').textContent = s.won ? '✅ ' + t('cipher_already_done') : t('solve');
+      q('#btnCipherSubmit').textContent = s.won ? '✅ ' + t('cipher_already_done') : 'ONAYLA';
       q('#btnCipherSubmit').disabled = s.won;
     }
     function cipherBack() {

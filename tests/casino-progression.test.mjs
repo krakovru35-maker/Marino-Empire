@@ -41,7 +41,9 @@ test('gerçek mod yetkisi olmadan istemci görev ödülü üretemez',()=>{
   const state=missions.createProgressState();
   missions.applyProgressEvent(state,'roulette_bet',{type:'split'});
   assert.equal(missions.claimMissionState(state,'roulette_split',false).points,0);
-  assert.match(read('public/js/casino/casino-missions.js'),/if\(!preview\(\)\)return false/);
+  const source=read('public/js/casino/casino-missions.js');
+  assert.match(source,/claimMissionState\(state,id,preview\(\)\)/);
+  assert.match(source,/grantDemoRewardPoints/);
 });
 
 test('ustalık puanı bahis miktarından bağımsızdır',()=>{
