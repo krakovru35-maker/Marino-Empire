@@ -2338,7 +2338,6 @@
 
       try { tg?.ready(); tg?.expand(); tg?.disableVerticalSwipes?.(); } catch (e) { }
       setupAuthStateListener();
-      
       // Telegram Dinamik Boyut Sabitleyici (Tüm Cihazlar İçin)
     if (window.Telegram?.WebApp) {
       const setTgHeight = () => {
@@ -2347,7 +2346,6 @@
       window.Telegram.WebApp.onEvent('viewportChanged', setTgHeight);
       setTgHeight();
     }
-      
       if (!await authenticateTelegram()) {
         S.user = { id: null, name: 'Kimlik doğrulanamadı', user: '' };
         toast('Güvenli Telegram oturumu kurulamadı. Lütfen oyunu Telegram içinden yeniden açın.');
