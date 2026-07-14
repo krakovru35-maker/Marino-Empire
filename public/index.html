@@ -25,6 +25,7 @@
   <link href="./styles/casino/blackjack.css" rel="stylesheet">
   <link href="./styles/casino/casino-progression.css" rel="stylesheet">
   <link href="./styles/mobile-boot-polish.css" rel="stylesheet">
+  <link href="./styles/social-hub.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
   <script src="./js/phase-1b.js" defer></script>
   <script src="./js/phase-2a.js" defer></script>
@@ -42,6 +43,7 @@
   <script src="./js/casino/casino-mastery.js" defer></script>
   <script src="./js/casino/casino-tournament.js" defer></script>
   <script src="./js/casino/casino-lobby.js" defer></script>
+  <script src="./js/social-hub.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
    MARINO EMPIRE — HAMSTER COMBAT STYLE UI
@@ -1828,19 +1830,40 @@
     </main>
 
     <main id="view-friends">
-      <div class="page-head">
-        <h2>Arkadaşlar & Sıralama</h2>
-        <p>Topluluğunu büyüt, ödülleri kap!</p>
-      </div>
-      <div style="display:flex; gap:8px; padding:0 14px 10px;">
-        <button class="action-btn" id="tabRef" style="flex:1; font-size:12px">Davet Et</button>
-        <button class="action-btn" id="tabRank"
-          style="flex:1; background:rgba(255,255,255,0.1); font-size:12px">Küresel</button>
-        <button class="action-btn" id="tabLeagueRank"
-          style="flex:1; background:rgba(255,255,255,0.1); font-size:12px">LİGİM</button>
-      </div>
-      <div id="listRef" class="list-scroll"></div>
-      <div id="listRank" class="list-scroll" style="display:none"></div>
+      <section class="social-hub" aria-label="Sosyal merkez">
+        <header class="social-head">
+          <div><span class="social-kicker">MARINO NETWORK</span><h2>Sosyal Merkez</h2></div>
+          <button id="socialMuteToggle" class="social-icon-btn" type="button" aria-label="Sohbet bildirimlerini kapat">🔔</button>
+        </header>
+        <nav class="social-tabs" aria-label="Sosyal merkez sekmeleri">
+          <button id="tabRef" data-social-tab="general" class="active" type="button">Genel</button>
+          <button id="tabRank" data-social-tab="league" type="button">Ligim</button>
+          <button id="tabLeagueRank" data-social-tab="friends" type="button">Arkadaşlar <span id="socialRequestBadge" hidden></span></button>
+          <button id="tabGifts" data-social-tab="gifts" type="button">Hediyeler</button>
+        </nav>
+        <div id="socialStatus" class="social-status" role="status">Güvenli bağlantı hazırlanıyor…</div>
+        <div id="socialChatPanel" class="social-chat-panel">
+          <button id="socialLoadOlder" class="social-load-older" type="button">Daha eski mesajlar</button>
+          <div id="socialMessageList" class="social-message-list" aria-live="polite"></div>
+          <button id="socialNewMessages" class="social-new-messages" type="button" hidden>Yeni mesajlar</button>
+          <form id="socialComposer" class="social-composer">
+            <div class="social-compose-row">
+              <textarea id="socialMessageInput" maxlength="160" rows="1" placeholder="Mesaj yaz…" aria-label="Mesaj"></textarea>
+              <button id="socialGiftShortcut" class="social-gift-shortcut" type="button" aria-label="Hediye gönder">🎁</button>
+              <button id="socialSend" class="social-send" type="submit">Gönder</button>
+            </div>
+            <div class="social-compose-meta"><span>İletişim bilgileri güvenliğiniz için otomatik gizlenir.</span><b id="socialCharCount">0/160</b></div>
+          </form>
+        </div>
+        <div id="socialFriendsPanel" class="social-panel" hidden>
+          <form id="socialFriendForm" class="social-code-form"><input id="socialCodeInput" maxlength="3" autocomplete="off" placeholder="Sosyal kod: 4F2" aria-label="Sosyal kod"><button type="submit">İstek gönder</button></form>
+          <div id="socialFriendRequests"></div><div id="socialFriendList"></div>
+        </div>
+        <div id="socialGiftsPanel" class="social-panel" hidden>
+          <div id="socialGiftSummary"></div><div id="socialGiftCatalog" class="social-gift-grid"></div>
+        </div>
+        <div id="listRef" hidden></div><div id="listRank" hidden></div>
+      </section>
     </main>
 
     <!-- Navigation -->
@@ -2264,6 +2287,9 @@
       } else {
         q('#view-' + t).classList.add('active');
       }
+      q('#app').scrollTop = 0;
+      if (t === 'friends') window.MarinoSocial?.open?.();
+      else window.MarinoSocial?.close?.();
     }
 
     /* ── Audio ── */
@@ -2552,6 +2578,27 @@
         if (!isReadOnly) inFlightActions.delete(name);
       }
     }
+
+    window.MarinoSocialBridge = {
+      preview: isLocalPreview,
+      invoke: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return window.MarinoSocialPreview?.invoke?.(action, payload, requestId);
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.rpc('marino_social_rpc', {
+          p_action: action, p_payload: payload, p_request_id: requestId
+        });
+        if (error) throw error;
+        return data;
+      },
+      toast: message => toast(message),
+      coinBalance: () => Number(S.game?.state?.coin || 0),
+      applyCoinBalance: balance => {
+        if (S.game?.state && Number.isFinite(Number(balance))) {
+          S.game.state.coin = Number(balance);
+          renderTop();
+        }
+      }
+    };
 
     function processState(d) {
       if (d.state) S.game.state = {
@@ -2894,10 +2941,6 @@
 
       q('#listRef').innerHTML = html;
     }
-
-    q('#tabRef').onclick = () => { q('#tabRef').style.background = ''; q('#tabRank').style.background = 'rgba(255,255,255,0.1)'; q('#tabLeagueRank').style.background = 'rgba(255,255,255,0.1)'; q('#listRef').style.display = 'block'; q('#listRank').style.display = 'none'; renderReferrals(); };
-    q('#tabRank').onclick = () => { S.rankTab = 'global'; q('#tabRank').style.background = ''; q('#tabRef').style.background = 'rgba(255,255,255,0.1)'; q('#tabLeagueRank').style.background = 'rgba(255,255,255,0.1)'; q('#listRank').style.display = 'block'; q('#listRef').style.display = 'none'; renderRank(); };
-    q('#tabLeagueRank').onclick = () => { S.rankTab = 'league'; q('#tabLeagueRank').style.background = ''; q('#tabRef').style.background = 'rgba(255,255,255,0.1)'; q('#tabRank').style.background = 'rgba(255,255,255,0.1)'; q('#listRank').style.display = 'block'; q('#listRef').style.display = 'none'; renderRank(); };
 
     /* ── Mini Games UI Engine ── */
     function openMini(id, title) {

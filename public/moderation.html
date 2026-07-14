@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow">
+  <title>Marino Social Moderation</title>
+  <script src="./__MARINO_RUNTIME_CONFIG_SCRIPT__"></script><script src="./runtime-config-loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="./styles/admin/social-moderation.css"><script src="./js/admin/social-moderation.js" defer></script>
+</head>
+<body>
+  <header><div><span>MARINO EMPIRE</span><h1>Sosyal Moderasyon</h1></div><button id="modSignOut" type="button" hidden>Çıkış</button></header>
+  <main>
+    <section id="modGate"><h2>Güvenli yönetici girişi</h2><p>Yetki yalnız sunucudaki operator/security_admin rolünden doğrulanır.</p><form id="modLogin"><input id="modEmail" type="email" autocomplete="email" required placeholder="Yönetici e-postası"><button type="submit">Giriş bağlantısı gönder</button></form><p id="modMessage" role="status"></p></section>
+    <section id="modWorkspace" hidden><div class="mod-toolbar"><b id="modRole">ROL DOĞRULANDI</b><button id="modRefresh" type="button">Kuyruğu yenile</button></div><div id="modQueue"></div></section>
+  </main>
+</body>
+</html>
