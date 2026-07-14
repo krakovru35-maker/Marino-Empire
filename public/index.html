@@ -47,6 +47,7 @@
   <script src="./js/casino/casino-lobby.js" defer></script>
   <script src="./js/social-hub.js" defer></script>
   <script src="./js/admin-center.js" defer></script>
+  <script src="./js/admin-operations.js" defer></script>
   <script src="./js/live-announcements.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
@@ -2140,11 +2141,12 @@
 
     const q = s => document.querySelector(s);
     const fmt = n => new Intl.NumberFormat('en-US').format(Number(n || 0));
+    const safeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
     const uid = () => crypto.randomUUID();
 
     let S = {
       user: null, game: null, busy: false, authenticated: false, authBlockedReason: null,
-      sessionExpiresAt: 0, startParam: '', rankTab: 'global',
+      sessionExpiresAt: 0, startParam: '', rankTab: 'global', taskCatalog: [],
       settings: JSON.parse(localStorage.getItem('m_set') || '{"sfx":true,"mus":true}')
     };
 
@@ -2615,6 +2617,7 @@
       }
     };
 
+    const CONTENT_ADMIN_RPCS = new Set(['admin_get_daily_content','admin_upsert_daily_content','admin_publish_daily_content','admin_cancel_daily_content','admin_get_content_audit']);
     window.MarinoAdminBridge = {
       preview: isLocalPreview,
       appReady: () => appPhase === APP_PHASE.READY && (isLocalPreview || (S.authenticated && !S.authBlockedReason)),
@@ -2623,6 +2626,21 @@
         if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
         const gateway = action.startsWith('announcement') ? 'marino_announcement_admin_rpc' : 'marino_admin_gateway';
         const { data, error } = await db.rpc(gateway, { p_action: action, p_payload: payload, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
+      content: async (name, payload = {}) => {
+        if (!CONTENT_ADMIN_RPCS.has(name)) throw new Error('content_admin_action_not_allowed');
+        if (isLocalPreview) return name === 'admin_get_daily_content' ? { role: 'super_admin', items: [] } : { ok: true };
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.rpc(name, payload);
+        if (error) throw error;
+        return data;
+      },
+      operations: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return { ok: true, items: [] };
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.rpc('marino_operations_admin_rpc', { p_action: action, p_payload: payload, p_request_id: requestId || uid() });
         if (error) throw error;
         return data;
       },
@@ -2671,6 +2689,14 @@
       if (d.completed_tasks) S.game.completed_tasks = d.completed_tasks;
     }
 
+    async function loadTaskState() {
+      if (isLocalPreview || !db || !S.authenticated) return;
+      const { data, error } = await db.rpc('marino_task_state');
+      if (error) throw error;
+      S.taskCatalog = Array.isArray(data?.items) ? data.items : [];
+      if (Array.isArray(data?.completed)) S.game.completed_tasks = data.completed;
+    }
+
     async function fetchGame() {
       try {
         const sp = S.startParam;
@@ -2686,6 +2712,7 @@
         });
 
         S.game = {}; processState(res);
+        try { await loadTaskState(); } catch (error) { console.error('Task catalogue unavailable', { code: String(error?.code || 'unknown') }); }
         renderAll();
 
         // Check Sports Coupons
@@ -2862,32 +2889,11 @@
     function renderTasks() {
       if (!S.game) return; const s = S.game.state; const done = S.game.completed_tasks || [];
       let html = '';
-
-      // Social Tasks
-      html += '<div class="sec-title">Sosyal Usta</div>';
-      const sts = [
-        { id: 'soc_tg', n: 'Telegram Grubuna Katıl', img: '📢', r: 5000, link: 'https://t.me/betmarinocom' },
-        { id: 'soc_tw', n: 'X (Twitter) Takip Et', img: '🐦', r: 2500, link: 'https://x.com/marinoetkinlik' }
-      ];
-      sts.forEach(t => {
-        const isD = done.includes(t.id);
-        html += `<div class="item-row"><div class="item-ico">${t.img}</div><div class="item-info"><div class="item-title">${t.n}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(t.r)} Coin</div></div><button class="action-btn ${isD ? '' : 'gold'}" onclick="if(!${isD}){ if(window.Telegram?.WebApp && window.Telegram.WebApp.openLink) window.Telegram.WebApp.openLink('${t.link}'); else window.open('${t.link}', '_blank'); doAction('marino_claim_task',{p_task_id:'${t.id}', p_level_no:1}); }" ${isD ? 'disabled' : ''}>${isD ? 'Alındı' : 'Tamamla'}</button></div>`;
-      });
-
-      html += '<div class="sec-title">Günlük Görevler</div>';
-      const dts = [{ id: 'daily_tap', n: '100 Dokunuş' }, { id: 'daily_collect', n: 'Kasa Topla' }, { id: 'daily_mini', n: 'Mini Oyun Oyna' }];
-      dts.forEach(t => {
-        const isD = done.includes(t.id);
-        html += `<div class="item-row"><div class="item-ico">${isD ? '✅' : '📅'}</div><div class="item-info"><div class="item-title">${t.n}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> 200 Coin</div></div><button class="action-btn ${isD ? '' : 'gold'}" onclick="doAction('marino_claim_task',{p_task_id:'${t.id}', p_level_no:1})" ${isD ? 'disabled' : ''}>${isD ? 'Alındı' : 'Tamamla'}</button></div>`;
-      });
-
-      html += `<div class="sec-title">Seviye Görevleri (Sv. ${s.lvl})</div>`;
-      const m = Math.min(100, Math.max(8, s.lvl + 3));
-      for (let l = 1; l <= m; l++) {
-        const tId = `L${l}_G1`; const isD = done.includes(tId); const lock = l > s.lvl;
-        if (l < s.lvl && isD) continue; // Hide old
-        html += `<div class="item-row"><div class="item-ico">${lock ? '🔒' : (isD ? '✅' : '🔸')}</div><div class="item-info"><div class="item-title">Sv. ${l} Ulaş</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(l * 100)} Coin</div></div><button class="action-btn ${lock || isD ? '' : 'gold'}" onclick="doAction('marino_claim_task',{p_task_id:'${tId}', p_level_no:${l}})" ${lock || isD ? 'disabled' : ''}>${lock ? 'Kilitli' : (isD ? 'Alındı' : 'Al')}</button></div>`;
-      }
+      const fallback=[{task_key:'soc_tg',task_name:'Telegram Grubuna Katıl',task_type:'achievement',reward_coin:5000,required_level:1},{task_key:'soc_tw',task_name:'X Hesabını Takip Et',task_type:'achievement',reward_coin:2500,required_level:1},{task_key:'daily_tap',task_name:'100 Dokunuş',task_type:'daily',reward_coin:200,required_level:1},{task_key:'daily_collect',task_name:'Kasa Topla',task_type:'daily',reward_coin:150,required_level:1},{task_key:'daily_mini',task_name:'Mini Oyun Oyna',task_type:'daily',reward_coin:200,required_level:1}];
+      const tasks=S.taskCatalog.length?S.taskCatalog:fallback;
+      const socialLinks={soc_tg:'https://t.me/betmarinocom',soc_tw:'https://x.com/marinoetkinlik'};
+      const sections=[['achievement','Sosyal & Başarımlar'],['daily','Günlük Görevler'],['weekly','Haftalık Görevler'],['level',`Seviye Görevleri (Sv. ${s.lvl})`],['event','Etkinlik Görevleri']];
+      sections.forEach(([type,title])=>{const group=tasks.filter(task=>task.task_type===type);if(!group.length)return;html+=`<div class="sec-title">${safeHtml(title)}</div>`;group.forEach(task=>{const id=String(task.task_key).toLowerCase(),isD=done.includes(id),level=Number(task.required_level||1),lock=level>s.lvl,link=socialLinks[id],icon=lock?'🔒':isD?'✅':type==='daily'?'📅':type==='level'?'🔸':'🏅';const action=link?`if(window.Telegram?.WebApp?.openLink)window.Telegram.WebApp.openLink('${link}');else window.open('${link}','_blank');doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`: `doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`;html+=`<div class="item-row"><div class="item-ico">${icon}</div><div class="item-info"><div class="item-title">${safeHtml(task.task_name)}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(task.reward_coin)} Coin${level>1?` · Sv. ${level}`:''}</div></div><button class="action-btn ${lock||isD?'':'gold'}" onclick="${action}" ${lock||isD?'disabled':''}>${lock?'Kilitli':isD?'Alındı':link?'Git & Al':'Al'}</button></div>`})});
       q('#listTasks').innerHTML = html;
     }
 
