@@ -2287,7 +2287,9 @@
       } else {
         q('#view-' + t).classList.add('active');
       }
-      q('#app').scrollTop = 0;
+      const appViewport = q('#app');
+      appViewport.scrollTop = 0;
+      requestAnimationFrame(() => { appViewport.scrollTop = 0; });
       if (t === 'friends') window.MarinoSocial?.open?.();
       else window.MarinoSocial?.close?.();
     }

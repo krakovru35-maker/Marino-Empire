@@ -77,6 +77,7 @@ test('mobile social layout includes keyboard-safe scroll and safe area', () => {
   assert.match(css, /overflow-y:auto/);
   assert.match(css, /@media\(max-width:350px\),\(max-height:620px\)/);
   for (const tab of ['general','league','friends','gifts']) assert.match(html, new RegExp(`data-social-tab="${tab}"`));
+  assert.match(html, /requestAnimationFrame\(\(\) => \{ appViewport\.scrollTop = 0; \}\)/);
 });
 
 test('moderation console trusts only the server role gateway', () => {
