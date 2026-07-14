@@ -26,6 +26,8 @@
   <link href="./styles/casino/casino-progression.css" rel="stylesheet">
   <link href="./styles/mobile-boot-polish.css" rel="stylesheet">
   <link href="./styles/social-hub.css" rel="stylesheet">
+  <link href="./styles/admin-center.css" rel="stylesheet">
+  <link href="./styles/live-announcements.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
   <script src="./js/phase-1b.js" defer></script>
   <script src="./js/phase-2a.js" defer></script>
@@ -44,6 +46,8 @@
   <script src="./js/casino/casino-tournament.js" defer></script>
   <script src="./js/casino/casino-lobby.js" defer></script>
   <script src="./js/social-hub.js" defer></script>
+  <script src="./js/admin-center.js" defer></script>
+  <script src="./js/live-announcements.js" defer></script>
   <style>
     /* ═══════════════════════════════════════════
    MARINO EMPIRE — HAMSTER COMBAT STYLE UI
@@ -1906,6 +1910,10 @@
           style="width:100%; background:linear-gradient(90deg, #2A8CFE, #2A54FE); margin: 10px 0; height:48px; border-radius:12px; font-weight:900">📖
           OYUN KILAVUZU (NASIL OYNANIR?)</button>
 
+        <button class="action-btn admin-center-entry" id="btnAdminCenter" type="button" hidden>
+          🛡️ YÖNETİM MERKEZİ
+        </button>
+
         <div class="alert-box">Ayarlar otomatik kaydedilir.</div>
 
         <div
@@ -2391,6 +2399,8 @@
       q('#app').appendChild(badge);
       bindUiEvents(); renderAll(); renderPreviewRank();
       markBootComplete();
+      document.dispatchEvent(new CustomEvent('marino:authenticated'));
+      window.MarinoAdmin?.bootstrap?.();
     }
 
     /* ── Bootstrap ── */
@@ -2434,6 +2444,9 @@
 
       // Initial load
       await fetchGame();
+      document.dispatchEvent(new CustomEvent('marino:authenticated'));
+      await window.MarinoAdmin?.bootstrap?.();
+      window.MarinoAnnouncements?.start?.();
       markBootComplete();
       window.MarinoPhase1B?.maybeStartOnboarding();
 
@@ -2599,6 +2612,43 @@
           S.game.state.coin = Number(balance);
           renderTop();
         }
+      }
+    };
+
+    window.MarinoAdminBridge = {
+      preview: isLocalPreview,
+      appReady: () => appPhase === APP_PHASE.READY && (isLocalPreview || (S.authenticated && !S.authBlockedReason)),
+      invoke: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return window.MarinoAdminPreview?.invoke?.(action, payload, requestId);
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const gateway = action.startsWith('announcement') ? 'marino_announcement_admin_rpc' : 'marino_admin_gateway';
+        const { data, error } = await db.rpc(gateway, { p_action: action, p_payload: payload, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
+      me: async () => {
+        if (isLocalPreview) return { is_admin: true, role: 'super_admin', is_owner: true, permissions: [] };
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) return { is_admin: false, permissions: [] };
+        const { data, error } = await db.rpc('marino_admin_me');
+        if (error) throw error;
+        return data;
+      },
+      announcements: async (action, payload = {}, requestId = null) => {
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.rpc('marino_announcement_player_rpc', { p_action: action, p_payload: payload, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
+      subscribeAnnouncements: handler => db.channel('marino-announcement-signals').on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'marino_announcement_signals'
+      }, handler).subscribe(),
+      removeChannel: channel => db.removeChannel(channel),
+      toast: message => toast(message),
+      openAction: action => {
+        const routes = { event: 'tasks', combo: 'home', cipher: 'home', rewards: 'store', chat: 'friends', store: 'store', update: 'home' };
+        if (routes[action]) showTab(routes[action]);
+        if (action === 'combo') openCombo();
+        if (action === 'cipher') openCipher();
       }
     };
 
