@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" data-app-state="booting">
 
 <head>
   <meta charset="utf-8">
@@ -24,6 +24,7 @@
   <link href="./styles/casino/roulette.css" rel="stylesheet">
   <link href="./styles/casino/blackjack.css" rel="stylesheet">
   <link href="./styles/casino/casino-progression.css" rel="stylesheet">
+  <link href="./styles/mobile-boot-polish.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
   <script src="./js/phase-1b.js" defer></script>
   <script src="./js/phase-2a.js" defer></script>
@@ -1644,23 +1645,22 @@
 </head>
 
 <body>
-  <div id="introAnim" class="intro-overlay">
+  <div id="introAnim" class="intro-overlay" role="dialog" aria-modal="true" aria-label="Marino Empire açılışı">
     <video id="introVid" data-src="./assets/intro.mp4" preload="none" muted playsinline
-      style="position:absolute; width:100%; height:100%; object-fit:cover; z-index:1"></video>
+      class="intro-hero"></video>
     <div class="intro-content">
-      <div style="font-size: 14px; font-weight: 800; color: #ffd13b; letter-spacing: 2px; margin-bottom: 5px">PRESENTING
-      </div>
-      <h1 class="intro-title" style="font-size:36px">MARINO EMPIRE</h1>
+      <div class="intro-mark" aria-hidden="true">M</div>
+      <div class="intro-kicker">CASINO EMPIRE</div>
+      <h1 class="intro-title">MARINO EMPIRE</h1>
+      <p class="intro-subtitle">İmparatorluğun hazırlanıyor</p>
       <div class="intro-bar">
-      <div class="intro-progress"></div>
+        <div class="intro-progress"></div>
       </div>
-      <div id="skipIntro" onclick="finishIntro()"
-        style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 900; background:rgba(255,255,255,0.1); padding:8px 20px; border-radius:99px; cursor:pointer; display:inline-block; border:1px solid rgba(255,255,255,0.1); z-index:10; position:relative">
-        VİDEOYU ATLA ❯</div>
+      <button type="button" id="skipIntro" class="intro-skip" onclick="finishIntro(true)">BU AÇILIŞI ATLA</button>
     </div>
   </div>
 
-  <div id="app">
+  <div id="app" inert>
 
     <!-- HOME VIEW (Phase 1A premium mobile composition) -->
     <div id="view-home" class="page" style="display: flex; flex-direction: column; height: 100%; flex: 1;">
@@ -2158,21 +2158,88 @@
     `).join('');
     }
 
+    const APP_PHASE = Object.freeze({ BOOTING: 'booting', INTRO: 'introPlaying', READY: 'ready' });
+    const INTRO_INSTALL_KEY = 'marino_install_seen_v1';
+    const INTRO_SKIP_KEY = 'marino_intro_skip_v1';
+    const INTRO_LAUNCH_KEY = 'marino_intro_launch_v1';
+    let appPhase = APP_PHASE.BOOTING;
     let introFinished = false;
+    let introWindowElapsed = false;
+    let appBootComplete = false;
     let introFinishTimer = null;
-    function finishIntro() {
-      if (introFinished) return;
+
+    function setAppPhase(phase) {
+      appPhase = phase;
+      document.documentElement.dataset.appState = phase;
+      q('#app')?.toggleAttribute('inert', phase !== APP_PHASE.READY);
+      try { sessionStorage.setItem(INTRO_LAUNCH_KEY, phase); } catch (e) { }
+    }
+
+    function completeIntroTransition() {
+      if (introFinished || !introWindowElapsed || !appBootComplete) return;
       const intro = q('#introAnim');
-      if (!intro) return;
       introFinished = true;
       if (introFinishTimer) {
         clearTimeout(introFinishTimer);
         introFinishTimer = null;
       }
-      try { localStorage.setItem('marino_intro_seen_v1', '1'); } catch (e) { }
-      intro.style.opacity = '0';
-      intro.style.pointerEvents = 'none';
-      setTimeout(() => intro.remove(), 1000);
+      if (!intro) {
+        setAppPhase(APP_PHASE.READY);
+        return;
+      }
+      intro.classList.add('is-exiting');
+      setTimeout(() => {
+        intro.remove();
+        setAppPhase(APP_PHASE.READY);
+        document.dispatchEvent(new CustomEvent('marino:app-ready'));
+      }, 380);
+    }
+
+    function finishIntro(skipped = false) {
+      if (introFinished) return;
+      introWindowElapsed = true;
+      if (skipped) window.MarinoAudio?.play?.('ui_open');
+      completeIntroTransition();
+    }
+
+    function markBootComplete() {
+      appBootComplete = true;
+      completeIntroTransition();
+    }
+
+    function beginIntroFlow() {
+      const intro = q('#introAnim');
+      if (!intro) {
+        introWindowElapsed = true;
+        return;
+      }
+      setAppPhase(APP_PHASE.INTRO);
+      let firstInstall = true;
+      let skipPermanently = false;
+      try {
+        firstInstall = localStorage.getItem(INTRO_INSTALL_KEY) !== '1';
+        skipPermanently = localStorage.getItem(INTRO_SKIP_KEY) === '1';
+        localStorage.setItem(INTRO_INSTALL_KEY, '1');
+      } catch (e) { }
+      const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+      const duration = skipPermanently ? 0 : reducedMotion ? 1.5 : firstInstall ? 2.4 : 1.8;
+      document.documentElement.style.setProperty('--intro-duration', `${duration}s`);
+      intro.classList.add(firstInstall ? 'is-first-install' : 'is-repeat');
+      intro.classList.toggle('is-reduced', reducedMotion);
+      const video = q('#introVid');
+      if (video && firstInstall && !reducedMotion && !skipPermanently) {
+        const videoSrc = video.dataset.src;
+        if (videoSrc) {
+          video.src = videoSrc;
+          video.load();
+          video.play()?.catch?.(() => { });
+        }
+      }
+      intro.addEventListener('pointerdown', () => {
+        window.MarinoAudio?.unlock?.();
+        window.MarinoAudio?.play?.('ui_open');
+      }, { once: true });
+      introFinishTimer = setTimeout(() => finishIntro(false), duration * 1000);
     }
 
     function openGuide() {
@@ -2294,41 +2361,23 @@
       const badge = document.createElement('div');
       badge.id = 'localPreviewBadge'; badge.className = 'local-preview-badge'; badge.textContent = 'LOCAL UI PREVIEW';
       q('#app').appendChild(badge);
-      bindUiEvents(); renderAll(); renderPreviewRank(); finishIntro();
+      bindUiEvents(); renderAll(); renderPreviewRank();
+      markBootComplete();
     }
 
     /* ── Bootstrap ── */
     async function init() {
+      beginIntroFlow();
       if (isLocalPreview) {
         startLocalPreview();
         return;
-      }
-      // Video Intro Logic
-      const v = q('#introVid');
-      let introSeen = false;
-      try { introSeen = localStorage.getItem('marino_intro_seen_v1') === '1'; } catch (e) { }
-      if (introSeen) {
-        q('#introAnim')?.remove();
-        introFinished = true;
-      } else if (v) {
-        const videoSrc = v.dataset.src;
-        if (videoSrc) {
-          v.src = videoSrc;
-          v.load();
-          const playAttempt = v.play();
-          if (playAttempt?.catch) playAttempt.catch(() => { });
-        }
-        v.onended = finishIntro;
-        // Phase 1A: shared CSS duration keeps progress and dismissal synchronized.
-        const introDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--intro-duration')) || 4.5;
-        introFinishTimer = setTimeout(finishIntro, introDuration * 1000);
       }
 
       if (!runtimeConfig || !db) {
         S.authBlockedReason = runtimeConfigResult?.error || 'runtime_config_unavailable';
         S.user = { id: null, name: 'Yapılandırma hatası', user: '' };
         toast('Güvenli ortam yapılandırması doğrulanamadı. Oyun başlatılmadı.');
-        finishIntro();
+        markBootComplete();
         return;
       }
 
@@ -2349,7 +2398,7 @@
       if (!await authenticateTelegram()) {
         S.user = { id: null, name: 'Kimlik doğrulanamadı', user: '' };
         toast('Güvenli Telegram oturumu kurulamadı. Lütfen oyunu Telegram içinden yeniden açın.');
-        finishIntro();
+        markBootComplete();
         return;
       }
 
@@ -2357,6 +2406,7 @@
 
       // Initial load
       await fetchGame();
+      markBootComplete();
       window.MarinoPhase1B?.maybeStartOnboarding();
 
       // Energy Regen Loop (1 per min)
