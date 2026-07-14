@@ -91,6 +91,20 @@ test('admin panel is staging-only and writes exclusively through RPC',()=>{
   assert.match(report,/claim_count/);
 });
 
+test('admin content quick templates make combo cipher and event creation option-driven',()=>{
+  const ops=fs.readFileSync('public/js/admin-operations.js','utf8');
+  assert.match(admin,/quickContentPanel/);
+  assert.match(admin,/visible_daily_code/);
+  assert.match(admin,/display_code/);
+  assert.match(admin,/keyboard:\s*'alphanumeric'/);
+  assert.match(ops,/data-quick-template/);
+  assert.match(ops,/visible_daily_code/);
+  assert.doesNotMatch(admin,/display_code[^;]+correct_answer/i);
+  assert.match(html,/payload\?\.display_code/);
+  assert.match(html,/keyboard === 'alphanumeric'/);
+  assert.match(html,/cipher-code-display/);
+});
+
 test('local preview content adapter performs no network or RPC invocation',()=>{
   assert.match(adapter,/if\(state\.preview\)setItems\(mock\(\)\);else/);
   assert.match(adapter,/state\.preview\?\{claimed:true\}:await state\.invoke/);

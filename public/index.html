@@ -1403,6 +1403,14 @@
       margin-bottom: 12px;
       line-height: 1.8;
     }
+    .morse-display.cipher-code-display {
+      font-size: clamp(22px, 7vw, 34px);
+      letter-spacing: 0.14em;
+      color: #fff3a6;
+      background: linear-gradient(135deg, rgba(255,209,59,0.16), rgba(66,217,255,0.08));
+      box-shadow: inset 0 1px rgba(255,255,255,0.08), 0 0 24px rgba(255,209,59,0.12);
+      user-select: text;
+    }
     .cipher-boxes {
       display: flex; justify-content: center; gap: 6px; margin: 8px 0 14px;
       flex-wrap: wrap;
@@ -4205,15 +4213,22 @@
     function renderCipherSheet() {
       const s = cipherState();
       const stagedCipher = window.MarinoDailyContent?.content?.('daily_cipher');
-      const wordLength = Number(stagedCipher?.payload?.word_length ?? S.hk?.cipher_hint?.word_length ?? 0);
+      const displayCode = String(stagedCipher?.payload?.display_code ?? '');
+      const wordLength = Number(stagedCipher?.payload?.word_length ?? (displayCode ? displayCode.length : S.hk?.cipher_hint?.word_length) ?? 0);
       const morse = String(stagedCipher?.payload?.morse ?? S.hk?.cipher_hint?.morse ?? '');
-      // Visual dot/dash
-      const visual = morse.split('').map(ch => {
-        if (ch === '.') return '<span class="morse-dot"></span>';
-        if (ch === '-') return '<span class="morse-dash"></span>';
-        return '<span style="display:inline-block;width:10px"></span>';
-      }).join('');
-      q('#morseDisplay').innerHTML = visual;
+      const morseDisplay = q('#morseDisplay');
+      morseDisplay.classList.toggle('cipher-code-display', !!displayCode);
+      if (displayCode) {
+        morseDisplay.textContent = displayCode;
+      } else {
+        // Visual dot/dash
+        const visual = morse.split('').map(ch => {
+          if (ch === '.') return '<span class="morse-dot"></span>';
+          if (ch === '-') return '<span class="morse-dash"></span>';
+          return '<span style="display:inline-block;width:10px"></span>';
+        }).join('');
+        morseDisplay.innerHTML = visual;
+      }
       // Boxes
       const boxesEl = q('#cipherBoxes'); boxesEl.innerHTML = '';
       for (let i = 0; i < wordLength; i++) {
@@ -4224,7 +4239,7 @@
       }
       // Keys
       const keysEl = q('#cipherKeys'); keysEl.innerHTML = '';
-      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const letters = stagedCipher?.payload?.keyboard === 'alphanumeric' ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       letters.split('').forEach(L => {
         const b = document.createElement('button');
         b.className = 'key-btn'; b.textContent = L;
