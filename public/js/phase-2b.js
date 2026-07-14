@@ -64,6 +64,7 @@
     const server = state.snapshot?.upgrades?.find(item => item.building_key === definition.key) || state.snapshot?.upgrades?.[index];
     const isPreview = preview();
     const supported = isPreview || Boolean(server);
+    const serverUpgradeKey = server?.building_key || definition.key;
     const level = isPreview ? (state.previewLevels.get(definition.key) || (index === 0 ? 3 : 0)) : Number(server?.level || 0);
     const unlock = Number(server?.unlock_level || definition.unlock);
     const locked = Number(state.snapshot?.level || 1) < unlock;
@@ -78,7 +79,7 @@
         <div class="building-income">Saatlik etki <strong>+${fmt(income)}</strong></div>
         ${!supported?'<small class="demo-label">KATALOG • SUNUCU DESTEĞİ BEKLİYOR</small>':''}
         ${locked?`<small class="lock-label">Seviye ${unlock} gerekli</small>`:''}
-      </div><button type="button" class="building-upgrade" data-upgrade="${definition.key}" data-cost="${cost}" data-income="${definition.income}" ${locked||maxed||!supported?'disabled':''}>
+      </div><button type="button" class="building-upgrade" data-upgrade="${definition.key}" data-server-upgrade="${escape(serverUpgradeKey)}" data-cost="${cost}" data-income="${definition.income}" ${locked||maxed||!supported?'disabled':''}>
         <span>${maxed?'MAKSİMUM':'YÜKSELT'}</span><small>${maxed?'Tamamlandı':fmt(cost)+' coin'}</small></button></article>`;
   }
 
@@ -195,7 +196,8 @@
     const definition = BUILDINGS.find(item => item.key === button.dataset.upgrade);
     if (!definition) return;
     button.disabled = true;
-    const result = await window.MarinoPhase2BBridge?.upgradeBuilding?.(definition.key, Number(button.dataset.cost), Number(button.dataset.income));
+    const serverKey = button.dataset.serverUpgrade || definition.key;
+    const result = await window.MarinoPhase2BBridge?.upgradeBuilding?.(serverKey, Number(button.dataset.cost), Number(button.dataset.income));
     if (preview() && result?.ok) {
       state.previewLevels.set(definition.key, (state.previewLevels.get(definition.key) || (definition.key==='casino_lobby'?3:0)) + 1);
       state.metrics.upgrades += 1;
@@ -203,6 +205,8 @@
       state.snapshot = window.MarinoPhase2BBridge.snapshot();
       renderBuildings(); renderTasks(); renderHomePulse();
       window.MarinoPhase2A?.syncScene?.({ level: state.snapshot.level, buildingLevel: Math.max(...state.previewLevels.values()) });
+    } else if (!preview() && result?.ok === false) {
+      button.disabled = false;
     } else if (preview()) {
       button.disabled = false;
       document.querySelector('#toast') && (document.querySelector('#toast').textContent='Demo coin bakiyesi yetersiz.');

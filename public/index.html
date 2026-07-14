@@ -2881,7 +2881,8 @@
         processState(d);
         if (d.message) toast(d.message);
         au.win(); renderAll();
-      } catch (e) { toast(e.message); au.fail(); }
+        return { ok: true, data: d };
+      } catch (e) { toast(e.message); au.fail(); return { ok: false, error: e.message }; }
       finally { S.busy = false; }
     }
 
