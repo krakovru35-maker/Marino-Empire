@@ -41,6 +41,7 @@ test('announcement delivery is targeted, sanitized and direct writes stay closed
   assert.match(announcements,/p_payload \?\| array\['auth_user_id','telegram_id','target_rules','status'\]/);
   assert.match(announcements,/action_type text[\s\S]*check\(action_type in \('none','event','combo','cipher','rewards','chat','store','update','dismiss'\)\)/);
   assert.match(announcements,/revoke all on table public\.%I from public,anon,authenticated/);
+  assert.match(announcements,/revoke all on sequence public\.marino_announcement_impressions_id_seq from public,anon,authenticated/);
   assert.match(announcements,/marino_announcement_signals[\s\S]*signal in \('refresh','stop'\)/);
   assert.doesNotMatch(announcements,/https?:\/\/|javascript:/i);
 });

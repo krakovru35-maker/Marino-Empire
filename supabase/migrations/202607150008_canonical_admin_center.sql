@@ -205,6 +205,7 @@ do $$ declare t text; begin
   execute format('revoke all on table public.%I from public,anon,authenticated',t);
  end loop;
 end $$;
+revoke all on sequence public.marino_admin_audit_details_id_seq from public,anon,authenticated;
 revoke all on function public.marino_admin_guard_owner() from public,anon,authenticated;
 revoke all on function public.marino_admin_audit_immutable() from public,anon,authenticated;
 revoke all on function public.marino_admin_has_permission(text) from public,anon,authenticated;

@@ -144,6 +144,8 @@ exception when invalid_text_representation or numeric_value_out_of_range or date
 end $$;
 
 do $$ declare t text; begin foreach t in array array['marino_announcements','marino_announcement_targets','marino_announcement_impressions','marino_announcement_dismissals','marino_announcement_signals'] loop execute format('alter table public.%I enable row level security',t); execute format('revoke all on table public.%I from public,anon,authenticated',t); end loop; end $$;
+revoke all on sequence public.marino_announcement_impressions_id_seq from public,anon,authenticated;
+revoke all on sequence public.marino_announcement_signals_id_seq from public,anon,authenticated;
 create policy marino_announcement_signal_read on public.marino_announcement_signals for select to authenticated using(auth.uid() is not null);
 grant select on public.marino_announcement_signals to authenticated;
 do $$ begin if exists(select 1 from pg_publication where pubname='supabase_realtime') and not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='marino_announcement_signals') then alter publication supabase_realtime add table public.marino_announcement_signals; end if; end $$;

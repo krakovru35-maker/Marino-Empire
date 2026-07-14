@@ -142,6 +142,8 @@ exception when invalid_text_representation or numeric_value_out_of_range or date
 end $$;
 
 do $$ declare t text; begin foreach t in array array['marino_admin_user_notes','marino_admin_sanctions','marino_events','marino_task_definitions','marino_casino_configs','marino_in_game_notifications'] loop execute format('alter table public.%I enable row level security',t); execute format('revoke all on table public.%I from public,anon,authenticated',t); end loop; end $$;
+revoke all on sequence public.marino_admin_user_notes_id_seq from public,anon,authenticated;
+revoke all on sequence public.marino_admin_sanctions_id_seq from public,anon,authenticated;
 revoke all on function public.marino_admin_require(text,boolean) from public,anon,authenticated;
 revoke all on function public.marino_admin_gateway(text,jsonb,uuid) from public,anon;
 grant execute on function public.marino_admin_gateway(text,jsonb,uuid) to authenticated;
