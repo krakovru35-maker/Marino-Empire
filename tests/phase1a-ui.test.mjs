@@ -79,7 +79,7 @@ test('quality and viewport use the same effective height helper', () => {
 test('protected Auth, RPC and tap economy contracts remain present', () => {
   assert.match(html, /persistSession:\s*false/);
   assert.match(html, /db\.rpc\('marino_secure_rpc'/);
-  assert.match(html, /rpc\('tap_coin', \{ p_taps: 1 \}\)/);
+  assert.match(html, /rpc\('tap_coin', \{ p_taps: batchSize \}\)/);
   assert.match(html, /if \(d\?\.state\) processState\(d\);\s*renderTop\(\);/);
 });
 
@@ -91,5 +91,15 @@ test('expired Telegram WebView sessions refresh once and preserve the economic r
   assert.match(html, /const requestId = isReadOnly \? null : \(suppliedRequestId \|\| uid\(\)\)/);
   assert.match(html, /let \{ data, error \} = await invoke\(\);[\s\S]*\(\{ data, error \} = await invoke\(\)\);/);
   assert.match(html, /p_action: name, p_payload: payload, p_request_id: requestId/);
-  assert.match(html, /if \(!S\.authBlockedReason\) toast\('İşlem sunucu tarafından onaylanmadı\.'\)/);
+});
+
+test('rapid taps are serialized into bounded authoritative batches without false rejection toasts', () => {
+  assert.match(html, /let queuedTapCount = 0/);
+  assert.match(html, /let tapInFlightCount = 0/);
+  assert.match(html, /Math\.min\(20, queuedTapCount, availableEnergy\)/);
+  assert.match(html, /const d = await rpc\('tap_coin', \{ p_taps: batchSize \}\)/);
+  assert.match(html, /queuedTapCount \+= 1;\s*scheduleTapFlush\(\)/);
+  assert.match(html, /Number\(s\.en \|\| 0\) - queuedTapCount - tapInFlightCount/);
+  assert.doesNotMatch(html, /rpc\('tap_coin', \{ p_taps: 1 \}\)/);
+  assert.doesNotMatch(html, /İşlem sunucu tarafından onaylanmadı/);
 });

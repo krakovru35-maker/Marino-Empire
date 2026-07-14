@@ -85,5 +85,5 @@ test('korunan RPC ve ekonomi imzaları değişmeden mevcuttur',()=>{
   assert.match(html,/authenticateTelegram/);
   assert.match(html,/marino_secure_rpc/);
   assert.match(html,/tap_coin/);
-  assert.match(html,/p_taps:\s*1/);
+  assert.match(html,/p_taps:\s*batchSize/);
 });
