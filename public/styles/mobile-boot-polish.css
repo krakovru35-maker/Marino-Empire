@@ -1,0 +1,272 @@
+:root {
+  --layer-background: 0;
+  --layer-stage: 10;
+  --layer-character: 20;
+  --layer-hud: 40;
+  --layer-panel: 100000;
+  --layer-intro: 300000;
+  --layer-critical: 400000;
+  --intro-duration: 1.8s;
+  --intro-fade-duration: .38s;
+}
+
+/* Regression matrix: 320x568 360x640 390x844 412x915 480x960 */
+
+#app { isolation: isolate; }
+#view-home { min-height: 0; }
+#view-home::before { z-index: var(--layer-background); }
+
+html:not([data-app-state="ready"]) #app {
+  pointer-events: none;
+  user-select: none;
+}
+
+.tap-container {
+  --character-size: clamp(190px, min(76vw, 42svh), 340px);
+  min-height: clamp(168px, calc(var(--app-height) - 390px - var(--safeT) - var(--safeB)), 420px);
+  align-items: flex-end !important;
+  justify-content: center;
+  overflow: visible !important;
+  padding: 0 10px !important;
+  z-index: var(--layer-stage) !important;
+  pointer-events: none;
+}
+
+.casino-scene {
+  z-index: var(--layer-background) !important;
+  pointer-events: none;
+}
+
+.tap-target {
+  position: absolute !important;
+  left: 50%;
+  bottom: 0;
+  width: var(--character-size) !important;
+  height: auto !important;
+  max-width: calc(100% - 16px);
+  max-height: 100% !important;
+  aspect-ratio: 1;
+  overflow: visible !important;
+  z-index: var(--layer-character) !important;
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+
+.tap-btn {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+  transform-origin: bottom center !important;
+  pointer-events: auto;
+}
+
+.tap-btn img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center bottom;
+  transform-origin: bottom center !important;
+  pointer-events: none;
+}
+
+#view-home > .header,
+#view-home > .balance-area,
+#view-home > .league-wrap,
+#view-home > .rank-shell,
+#view-home > .bottom-controls,
+#view-home > .upgrade-target,
+#view-home > .home-quick-actions,
+#view-home > .empire-hub-trigger {
+  z-index: var(--layer-hud) !important;
+}
+
+.nav-bar {
+  z-index: var(--layer-hud) !important;
+  transition: opacity .22s ease, transform .22s ease, visibility .22s !important;
+}
+
+html:not([data-app-state="ready"]) .nav-bar,
+body:has(.sheet-overlay.show) .nav-bar,
+body:has(.fs-overlay.show) .nav-bar,
+.casino-game-open .nav-bar {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(calc(100% + var(--safeB)));
+  pointer-events: none !important;
+}
+
+html[data-app-state="ready"] .nav-bar {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sheet-overlay,
+.fs-overlay,
+.onboarding-overlay,
+.casino-game-shell {
+  z-index: var(--layer-panel) !important;
+}
+
+.intro-overlay {
+  z-index: var(--layer-intro) !important;
+  padding: var(--safeT) 24px var(--safeB);
+  background:
+    radial-gradient(circle at 50% 38%, rgba(53, 202, 239, .16), transparent 30%),
+    radial-gradient(circle at 50% 64%, rgba(255, 208, 73, .11), transparent 35%),
+    linear-gradient(155deg, #02070d, #061422 52%, #02060b);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity var(--intro-fade-duration) ease, visibility var(--intro-fade-duration) ease;
+}
+
+.intro-overlay::before,
+.intro-overlay::after {
+  content: '';
+  position: absolute;
+  inset: -25%;
+  pointer-events: none;
+}
+
+.intro-overlay::before {
+  background: conic-gradient(from 90deg, transparent, rgba(76, 216, 244, .08), transparent 24%, rgba(255, 215, 96, .08), transparent 52%);
+  animation: introAura 8s linear infinite;
+}
+
+.intro-overlay::after {
+  inset: 0;
+  background: linear-gradient(115deg, transparent 34%, rgba(255,255,255,.045) 49%, transparent 64%);
+  transform: translateX(-100%);
+  animation: introSweep var(--intro-duration) ease-out both;
+}
+
+.intro-overlay.is-exiting {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-hero {
+  inset: 0;
+  z-index: 0;
+  opacity: .28;
+  filter: saturate(.75) contrast(1.08);
+  pointer-events: none;
+}
+
+.intro-overlay.is-repeat .intro-hero,
+.intro-overlay.is-reduced .intro-hero { display: none; }
+
+.intro-content {
+  z-index: 2;
+  width: min(100%, 360px);
+  text-align: center;
+}
+
+.intro-mark {
+  display: grid;
+  place-items: center;
+  width: 82px;
+  height: 82px;
+  margin: 0 auto 18px;
+  border: 1px solid rgba(255, 220, 118, .52);
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(255,220,111,.16), rgba(37,207,238,.08));
+  color: #ffe27d;
+  font-size: 42px;
+  font-weight: 900;
+  box-shadow: inset 0 1px rgba(255,255,255,.18), 0 0 38px rgba(255,205,60,.13), 0 20px 55px rgba(0,0,0,.44);
+  text-shadow: 0 0 22px rgba(255,218,95,.45);
+  animation: introMark 1.4s ease-in-out infinite alternate;
+}
+
+.intro-kicker {
+  margin-bottom: 7px;
+  color: #64dcef;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .32em;
+}
+
+.intro-title {
+  margin: 0;
+  font-size: clamp(30px, 9vw, 42px) !important;
+  line-height: 1;
+  letter-spacing: .1em;
+}
+
+.intro-subtitle {
+  margin: 10px 0 20px;
+  color: rgba(222, 235, 246, .62);
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+.intro-bar { width: min(62vw, 220px); }
+.intro-progress { animation-duration: var(--intro-duration) !important; }
+
+.intro-skip {
+  min-height: 36px;
+  margin-top: 20px;
+  padding: 0 17px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 99px;
+  background: rgba(255,255,255,.045);
+  color: rgba(233,241,248,.52);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.toast { z-index: var(--layer-critical) !important; }
+
+@keyframes introAura { to { transform: rotate(1turn); } }
+@keyframes introSweep { to { transform: translateX(100%); } }
+@keyframes introMark { from { transform: translateY(2px) scale(.985); } to { transform: translateY(-3px) scale(1.015); } }
+
+@media (max-height: 700px) {
+  :root { --nav-space: calc(62px + var(--safeB)); }
+  .tap-container {
+    --character-size: clamp(184px, min(70vw, 36svh), 246px);
+    min-height: 176px;
+  }
+  .bottom-controls { margin-top: -2px !important; }
+  .upgrade-target { min-height: 41px !important; margin-bottom: 4px !important; }
+  .home-quick-actions { padding-bottom: 3px !important; }
+  .empire-hub-trigger { min-height: 25px !important; margin-bottom: 3px !important; }
+}
+
+@media (max-height: 600px) {
+  :root { --nav-space: calc(58px + var(--safeB)); }
+  .tap-container {
+    --character-size: clamp(176px, min(66vw, 34svh), 208px);
+    min-height: 168px;
+  }
+  .header { min-height: 37px !important; }
+  .bottom-controls { padding-bottom: 2px !important; }
+  .energy-box, .boost-btn { height: 37px !important; min-height: 37px !important; }
+  .upgrade-target { min-height: 36px !important; }
+  .home-quick-actions .quick-pill { min-height: 25px !important; }
+  .empire-hub-trigger { min-height: 23px !important; }
+}
+
+@media (min-width: 430px) and (min-height: 820px) {
+  .tap-container { --character-size: clamp(300px, 72vw, 344px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-overlay::before,
+  .intro-overlay::after,
+  .intro-mark,
+  .intro-title,
+  .intro-progress { animation-iteration-count: 1 !important; }
+  .intro-overlay::before,
+  .intro-overlay::after,
+  .intro-mark { animation: none !important; }
+  .intro-progress { animation-duration: var(--intro-duration) !important; }
+}
