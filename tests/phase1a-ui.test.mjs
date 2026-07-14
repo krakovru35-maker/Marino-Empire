@@ -96,10 +96,14 @@ test('expired Telegram WebView sessions refresh once and preserve the economic r
 test('rapid taps are serialized into bounded authoritative batches without false rejection toasts', () => {
   assert.match(html, /let queuedTapCount = 0/);
   assert.match(html, /let tapInFlightCount = 0/);
-  assert.match(html, /Math\.min\(20, queuedTapCount, availableEnergy\)/);
+  assert.match(html, /const TAP_GUARD = Object\.freeze/);
+  assert.match(html, /event && event\.isTrusted === false/);
+  assert.match(html, /queuedTapCount \+ tapInFlightCount >= TAP_GUARD\.queueLimit/);
+  assert.match(html, /Math\.min\(TAP_GUARD\.maxBatchSize, queuedTapCount, availableEnergy\)/);
   assert.match(html, /const d = await rpc\('tap_coin', \{ p_taps: batchSize \}\)/);
   assert.match(html, /queuedTapCount \+= 1;\s*scheduleTapFlush\(\)/);
   assert.match(html, /Number\(s\.en \|\| 0\) - queuedTapCount - tapInFlightCount/);
+  assert.match(html, /tap_rate_limited\|rate limit\|too many/i);
   assert.doesNotMatch(html, /rpc\('tap_coin', \{ p_taps: 1 \}\)/);
   assert.doesNotMatch(html, /İşlem sunucu tarafından onaylanmadı/);
 });

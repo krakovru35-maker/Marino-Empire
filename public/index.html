@@ -2388,6 +2388,7 @@
         }, 50);
       });
       q('#btnTap').onpointerdown = e => {
+        if (!isTapEventAllowed(e)) return;
         if (S.settings.sfx) au.setup();
         (window.MarinoPhase1B?.tapFeedback || window.MarinoPhase1A?.tapFeedback)?.(e);
         handleTap(e);
@@ -2790,19 +2791,76 @@
     let queuedTapCount = 0;
     let tapInFlightCount = 0;
     let tapFlushTimer = null;
+    const TAP_GUARD = Object.freeze({
+      minPointerIntervalMs: 38,
+      suspiciousWindowMs: 1200,
+      suspiciousLimit: 10,
+      queueLimit: 30,
+      flushDelayMs: 140,
+      maxBatchSize: 10,
+      cooldownMs: 1800,
+      toastCooldownMs: 1600
+    });
+    let lastTapEventAt = 0;
+    let suspiciousTapCount = 0;
+    let suspiciousWindowStart = 0;
+    let tapGuardUntil = 0;
+    let lastTapGuardToastAt = 0;
+
+    function showTapGuardToast(message) {
+      const now = performance.now();
+      if (now - lastTapGuardToastAt < TAP_GUARD.toastCooldownMs) return;
+      lastTapGuardToastAt = now;
+      toast(message);
+    }
+
+    function isTapEventAllowed(event) {
+      const now = performance.now();
+      if (tapGuardUntil > now) {
+        showTapGuardToast('Cok hizli dokunus algilandi; kisa sure yavaslatildi.');
+        return false;
+      }
+      if (event && event.isTrusted === false) {
+        tapGuardUntil = now + TAP_GUARD.cooldownMs;
+        showTapGuardToast('Otomatik dokunus engellendi.');
+        return false;
+      }
+      if (queuedTapCount + tapInFlightCount >= TAP_GUARD.queueLimit) {
+        showTapGuardToast('Dokunuslar isleniyor, bir an yavasla.');
+        return false;
+      }
+
+      if (!suspiciousWindowStart || now - suspiciousWindowStart > TAP_GUARD.suspiciousWindowMs) {
+        suspiciousWindowStart = now;
+        suspiciousTapCount = 0;
+      }
+
+      const delta = lastTapEventAt ? now - lastTapEventAt : Number.POSITIVE_INFINITY;
+      lastTapEventAt = now;
+      if (delta < TAP_GUARD.minPointerIntervalMs) {
+        suspiciousTapCount += 1;
+        if (suspiciousTapCount >= TAP_GUARD.suspiciousLimit) {
+          tapGuardUntil = now + TAP_GUARD.cooldownMs;
+          suspiciousTapCount = 0;
+          showTapGuardToast('Cok hizli dokunus algilandi; kisa sure yavaslatildi.');
+          return false;
+        }
+      }
+      return true;
+    }
 
     function scheduleTapFlush() {
       if (tapFlushTimer || tapInFlightCount > 0) return;
       tapFlushTimer = setTimeout(() => {
         tapFlushTimer = null;
         flushTapQueue();
-      }, 70);
+      }, TAP_GUARD.flushDelayMs);
     }
 
     async function flushTapQueue() {
       if (isLocalPreview || tapInFlightCount > 0 || queuedTapCount <= 0 || !S.game?.state) return;
       const availableEnergy = Math.max(0, Number(S.game.state.en || 0));
-      const batchSize = Math.min(20, queuedTapCount, availableEnergy);
+      const batchSize = Math.min(TAP_GUARD.maxBatchSize, queuedTapCount, availableEnergy);
       if (batchSize <= 0) {
         queuedTapCount = 0;
         return;
@@ -2814,7 +2872,13 @@
         if (d?.state) processState(d);
         renderTop();
       } catch (error) {
-        if (!S.authBlockedReason) toast('Dokunuş işlenemedi. Lütfen tekrar deneyin.');
+        const message = String(error?.message || error || '');
+        if (/tap_rate_limited|rate limit|too many/i.test(message)) {
+          tapGuardUntil = performance.now() + Math.max(TAP_GUARD.cooldownMs, 2500);
+          showTapGuardToast('Cok hizli dokunus algilandi; kisa sure yavaslatildi.');
+        } else if (!S.authBlockedReason) {
+          toast('Dokunuş işlenemedi. Lütfen tekrar deneyin.');
+        }
       } finally {
         tapInFlightCount = 0;
         if (queuedTapCount > 0) scheduleTapFlush();
