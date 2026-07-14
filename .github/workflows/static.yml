@@ -60,6 +60,8 @@ jobs:
         run: deno check supabase/functions/telegram-auth/index.ts
       - name: Test Telegram auth helpers
         run: deno test supabase/functions/telegram-auth/*_test.ts
+      - name: Type-check Telegram broadcast function
+        run: deno check supabase/functions/telegram-broadcast/index.ts
       - name: Test social security contracts
         run: deno test --allow-read=supabase/migrations supabase/tests/*_test.ts
 
