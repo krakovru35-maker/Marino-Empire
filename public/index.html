@@ -2610,10 +2610,45 @@
     }
 
     /* ── Actions ── */
+    let queuedTapCount = 0;
+    let tapInFlightCount = 0;
+    let tapFlushTimer = null;
+
+    function scheduleTapFlush() {
+      if (tapFlushTimer || tapInFlightCount > 0) return;
+      tapFlushTimer = setTimeout(() => {
+        tapFlushTimer = null;
+        flushTapQueue();
+      }, 70);
+    }
+
+    async function flushTapQueue() {
+      if (isLocalPreview || tapInFlightCount > 0 || queuedTapCount <= 0 || !S.game?.state) return;
+      const availableEnergy = Math.max(0, Number(S.game.state.en || 0));
+      const batchSize = Math.min(20, queuedTapCount, availableEnergy);
+      if (batchSize <= 0) {
+        queuedTapCount = 0;
+        return;
+      }
+      queuedTapCount -= batchSize;
+      tapInFlightCount = batchSize;
+      try {
+        const d = await rpc('tap_coin', { p_taps: batchSize });
+        if (d?.state) processState(d);
+        renderTop();
+      } catch (error) {
+        if (!S.authBlockedReason) toast('Dokunuş işlenemedi. Lütfen tekrar deneyin.');
+      } finally {
+        tapInFlightCount = 0;
+        if (queuedTapCount > 0) scheduleTapFlush();
+      }
+    }
+
     async function handleTap(e) {
       if (S.busy || !S.game) return;
       const s = S.game.state;
-      if (s.en <= 0) { toast('Enerji bitti!'); au.fail(); return; }
+      const availableEnergy = Number(s.en || 0) - queuedTapCount - tapInFlightCount;
+      if (availableEnergy <= 0) { toast('Enerji bitti!'); au.fail(); return; }
 
       // Economic state changes only after the authenticated server acknowledges them.
       au.tap();
@@ -2635,14 +2670,9 @@
         return;
       }
 
-      // Buffer and sync (simplified for stability, sending 1 hit)
-      try {
-        const d = await rpc('tap_coin', { p_taps: 1 });
-        if (d?.state) processState(d);
-        renderTop();
-      } catch (err) {
-        if (!S.authBlockedReason) toast('İşlem sunucu tarafından onaylanmadı.');
-      }
+      // Rapid taps are serialized into server-authoritative batches. No client economy mutation.
+      queuedTapCount += 1;
+      scheduleTapFlush();
     }
 
     async function handleCollect() {

@@ -100,7 +100,7 @@ test('local preview content adapter performs no network or RPC invocation',()=>{
 test('existing auth tap and economy contracts remain intact',()=>{
   assert.match(html,/async function authenticateTelegram\(\)/);
   assert.match(html,/db\.rpc\('marino_secure_rpc'/);
-  assert.match(html,/rpc\('tap_coin', \{ p_taps: 1 \}\)/);
+  assert.match(html,/rpc\('tap_coin', \{ p_taps: batchSize \}\)/);
   assert.match(html,/function processState\(d\)/);
   const markup=html.replace(/<script(?:\s[^>]*)?>[\s\S]*?<\/script>/gi,'');
   const ids=[...markup.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);

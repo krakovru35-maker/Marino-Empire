@@ -50,7 +50,7 @@ test('Lite and reduced-motion disable heavy environment effects', () => {
 test('protected Auth, RPC and economy contracts stay intact', () => {
   assert.match(html, /function authenticateTelegram\(/);
   assert.match(html, /db\.rpc\('marino_secure_rpc'/);
-  assert.match(html, /rpc\('tap_coin', \{ p_taps: 1 \}\)/);
+  assert.match(html, /rpc\('tap_coin', \{ p_taps: batchSize \}\)/);
   assert.match(html, /if \(d\?\.state\) processState\(d\);\s*renderTop\(\);/);
   assert.match(html, /rpc\('collect_income', \{ p_telegram_id: String\(S\.user\.id\), p_request_id: uid\(\) \}\)/);
 });
