@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const migration = fs.readFileSync('supabase/migrations/202607140006_social_chat_and_gifts.sql', 'utf8');
+const cryptoFix = fs.readFileSync('supabase/migrations/202607140007_social_pgcrypto_qualification.sql', 'utf8');
 const html = fs.readFileSync('public/index.html', 'utf8');
 const js = fs.readFileSync('public/js/social-hub.js', 'utf8');
 const css = fs.readFileSync('public/styles/social-hub.css', 'utf8');
@@ -52,6 +53,13 @@ test('gift transaction is server-priced, locked, idempotent and coin sink only',
   assert.match(migration, /v_pair_total >= 3/);
   assert.match(migration, /caller_identity_or_price_not_allowed/);
   assert.doesNotMatch(migration, /recipient.*marino_coin\s*=|marino_coin\s*=.*recipient/i);
+});
+
+test('pgcrypto calls are explicitly qualified without widening search_path', () => {
+  assert.match(cryptoFix, /extensions\.gen_random_bytes\(2\)/);
+  assert.equal((cryptoFix.match(/extensions\.digest\(/g) || []).length, 2);
+  assert.doesNotMatch(cryptoFix, /search_path\s*=.*extensions/i);
+  assert.match(cryptoFix, /revoke all on function public\.marino_gift_send/);
 });
 
 test('social UI keeps untrusted messages out of innerHTML', () => {
