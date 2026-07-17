@@ -26,6 +26,7 @@
   <link href="./styles/casino/casino-progression.css" rel="stylesheet">
   <link href="./styles/mobile-boot-polish.css" rel="stylesheet">
   <link href="./styles/social-hub.css" rel="stylesheet">
+  <link href="./styles/claim-mining.css" rel="stylesheet">
   <link href="./styles/admin-center.css" rel="stylesheet">
   <link href="./styles/live-announcements.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
@@ -46,6 +47,7 @@
   <script src="./js/casino/casino-tournament.js" defer></script>
   <script src="./js/casino/casino-lobby.js" defer></script>
   <script src="./js/social-hub.js" defer></script>
+  <script src="./js/claim-mining.js" defer></script>
   <script src="./js/admin-center.js" defer></script>
   <script src="./js/admin-operations.js" defer></script>
   <script src="./js/live-announcements.js" defer></script>
@@ -2657,6 +2659,13 @@
         if (error) throw error;
         return data;
       },
+      claimAdmin: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return window.MarinoClaimMiningPreview?.admin?.(action, payload, requestId);
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.rpc('marino_claim_admin_rpc', { p_action: action, p_payload: payload, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
       me: async () => {
         if (isLocalPreview) return { is_admin: true, role: 'super_admin', is_owner: true, permissions: [] };
         if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) return { is_admin: false, permissions: [] };
@@ -2681,6 +2690,23 @@
         if (action === 'combo') openCombo();
         if (action === 'cipher') openCipher();
       }
+    };
+
+    window.MarinoClaimBridge = {
+      preview: isLocalPreview,
+      ready: () => isLocalPreview || (appPhase === APP_PHASE.READY && S.authenticated && !S.authBlockedReason && !!S.game?.state),
+      invoke: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return window.MarinoClaimMiningPreview?.player?.(action, payload, requestId);
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const clean = { ...(payload || {}) };
+        delete clean.telegram_id; delete clean.p_telegram_id; delete clean.auth_user_id; delete clean.player_id;
+        const { data, error } = await db.rpc('marino_claim_mining_rpc', { p_action: action, p_payload: clean, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
+      toast: message => toast(message),
+      refresh: () => { renderAll(); return true; },
+      suggestedUsername: () => S.user?.user || ''
     };
 
     window.MarinoEconomyBridge = {
@@ -2955,7 +2981,7 @@
     }
 
     /* ── UI Rendering ── */
-    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); if (!isLocalPreview) renderRank(); window.MarinoPhase2B?.sync?.(window.MarinoPhase2BBridge.snapshot()); }
+    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); window.MarinoClaimMining?.sync?.(); if (!isLocalPreview) renderRank(); window.MarinoPhase2B?.sync?.(window.MarinoPhase2BBridge.snapshot()); }
 
     function renderPreviewRank() {
       q('#listRank').innerHTML = '<div class="sec-title">Yerel Önizleme Sıralaması</div><div class="item-row"><div class="item-ico">1</div><div class="item-info"><div class="item-title">Local Marino</div><div class="item-sub">Sv. 8 • XP: 2,750</div></div></div>';
