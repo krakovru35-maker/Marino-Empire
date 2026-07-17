@@ -76,13 +76,80 @@ html:not([data-app-state="ready"]) #app {
 
 #view-home > .header,
 #view-home > .balance-area,
-#view-home > .league-wrap,
-#view-home > .rank-shell,
+#view-home > .hero-status-row,
 #view-home > .bottom-controls,
 #view-home > .upgrade-target,
 #view-home > .empire-hub-trigger {
   z-index: var(--layer-hud) !important;
 }
+
+/* Character-first mobile home: secondary actions live in the command sheet. */
+.hero-status-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  width: calc(100% - 28px);
+  margin: 3px auto 4px;
+}
+
+.hero-status-row .league-wrap { margin: 0; }
+.hero-status-row .league-wrap #leagueBadge {
+  min-height: 34px;
+  padding: 5px 9px !important;
+  white-space: nowrap;
+}
+.hero-status-row .league-wrap #leagueName { max-width: 86px; overflow: hidden; text-overflow: ellipsis; }
+.hero-status-row .rank-shell { width: 100%; margin: 0; padding: 5px 8px 6px; }
+.hero-status-row .rank-shell .rank-row { font-size: 8px; }
+.hero-status-row .rank-shell .progress-bg { height: 4px; }
+
+.tap-container {
+  --character-size: clamp(230px, min(88vw, 52svh), 380px);
+  min-height: 0;
+}
+
+.tap-target { bottom: 1px; }
+
+.bottom-controls {
+  padding-top: 4px !important;
+  padding-bottom: 5px !important;
+}
+
+.empire-hub-trigger {
+  min-height: 38px !important;
+  margin-bottom: 6px !important;
+  border-color: rgba(88, 215, 240, .24) !important;
+  background: linear-gradient(105deg, rgba(7, 19, 30, .96), rgba(14, 31, 45, .94), rgba(50, 37, 13, .88)) !important;
+}
+
+.command-upgrade-target { margin: 8px 0 !important; }
+
+.command-overview {
+  display: grid;
+  grid-template-columns: .8fr .7fr 1.5fr;
+  gap: 6px;
+  margin: 0 0 9px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.command-overview > span {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 11px;
+  background: rgba(255,255,255,.035);
+}
+
+.command-overview small,
+.command-overview b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.command-overview small { color: #748399; font-size: 7px; font-weight: 900; letter-spacing: .08em; }
+.command-overview b { margin-top: 3px; color: #e9f4ff; font-size: 9px; }
 
 .nav-bar {
   z-index: var(--layer-hud) !important;
@@ -229,30 +296,36 @@ html[data-app-state="ready"] .nav-bar {
 
 @media (max-height: 700px) {
   :root { --nav-space: calc(62px + var(--safeB)); }
+  .nav-bar {
+    height: var(--nav-space) !important;
+    min-height: var(--nav-space) !important;
+    padding: 4px 5px calc(4px + var(--safeB)) !important;
+  }
+  .nav-btn { gap: 1px; padding: 3px 0; }
   .tap-container {
-    --character-size: clamp(184px, min(70vw, 36svh), 246px);
-    min-height: 176px;
+    --character-size: clamp(194px, min(76vw, 39svh), 258px);
+    min-height: 0;
   }
   .bottom-controls { margin-top: -2px !important; }
-  .upgrade-target { min-height: 41px !important; margin-bottom: 4px !important; }
   .empire-hub-trigger { min-height: 25px !important; margin-bottom: 3px !important; }
+  .hero-status-row { margin-top: 1px; margin-bottom: 2px; }
 }
 
 @media (max-height: 600px) {
   :root { --nav-space: calc(58px + var(--safeB)); }
   .tap-container {
-    --character-size: clamp(176px, min(66vw, 34svh), 208px);
-    min-height: 168px;
+    --character-size: clamp(176px, min(72vw, 36svh), 216px);
+    min-height: 0;
   }
   .header { min-height: 37px !important; }
   .bottom-controls { padding-bottom: 2px !important; }
   .energy-box, .boost-btn { height: 37px !important; min-height: 37px !important; }
-  .upgrade-target { min-height: 36px !important; }
   .empire-hub-trigger { min-height: 23px !important; }
+  .hero-status-row .league-wrap #leagueName { display: none; }
 }
 
 @media (min-width: 430px) and (min-height: 820px) {
-  .tap-container { --character-size: clamp(300px, 72vw, 344px); }
+  .tap-container { --character-size: clamp(340px, 78vw, 390px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
