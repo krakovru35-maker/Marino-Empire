@@ -6,7 +6,7 @@ const html = fs.readFileSync('public/index.html', 'utf8');
 const phaseJs = fs.readFileSync('public/js/phase-1a.js', 'utf8');
 const polishCss = fs.readFileSync('public/styles/mobile-boot-polish.css', 'utf8');
 
-test('intro media is assigned only for the first install while every cold start keeps a branded intro', () => {
+test('intro media is assigned on every cold start unless motion or permanent-skip preferences disable it', () => {
   const videoTag = html.match(/<video\s+id="introVid"[^>]*>/)?.[0] || '';
   assert.doesNotMatch(videoTag, /\ssrc=/);
   assert.match(videoTag, /data-src="\.\/assets\/intro\.mp4"/);
@@ -15,6 +15,8 @@ test('intro media is assigned only for the first install while every cold start 
   assert.ok(seenCheck >= 0);
   assert.match(html, /beginIntroFlow\(\);\s*if \(isLocalPreview\)/);
   assert.match(html, /firstInstall \? 2\.4 : 1\.8/);
+  assert.match(html, /if \(video && !reducedMotion && !skipPermanently\)/);
+  assert.doesNotMatch(polishCss, /is-repeat \.intro-hero/);
   assert.match(html, /INTRO_SKIP_KEY = 'marino_intro_skip_v1'/);
 });
 
@@ -104,6 +106,7 @@ test('rapid taps are serialized into bounded authoritative batches without false
   assert.match(html, /queuedTapCount \+= 1;\s*scheduleTapFlush\(\)/);
   assert.match(html, /Number\(s\.en \|\| 0\) - queuedTapCount - tapInFlightCount/);
   assert.match(html, /tap_rate_limited\|rate limit\|too many/i);
-  assert.doesNotMatch(html, /rpc\('tap_coin', \{ p_taps: 1 \}\)/);
+  const manualTapBody = html.match(/async function handleTap\(e\) \{[\s\S]*?async function handleCollect/)?.[0] || '';
+  assert.doesNotMatch(manualTapBody, /rpc\('tap_coin'/);
   assert.doesNotMatch(html, /İşlem sunucu tarafından onaylanmadı/);
 });

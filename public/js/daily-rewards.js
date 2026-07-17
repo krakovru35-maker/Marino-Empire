@@ -30,7 +30,7 @@
   function render(){
     const grid=document.querySelector('#calGrid'),button=claimButton(),body=document.querySelector('.daily-reward-body');if(!grid||!button||!body)return;
     body.appendChild(button);grid.innerHTML=REWARDS.map(card).join('');const today=grid.querySelector('.is-today');
-    if(today){today.appendChild(button);button.hidden=false;button.disabled=false;button.textContent=state.preview?'DEMO AL':'AL'}else{button.hidden=true;button.disabled=true}
+    if(today){today.appendChild(button);button.hidden=false;button.disabled=false;button.textContent=state.preview?'ÖNİZLEME AL':'AL'}else{button.hidden=true;button.disabled=true}
   }
   function bindBack(){const back=window.Telegram?.WebApp?.BackButton;if(!back||state.backBound)return;back.onClick(close);back.show();state.backBound=true}
   function unbindBack(){const back=window.Telegram?.WebApp?.BackButton;if(!back||!state.backBound)return;back.offClick?.(close);back.hide();state.backBound=false}

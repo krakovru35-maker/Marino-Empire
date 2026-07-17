@@ -30,8 +30,8 @@
   const REWARDS = [
     ['spin_1','1 Sanal Free Spin','spin',25,1,'Bu oturum'],['spin_3','3 Sanal Free Spin','spin',65,3,'Bu oturum'],['spin_5','5 Sanal Free Spin','spin',95,5,'Bu oturum'],
     ['bet_1','1 Sanal Free Bet','bet',30,1,'Bu oturum'],['bet_3','3 Sanal Free Bet','bet',75,3,'Bu oturum'],
-    ['energy_pack','Enerji Paketi','energy',40,1,'Sunucu aktivasyonu gerekir'],['tap_boost','Tap Boost','boost',55,1,'Sunucu aktivasyonu gerekir'],
-    ['income_boost','Geçici Saatlik Gelir Boost','income',80,1,'Sunucu aktivasyonu gerekir'],['badge','Marino Kozmetik Rozeti','cosmetic',70,1,'Bu oturum'],['decor','Casino Sahne Dekoru','decor',110,1,'Bu oturum']
+    ['energy_pack','Enerji Paketi','energy',40,1,'Server onayı gerekir'],['tap_boost','Tap Boost','boost',55,1,'Server onayı gerekir'],
+    ['income_boost','Geçici Saatlik Gelir Boost','income',80,1,'Server onayı gerekir'],['badge','Marino Kozmetik Rozeti','cosmetic',70,1,'Bu oturum'],['decor','Casino Sahne Dekoru','decor',110,1,'Bu oturum']
   ].map(([id,name,type,cost,amount,expiry])=>({id,name,type,cost,amount,expiry}));
   const state = {
     snapshot:null, category:'daily', metrics:{ taps:0,energy:0,collects:0,upgrades:0,combo:0,cipher:0,casino:0,friends:0 },
@@ -77,7 +77,7 @@
         <div class="building-heading"><span>${escape(definition.name)}</span><em>${escape(definition.category)}</em></div>
         <div class="building-level">Seviye <b>${level}</b> <i>→</i> <b>${Math.min(definition.max,level+1)}</b></div>
         <div class="building-income">Saatlik etki <strong>+${fmt(income)}</strong></div>
-        ${!server&&!isPreview?'<small class="demo-label">Sunucu anahtarıyla yükseltilebilir</small>':''}
+        ${!server&&!isPreview?'<small class="demo-label">Server onayıyla yükseltilebilir</small>':''}
         ${locked?`<small class="lock-label">Seviye ${unlock} gerekli</small>`:''}
       </div><button type="button" class="building-upgrade" data-upgrade="${definition.key}" data-server-upgrade="${escape(serverUpgradeKey)}" data-cost="${cost}" data-income="${definition.income}" ${locked||maxed||!supported?'disabled':''}>
         <span>${maxed?'MAKSİMUM':'YÜKSELT'}</span><small>${maxed?'Tamamlandı':fmt(cost)+' coin'}</small></button></article>`;
@@ -149,7 +149,7 @@
     return `<article class="reward-card"><div class="reward-symbol ${reward.type}">${spriteIcon('casino',REWARD_ICONS[reward.type]||'chip',reward.name)}</div><div class="reward-copy"><h4>${escape(reward.name)}</h4><p>Oyun hakkı • nakit değeri yoktur • transfer edilemez</p><span>Kalan kullanım: <b>${count}</b></span><small>Koşul / süre: ${escape(reward.expiry)}</small></div><button type="button" data-buy-reward="${reward.id}" ${canBuy?'':'disabled'}><b>${fmt(reward.cost)} MRP</b><small>${enough?'SATIN AL':'PUAN YETERSİZ'}</small></button></article>`;
   }
 
-  function walletMarkup(){return `<section class="virtual-wallet"><header><div><span>HAK CÜZDANI</span><h3>Casino avantajların</h3></div><b>AKTİF</b></header><div class="wallet-grid"><div><strong>${state.entitlements.spin}</strong><span>Free Spin</span><small>Aktif hak</small></div><div><strong>${state.entitlements.bet}</strong><span>Free Bet</span><small>Nakit yok</small></div><div><strong>${state.entitlements.energy}</strong><span>Enerji Paketi</span><small>${state.entitlements.energy?'Kullanılmadı':'Yok'}</small></div><div><strong>${state.entitlements.boost+state.entitlements.income}</strong><span>Aktif Boost</span><small>Server aktivasyonu</small></div></div></section>`}
+  function walletMarkup(){return `<section class="virtual-wallet"><header><div><span>HAK CÜZDANI</span><h3>Casino avantajların</h3></div><b>AKTİF</b></header><div class="wallet-grid"><div><strong>${state.entitlements.spin}</strong><span>Free Spin</span><small>Aktif hak</small></div><div><strong>${state.entitlements.bet}</strong><span>Free Bet</span><small>Nakit yok</small></div><div><strong>${state.entitlements.energy}</strong><span>Enerji Paketi</span><small>${state.entitlements.energy?'Kullanılmadı':'Yok'}</small></div><div><strong>${state.entitlements.boost+state.entitlements.income}</strong><span>Aktif Boost</span><small>Server onayı</small></div></div></section>`}
 
   function installRewardUi(){
     if(document.querySelector('#sheetRewardVault'))return;
@@ -170,7 +170,7 @@
   function cancelReward(){state.pendingReward=null;const modal=document.querySelector('#rewardConfirm');if(modal)modal.hidden=true}
   function confirmReward(){
     const reward=state.pendingReward;if(!reward)return cancelReward();
-    if(!preview()&&!window.MarinoPhase2BBridge?.buyReward){cancelReward();return showRewardNotice('Ödül mağazası server aktivasyonu bekliyor','failed')}
+    if(!preview()&&!window.MarinoPhase2BBridge?.buyReward){cancelReward();return showRewardNotice('Ödül mağazası server onayı bekliyor','failed')}
     if(state.rewardPoints<reward.cost){cancelReward();window.MarinoAudio?.play?.('ui_error');return showRewardNotice('Puan yetersiz','failed')}
     state.rewardPoints-=reward.cost;state.entitlements[reward.type]=(state.entitlements[reward.type]||0)+reward.amount;cancelReward();renderRewardStore();renderHomePulse();window.MarinoAudio?.play?.('reward_purchase');if(reward.type==='spin')window.MarinoAudio?.play?.('free_spin_unlock');if(reward.type==='bet')window.MarinoAudio?.play?.('free_bet_unlock');showRewardNotice(`${reward.name} cüzdana eklendi`,'success');
   }
@@ -180,7 +180,7 @@
     if(!preview()||(id!=='slot'&&id!=='sports'))return;const body=document.querySelector('#miniBody');if(!body)return;const type=id==='slot'?'spin':'bet',label=id==='slot'?'Sanal Free Spin Kullan':'Sanal Free Bet Kuponu';
     const panel=document.createElement('section');panel.className='demo-entitlement-panel';panel.innerHTML=`<div><b>${label}</b><span>Nakit değeri yoktur • gerçek bahis gönderilmez</span></div><button type="button" ${state.entitlements[type]>0?'':'disabled'}>${state.entitlements[type]} hak</button><p aria-live="polite"></p>`;body.prepend(panel);panel.querySelector('button').addEventListener('click',()=>useDemoEntitlement(type,panel));
   }
-  function useDemoEntitlement(type,panel){if(!preview()||state.entitlements[type]<=0)return;state.entitlements[type]-=1;const isSpin=type==='spin';panel.querySelector('button').textContent=`${state.entitlements[type]} hak`;panel.querySelector('button').disabled=state.entitlements[type]<=0;panel.querySelector('p').textContent=isSpin?'Sanal sonuç: Marino yıldızı • bakiye veya coin ödülü yoktur.':'Demo kupon işaretlendi • hiçbir bahis gönderilmedi, kazanç oluşturulmadı.';renderHomePulse();renderRewardStore()}
+  function useDemoEntitlement(type,panel){if(!preview()||state.entitlements[type]<=0)return;state.entitlements[type]-=1;const isSpin=type==='spin';panel.querySelector('button').textContent=`${state.entitlements[type]} hak`;panel.querySelector('button').disabled=state.entitlements[type]<=0;panel.querySelector('p').textContent=isSpin?'Sanal sonuç: Marino yıldızı • bakiye veya coin ödülü yoktur.':'Sanal kupon işaretlendi • hiçbir bahis gönderilmedi, kazanç oluşturulmadı.';renderHomePulse();renderRewardStore()}
 
   function wrapMiniGames(){
     if(!preview()||window.openMini?.__phase2bWrapped)return;const original=window.openMini;if(typeof original!=='function')return;
@@ -205,7 +205,7 @@
       button.disabled = false;
     } else if (preview()) {
       button.disabled = false;
-      document.querySelector('#toast') && (document.querySelector('#toast').textContent='Demo coin bakiyesi yetersiz.');
+      document.querySelector('#toast') && (document.querySelector('#toast').textContent='Önizleme bakiyesi yetersiz.');
     }
   }
 

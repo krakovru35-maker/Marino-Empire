@@ -26,6 +26,7 @@
   <link href="./styles/casino/casino-progression.css" rel="stylesheet">
   <link href="./styles/mobile-boot-polish.css" rel="stylesheet">
   <link href="./styles/social-hub.css" rel="stylesheet">
+  <link href="./styles/claim-mining.css" rel="stylesheet">
   <link href="./styles/admin-center.css" rel="stylesheet">
   <link href="./styles/live-announcements.css" rel="stylesheet">
   <script src="./js/phase-1a.js" defer></script>
@@ -46,6 +47,7 @@
   <script src="./js/casino/casino-tournament.js" defer></script>
   <script src="./js/casino/casino-lobby.js" defer></script>
   <script src="./js/social-hub.js" defer></script>
+  <script src="./js/claim-mining.js" defer></script>
   <script src="./js/admin-center.js" defer></script>
   <script src="./js/admin-operations.js" defer></script>
   <script src="./js/live-announcements.js" defer></script>
@@ -1773,16 +1775,8 @@
         <span class="upgrade-target-arrow" aria-hidden="true"></span>
       </button>
 
-      <div class="quick-bar home-quick-actions">
-        <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
-          <span class="ico">🚀</span><span data-i18n="boost">BOOST</span>
-        </button>
-        <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
-          <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
-        </button>
-      </div>
       <button class="empire-hub-trigger" id="btnEmpireHub" type="button" aria-label="Empire Hub'ı aç">
-        <span>EMPIRE HUB</span><small>İstatistikler ve günlük şifreler</small><span aria-hidden="true">›</span>
+        <span>HIZLI MENÜ</span><small>Mining, boost, görevler ve günlük içerik</small><span aria-hidden="true">›</span>
       </button>
       <div class="empire-tier-transition" id="empireTierTransition" role="status" aria-live="polite" hidden>
         <strong>İmparatorluğun büyüdü</strong><span id="empireTierName"></span>
@@ -1794,8 +1788,16 @@
       <div class="sheet empire-hub-sheet">
         <div class="sheet-handle"></div>
         <button class="sheet-close" data-close="sheetEmpireHub" aria-label="Empire Hub'ı kapat">✕</button>
-        <h3>Empire Hub</h3>
+        <h3>Hızlı Menü</h3>
         <div class="empire-hub-panel">
+          <div class="command-menu-grid" aria-label="Hızlı oyun menüsü">
+            <button class="command-menu-button boost" id="btnOpenBoost" data-testid="open-boost-btn" type="button"><span>🚀</span><b>Boost</b><small>Güçlendirmeler</small></button>
+            <button class="command-menu-button air" id="btnOpenAirdrop" data-testid="open-airdrop-btn" type="button"><span>🪂</span><b>Airdrop</b><small>Cüzdan durumu</small></button>
+            <button class="command-menu-button mine" id="btnOpenClaimMining" data-testid="open-claim-mining-btn" type="button"><span>⛏️</span><b>Mining</b><small>Claim Coin kaz</small></button>
+            <button class="command-menu-button" data-command-tab="buildings" type="button"><span>🏢</span><b>Binalar</b><small>İmparatorluğu büyüt</small></button>
+            <button class="command-menu-button" data-command-tab="tasks" type="button"><span>📋</span><b>Görevler</b><small>İlerleme ve ödüller</small></button>
+            <button class="command-menu-button" data-command-tab="store" type="button"><span>🎁</span><b>Ödül Kasası</b><small>Casino ve talepler</small></button>
+          </div>
           <div class="hk-floats empire-hub-actions">
             <article class="content-hub-card"><button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
               <div class="hk-float-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="10" height="14" rx="2"/><path d="m9 9 2 3-2 3-2-3 2-3Zm6-2 5 3v10H9"/></svg></div>
@@ -2268,7 +2270,7 @@
       intro.classList.add(firstInstall ? 'is-first-install' : 'is-repeat');
       intro.classList.toggle('is-reduced', reducedMotion);
       const video = q('#introVid');
-      if (video && firstInstall && !reducedMotion && !skipPermanently) {
+      if (video && !reducedMotion && !skipPermanently) {
         const videoSrc = video.dataset.src;
         if (videoSrc) {
           video.src = videoSrc;
@@ -2367,6 +2369,10 @@
       q('#btnSettings').onclick = () => { au.click(); q('#sheetSettings').classList.add('show'); };
       q('#btnProfile').onclick = () => { au.click(); renderProfile(); q('#sheetProfile').classList.add('show'); };
       q('#btnEmpireHub').onclick = () => { au.click(); q('#sheetEmpireHub').classList.add('show'); };
+      document.querySelectorAll('[data-command-tab]').forEach(button => button.onclick = () => {
+        q('#sheetEmpireHub').classList.remove('show');
+        showTab(button.dataset.commandTab);
+      });
       q('#btnPrestige').onclick = handlePrestige;
       q('#closeMini').onclick = () => {
         au.click(); q('#fsMini').classList.remove('show');
@@ -2657,6 +2663,27 @@
         if (error) throw error;
         return data;
       },
+      claimAdmin: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return window.MarinoClaimMiningPreview?.admin?.(action, payload, requestId);
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.rpc('marino_claim_admin_rpc', { p_action: action, p_payload: payload, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
+      modules: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return { ok: true, items: [], settings: {}, recipients: 0 };
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.rpc('marino_admin_modules_rpc', { p_action: action, p_payload: payload, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
+      broadcast: async (payload = {}) => {
+        if (isLocalPreview) return { ok: true, dry_run: payload.dry_run !== false, recipients: 12, sent: payload.dry_run === false ? 12 : 0, failed: 0 };
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.functions.invoke('telegram-broadcast', { body: payload });
+        if (error) throw error;
+        return data;
+      },
       me: async () => {
         if (isLocalPreview) return { is_admin: true, role: 'super_admin', is_owner: true, permissions: [] };
         if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) return { is_admin: false, permissions: [] };
@@ -2681,6 +2708,23 @@
         if (action === 'combo') openCombo();
         if (action === 'cipher') openCipher();
       }
+    };
+
+    window.MarinoClaimBridge = {
+      preview: isLocalPreview,
+      ready: () => isLocalPreview || (appPhase === APP_PHASE.READY && S.authenticated && !S.authBlockedReason && !!S.game?.state),
+      invoke: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return window.MarinoClaimMiningPreview?.player?.(action, payload, requestId);
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const clean = { ...(payload || {}) };
+        delete clean.telegram_id; delete clean.p_telegram_id; delete clean.auth_user_id; delete clean.player_id;
+        const { data, error } = await db.rpc('marino_claim_mining_rpc', { p_action: action, p_payload: clean, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
+      toast: message => toast(message),
+      refresh: () => { renderAll(); return true; },
+      suggestedUsername: () => S.user?.user || ''
     };
 
     window.MarinoEconomyBridge = {
@@ -2889,6 +2933,45 @@
       }
     }
 
+    const AUTO_TAP_INTERVAL_MS = 15000;
+    let autoTapTimer = null;
+    let autoTapInFlight = false;
+
+    function stopAutoTapLoop() {
+      if (autoTapTimer) clearInterval(autoTapTimer);
+      autoTapTimer = null;
+    }
+
+    async function performAutoTapTick() {
+      if (isLocalPreview || autoTapInFlight || document.visibilityState === 'hidden' || !S.game?.state) return;
+      const activeUntil = Number(permBoostState().auto_tap_end || 0);
+      if (!activeUntil || activeUntil <= Date.now()) {
+        stopAutoTapLoop();
+        renderBoosts();
+        return;
+      }
+      if (Number(S.game.state.en || 0) < 1 || S.authBlockedReason || !S.authenticated) return;
+      autoTapInFlight = true;
+      try {
+        const data = await rpc('tap_coin', { p_taps: 1 });
+        if (data?.state) processState(data);
+        renderTop();
+      } catch (error) {
+        if (!S.authBlockedReason) console.warn('Auto tap rejected', { code: String(error?.code || 'request_failed') });
+      } finally {
+        autoTapInFlight = false;
+      }
+    }
+
+    function syncAutoTapLoop() {
+      const active = Number(permBoostState().auto_tap_end || 0) > Date.now();
+      if (!active) return stopAutoTapLoop();
+      if (!autoTapTimer) {
+        autoTapTimer = setInterval(performAutoTapTick, AUTO_TAP_INTERVAL_MS);
+        setTimeout(performAutoTapTick, 1200);
+      }
+    }
+
     async function handleTap(e) {
       if (S.busy || !S.game) return;
       const s = S.game.state;
@@ -2955,7 +3038,7 @@
     }
 
     /* ── UI Rendering ── */
-    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); if (!isLocalPreview) renderRank(); window.MarinoPhase2B?.sync?.(window.MarinoPhase2BBridge.snapshot()); }
+    function renderAll() { renderTop(); renderBuildings(); renderTasks(); renderStore(); window.MarinoClaimMining?.sync?.(); if (!isLocalPreview) renderRank(); window.MarinoPhase2B?.sync?.(window.MarinoPhase2BBridge.snapshot()); }
 
     function renderPreviewRank() {
       q('#listRank').innerHTML = '<div class="sec-title">Yerel Önizleme Sıralaması</div><div class="item-row"><div class="item-ico">1</div><div class="item-info"><div class="item-title">Local Marino</div><div class="item-sub">Sv. 8 • XP: 2,750</div></div></div>';
@@ -3013,7 +3096,7 @@
       const tasks=S.taskCatalog.length?S.taskCatalog:fallback;
       const socialLinks={soc_tg:'https://t.me/betmarinocom',soc_tw:'https://x.com/marinoetkinlik'};
       const sections=[['achievement','Sosyal & Başarımlar'],['daily','Günlük Görevler'],['weekly','Haftalık Görevler'],['level',`Seviye Görevleri (Sv. ${s.lvl})`],['event','Etkinlik Görevleri']];
-      sections.forEach(([type,title])=>{const group=tasks.filter(task=>task.task_type===type);if(!group.length)return;html+=`<div class="sec-title">${safeHtml(title)}</div>`;group.forEach(task=>{const id=String(task.task_key).toLowerCase(),isD=done.includes(id),level=Number(task.required_level||1),lock=level>s.lvl,link=socialLinks[id],icon=lock?'🔒':isD?'✅':type==='daily'?'📅':type==='level'?'🔸':'🏅';const action=link?`if(window.Telegram?.WebApp?.openLink)window.Telegram.WebApp.openLink('${link}');else window.open('${link}','_blank');doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`: `doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`;html+=`<div class="item-row"><div class="item-ico">${icon}</div><div class="item-info"><div class="item-title">${safeHtml(task.task_name)}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(task.reward_coin)} Coin${level>1?` · Sv. ${level}`:''}</div></div><button class="action-btn ${lock||isD?'':'gold'}" onclick="${action}" ${lock||isD?'disabled':''}>${lock?'Kilitli':isD?'Alındı':link?'Git & Al':'Al'}</button></div>`})});
+      sections.forEach(([type,title])=>{const group=tasks.filter(task=>task.task_type===type);if(!group.length)return;html+=`<div class="sec-title">${safeHtml(title)}</div>`;group.forEach(task=>{const id=String(task.task_key).toLowerCase(),isD=done.includes(id),level=Number(task.required_level||1),progress=Math.max(0,Number(task.progress||0)),goal=Math.max(0,Number(task.goal||0)),progressBlocked=goal>0&&progress<goal,lock=level>s.lvl,disabled=lock||isD||progressBlocked,link=socialLinks[id],icon=lock?'🔒':isD?'✅':type==='daily'?'📅':type==='level'?'🔸':'🏅';const action=link?`if(window.Telegram?.WebApp?.openLink)window.Telegram.WebApp.openLink('${link}');else window.open('${link}','_blank');doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`: `doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`;const progressMarkup=goal>0?`<div class="server-task-progress"><i style="width:${Math.min(100,(progress/goal)*100)}%"></i></div><div class="item-sub server-task-count">Sunucu ilerlemesi: ${Math.min(progress,goal)}/${goal}</div>`:'';html+=`<div class="item-row"><div class="item-ico">${icon}</div><div class="item-info"><div class="item-title">${safeHtml(task.task_name)}</div>${task.description?`<div class="item-sub">${safeHtml(task.description)}</div>`:''}<div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(task.reward_coin)} Coin${level>1?` · Sv. ${level}`:''}</div>${progressMarkup}</div><button class="action-btn ${disabled?'':'gold'}" onclick="${action}" ${disabled?'disabled':''}>${lock?'Kilitli':isD?'Alındı':progressBlocked?`${Math.min(progress,goal)}/${goal}`:link?'Git & Al':'Al'}</button></div>`})});
       q('#listTasks').innerHTML = html;
     }
 
@@ -3961,7 +4044,7 @@
         S.game.daily_login.current_streak = Math.min(7, Number(S.game.daily_login.current_streak || 0) + 1);
         S.game.daily_login.can_claim_today = false;
         window.MarinoDailyRewards?.claimSuccess?.({ streak: S.game.daily_login.current_streak, preview: true });
-        toast('Demo günlük ödül alındı!');
+        toast('Günlük ödül önizlemesi alındı!');
         S.busy = false;
         return;
       }
@@ -4523,6 +4606,7 @@
               const p2 = permBoostState();
               p2.auto_tap_end = res.until ? new Date(res.until).getTime() : (Date.now() + 12*3600*1000);
               savePermBoostState(p2);
+              syncAutoTapLoop();
               S.game.state.coin -= Number(res.cost || 5000);
             } else {
               return toast('Sunucu onayı alınamadı. Bakiye değiştirilmedi.');
@@ -4640,8 +4724,14 @@
       const wire = (sel, fn) => { const el = q(sel); if (el) el.onclick = fn; };
       wire('#btnDailyCombo', openCombo);
       wire('#btnDailyCipher', openCipher);
-      wire('#btnOpenBoost', openBoost);
-      wire('#btnOpenAirdrop', openAirdrop);
+      wire('#btnOpenBoost', () => { q('#sheetEmpireHub').classList.remove('show'); openBoost(); });
+      wire('#btnOpenAirdrop', () => { q('#sheetEmpireHub').classList.remove('show'); openAirdrop(); });
+      wire('#btnOpenClaimMining', () => {
+        q('#sheetEmpireHub').classList.remove('show');
+        showTab('store');
+        window.MarinoClaimMining?.sync?.();
+        setTimeout(() => q('#claimMiningMount')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+      });
       wire('#btnComboConfirm', confirmCombo);
       wire('#btnCipherBack', cipherBack);
       wire('#btnCipherSubmit', cipherSubmit);
@@ -4653,8 +4743,8 @@
       setInterval(refreshCombocipherBadges, 1000);
       // Fetch server state once on init, then every 60s (never in local preview).
       if (!isLocalPreview) {
-        hkRefreshState().then(() => { refreshCombocipherBadges(); });
-        setInterval(() => { hkRefreshState(); }, 60000);
+        hkRefreshState().then(() => { refreshCombocipherBadges(); syncAutoTapLoop(); });
+        setInterval(() => { hkRefreshState().then(syncAutoTapLoop); }, 60000);
       }
     }
     // Run after main init() has bound DOM

@@ -1,10 +1,10 @@
 {
-  "authority": "Demo presentation catalogue only; server-side integration required for any real entitlement.",
+  "authority": "UI preview catalogue only; server-side integration required for any real entitlement.",
   "paylines": 20,
   "multipliers": {
     "M": [0,0,4,12,40], "CROWN": [0,0,3,10,30], "YACHT": [0,0,3,8,24],
     "VAULT": [0,0,2,7,20], "COCKTAIL": [0,0,2,6,16], "DIAMOND": [0,0,2,5,14],
     "ACE": [0,0,1,3,8], "WILD": [0,0,5,15,50], "SCATTER": [0,0,2,10,25]
   },
-  "notice": "Demo sonucu, nakit değeri yoktur"
+  "notice": "Önizleme sonucu, nakit değeri yoktur"
 }

@@ -32,11 +32,15 @@ test('UI events are bound once for real and preview adapters', () => {
   assert.equal([...html.matchAll(/function bindUiEvents\(/g)].length, 1);
 });
 
-test('Empire Hub is a sheet and home actions remain visible', () => {
+test('compact home opens one command sheet containing the gameplay shortcuts', () => {
   assert.doesNotMatch(html, /<details[^>]*id="empireHub"/);
   assert.match(html, /id="sheetEmpireHub" class="sheet-overlay"/);
   assert.match(html, /id="btnEmpireHub"/);
-  assert.match(html, /class="quick-bar home-quick-actions"/);
+  assert.doesNotMatch(html, /class="quick-bar home-quick-actions"/);
+  assert.match(html, /class="command-menu-grid"/);
+  assert.match(html, /data-command-tab="buildings"/);
+  assert.match(html, /data-command-tab="tasks"/);
+  assert.match(html, /data-command-tab="store"/);
   assert.equal([...html.matchAll(/id="btnOpenBoost"/g)].length, 1);
   assert.equal([...html.matchAll(/id="btnOpenAirdrop"/g)].length, 1);
 });

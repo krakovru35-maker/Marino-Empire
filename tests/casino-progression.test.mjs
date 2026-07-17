@@ -42,7 +42,8 @@ test('gerçek mod yetkisi olmadan istemci görev ödülü üretemez',()=>{
   missions.applyProgressEvent(state,'roulette_bet',{type:'split'});
   assert.equal(missions.claimMissionState(state,'roulette_split',false).points,0);
   const source=read('public/js/casino/casino-missions.js');
-  assert.match(source,/claimMissionState\(state,id,preview\(\)\)/);
+  assert.match(source,/MarinoPhase2BBridge\?\.claimTask\?\.\(id,1\)/);
+  assert.match(source,/pendingClaims/);
   assert.match(source,/grantDemoRewardPoints/);
 });
 
@@ -65,7 +66,7 @@ test('kataloglar UI otoritesi olmadığını açıkça belirtir',()=>{
   for(const file of ['public/data/casino/casino-missions.json','public/data/casino/casino-badges.json']){
     const data=JSON.parse(read(file));
     assert.match(JSON.stringify(data),/authority/i);
-    assert.match(JSON.stringify(data),/demo|cosmetic|catalog/i);
+    assert.match(JSON.stringify(data),/preview|cosmetic|catalog/i);
   }
 });
 
@@ -73,6 +74,18 @@ test('Free Spin ve Free Bet hibeleri localhost preview korumasındadır',()=>{
   const source=read('public/js/phase-2b.js');
   assert.match(source,/grantDemoRewardPoints\(amount\).*?!preview\(\)/s);
   assert.match(source,/grantDemoEntitlement\(type,amount=1\).*?!preview\(\)/s);
+});
+
+test('casino task progress migration records server-confirmed gameplay only',()=>{
+  const sql=read('supabase/migrations/202607180002_casino_task_progress.sql');
+  assert.match(sql,/create table if not exists public\.marino_player_task_progress/);
+  assert.match(sql,/create or replace function public\.marino_record_task_progress/);
+  assert.match(sql,/security definer/);
+  assert.match(sql,/revoke all on function public\.marino_record_task_progress\(bigint,text,integer\) from public, anon, authenticated/);
+  assert.match(sql,/perform public\.marino_record_task_progress\(v_player_id, 'slot_spin', 1\)/);
+  assert.match(sql,/perform public\.marino_record_task_progress\(v_player_id, 'roulette_spin', 1\)/);
+  assert.match(sql,/perform public\.marino_record_task_progress\(v_player_id, 'blackjack_hand', 1\)/);
+  assert.match(sql,/Görev henüz tamamlanmadı/);
 });
 
 test('responsive görev sheeti ve reduced motion fallback vardır',()=>{

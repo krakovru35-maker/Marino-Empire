@@ -41,15 +41,32 @@
 
   const preview=()=>window.MarinoLocalPreview?.detect?.(window.location,window.Telegram?.WebApp)===true;
   const state=createProgressState();let category='daily',sheet=null,sessionTimer=0,lastTriple=false;
+  const pendingClaims=new Set();
   const icon=(id,label='')=>`<svg viewBox="0 0 24 24" ${label?`role="img" aria-label="${label}"`:'aria-hidden="true"'}><use href="./assets/ui/casino/marino-casino-icons.svg#casino-${id}"></use></svg>`;
   function emit(event,payload={}){document.dispatchEvent(new CustomEvent('marino:casino-event',{detail:{event,payload,preview:preview()}}));}
   function record(event,payload={}){
     const result=applyProgressEvent(state,event,payload);emit(event,payload);
     result.chains.forEach(chain=>emit('chain_ready',{chain}));if(result.tripleVisit&&!lastTriple){lastTriple=true;emit('triple_visit',{});}refresh();return true;
   }
-  function claimMission(id){const result=claimMissionState(state,id,preview());if(!result.ok)return false;window.MarinoPhase2B?.grantDemoRewardPoints?.(result.points);emit('mission_claim',{id,points:result.points});window.MarinoAudio?.play?.('task_complete');refresh();return true;}
+  async function claimMission(id){
+    const mission=MISSION_DEFS.find(item=>item.id===id);
+    if(!mission||state.claimed.has(id)||progress(state,mission)<mission.goal||pendingClaims.has(id))return false;
+    pendingClaims.add(id);refresh();
+    try{
+      if(preview()){
+        const result=claimMissionState(state,id,true);if(!result.ok)return false;
+        window.MarinoPhase2B?.grantDemoRewardPoints?.(result.points);emit('mission_claim',{id,points:result.points,server:false});window.MarinoAudio?.play?.('task_complete');refresh();return true;
+      }
+      const response=await window.MarinoPhase2BBridge?.claimTask?.(id,1);
+      if(response?.ok===false)throw Error(response?.message||'task_claim_failed');
+      state.claimed.add(id);emit('mission_claim',{id,points:mission.points,server:true});window.MarinoAudio?.play?.('task_complete');refresh();return true;
+    }catch(error){
+      emit('mission_claim_failed',{id,reason:String(error?.message||'server_rejected').slice(0,80)});
+      return false;
+    }finally{pendingClaims.delete(id);refresh();}
+  }
   function claimChain(id){const chain=CHAIN_DEFS.find(item=>item.id===id);if(!preview()||!chain||state.chainStage[id]<chain.steps.length||state.chainClaimed.has(id))return false;state.chainClaimed.add(id);window.MarinoPhase2B?.grantDemoRewardPoints?.(chain.reward.points);window.MarinoPhase2B?.grantDemoEntitlement?.(chain.reward.entitlement,1);emit('chain_complete',{id,game:chain.game,points:chain.reward.points});window.MarinoAudio?.play?.(chain.reward.entitlement==='spin'?'free_spin_unlock':'free_bet_unlock');refresh();return true;}
-  function missionCard(mission){const value=progress(state,mission),percent=Math.round(value/mission.goal*100),claimed=state.claimed.has(mission.id),ready=value>=mission.goal;return`<article class="casino-mission-card ${claimed?'is-claimed':''}"><div class="casino-mission-icon">${icon(GAME_ICON[mission.game],mission.game)}</div><div><span>${mission.game.toUpperCase()} • AKTİF</span><h4>${mission.title}</h4><p>${mission.description}</p><div class="casino-progress"><i style="width:${percent}%"></i></div><small>${value}/${mission.goal} • ${mission.points} MRP • ${mission.expiry}</small></div><button type="button" data-casino-claim="${mission.id}" ${ready&&!claimed&&preview()?'':'disabled'}>${claimed?'ALINDI':ready?(preview()?'ÖDÜLÜ AL':'SERVER ONAYI GEREKLİ'):'DEVAM'}</button></article>`;}
+  function missionCard(mission){const value=progress(state,mission),percent=Math.round(value/mission.goal*100),claimed=state.claimed.has(mission.id),ready=value>=mission.goal,pending=pendingClaims.has(mission.id),canClaim=ready&&!claimed&&!pending;return`<article class="casino-mission-card ${claimed?'is-claimed':''}"><div class="casino-mission-icon">${icon(GAME_ICON[mission.game],mission.game)}</div><div><span>${mission.game.toUpperCase()} • AKTİF</span><h4>${mission.title}</h4><p>${mission.description}</p><div class="casino-progress"><i style="width:${percent}%"></i></div><small>${value}/${mission.goal} • ${mission.points} MRP • ${mission.expiry}</small></div><button type="button" data-casino-claim="${mission.id}" ${canClaim?'':'disabled'}>${claimed?'ALINDI':pending?'ONAYLANIYOR':ready?(preview()?'ÖDÜLÜ AL':'SERVERDAN AL'):'DEVAM'}</button></article>`;}
   function chainCard(chain){const stage=state.chainStage[chain.id]||0,done=stage>=chain.steps.length,claimed=state.chainClaimed.has(chain.id);return`<article class="casino-chain-card"><header>${icon(GAME_ICON[chain.game])}<div><span>3 AŞAMALI ZİNCİR</span><h4>${chain.title}</h4></div></header><ol>${chain.steps.map((step,index)=>`<li class="${index<stage?'done':index===stage?'active':'locked'}"><b>${index+1}</b><span>${step.title}</span></li>`).join('')}</ol><button type="button" data-chain-claim="${chain.id}" ${done&&!claimed&&preview()?'':'disabled'}>${claimed?'ALINDI':done?'45 MRP + SANAL HAK':'ZİNCİRİ TAMAMLA'}</button><small>Sanal hak, nakit değeri yoktur</small></article>`;}
   function ensureSheet(){if(sheet)return sheet;sheet=document.createElement('div');sheet.className='casino-progression-overlay';sheet.hidden=true;sheet.innerHTML='<button type="button" class="casino-progression-backdrop" aria-label="Casino görevlerini kapat"></button><section class="casino-progression-sheet" role="dialog" aria-modal="true" aria-label="Casino Görevleri"><header><div><span>MARINO CASINO</span><h3>Casino Görevleri</h3></div><button type="button" data-casino-progress-close aria-label="Kapat">×</button></header><div class="casino-progression-body"></div></section>';document.body.append(sheet);return sheet;}
   function renderSheet(){const target=ensureSheet().querySelector('.casino-progression-body'),missions=MISSION_DEFS.filter(item=>item.category===category);target.innerHTML=`<nav>${Object.entries(CATEGORY_LABEL).map(([id,label])=>`<button type="button" data-mission-category="${id}" class="${id===category?'active':''}">${label}</button>`).join('')}</nav><div class="casino-mission-grid">${missions.map(missionCard).join('')}</div><h3>Aktif Görev Zincirleri</h3><div class="casino-chain-grid">${CHAIN_DEFS.map(chainCard).join('')}</div>${window.MarinoCasinoMastery?.sheetMarkup?.()||''}`;}
