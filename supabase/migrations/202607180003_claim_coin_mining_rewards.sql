@@ -42,12 +42,12 @@ create index if not exists marino_reward_claim_requests_status_idx
 create index if not exists marino_reward_claim_requests_player_idx
   on public.marino_reward_claim_requests (player_id, created_at desc);
 
-insert into public.marino_admin_permission_catalog(permission_key, description, critical)
+insert into public.marino_admin_permission_catalog(permission_key, admin_assignable, description)
 values
-  ('rewards.view','View reviewed FreeSpin/FreeBet reward claim requests',false),
-  ('rewards.manage','Approve, reject or mark reviewed reward claim requests fulfilled',false)
+  ('rewards.view',true,'View reviewed FreeSpin/FreeBet reward claim requests'),
+  ('rewards.manage',true,'Approve, reject or mark reviewed reward claim requests fulfilled')
 on conflict(permission_key) do update
-set description=excluded.description, critical=excluded.critical;
+set admin_assignable=excluded.admin_assignable, description=excluded.description;
 
 alter table public.marino_site_accounts enable row level security;
 alter table public.marino_claim_coin_wallets enable row level security;
@@ -214,7 +214,8 @@ exception when others then
     delete from public.marino_idempotency_keys where auth_user_id=v_auth and request_id=p_request_id and response is null;
   end if;
   raise;
-end $$;
+end;
+$$;
 
 revoke all on function public.marino_claim_mining_rpc(text,jsonb,uuid) from public, anon;
 grant execute on function public.marino_claim_mining_rpc(text,jsonb,uuid) to authenticated;
@@ -284,7 +285,8 @@ begin
   else
     raise exception 'claim_admin_action_not_allowed' using errcode='42501';
   end if;
-end $$;
+end;
+$$;
 
 revoke all on function public.marino_claim_admin_rpc(text,jsonb,uuid) from public, anon;
 grant execute on function public.marino_claim_admin_rpc(text,jsonb,uuid) to authenticated;

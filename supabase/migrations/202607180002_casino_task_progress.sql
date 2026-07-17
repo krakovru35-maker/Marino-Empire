@@ -62,7 +62,8 @@ begin
       set progress_value = least(public.marino_player_task_progress.progress_value + excluded.progress_value, 1000000),
           updated_at = now();
   end loop;
-end $$;
+end;
+$$;
 
 revoke all on function public.marino_record_task_progress(bigint,text,integer) from public, anon, authenticated;
 
@@ -134,7 +135,8 @@ begin
     'reputation',v_player.reputation,'claimable_coin',v_player.claimable_coin,
     'offline_capacity_hours',v_player.offline_capacity_hours,'prestige_points',v_player.prestige_points),
     'completed_tasks',(public.marino_task_state()->'completed'),'message','Görev ödülü alındı: +'||v_reward||' coin');
-end $$;
+end;
+$$;
 
 revoke all on function public.marino_claim_task(text,text,integer,text) from public,anon,authenticated;
 create or replace function public.marino_secure_rpc(
@@ -218,7 +220,7 @@ begin
       if v_bet not between 1 and 1000000 then raise exception 'invalid_bet'; end if;
       v_response := to_jsonb(public.marino_play_slot(v_telegram_id, v_bet, coalesce(p_request_id::text,'')));
       perform public.marino_record_task_progress(v_player_id, 'slot_spin', 1);
-      if case when coalesce(v_response->>'win_amount','') ~ '^[0-9]+(\.[0-9]+)?$' then (v_response->>'win_amount')::numeric else 0 end > 0 then
+      if (case when coalesce(v_response->>'win_amount','') ~ '^[0-9]+(\.[0-9]+)?$' then (v_response->>'win_amount')::numeric else 0 end) > 0 then
         perform public.marino_record_task_progress(v_player_id, 'slot_payline_win', 1);
       end if;
     when 'marino_play_mini_game' then
@@ -315,7 +317,7 @@ exception when others then
     where auth_user_id = v_auth_user and request_id = p_request_id and response is null;
   end if;
   raise;
-end
+end;
 $$;
 
 
