@@ -288,7 +288,13 @@ html[data-app-state="ready"] .nav-bar {
   letter-spacing: .08em;
 }
 
-.toast { z-index: var(--layer-critical) !important; }
+.toast {
+  position: fixed !important;
+  top: max(calc(var(--safeT) + 12px), 72px) !important;
+  width: max-content;
+  max-width: calc(100vw - 28px);
+  z-index: var(--layer-critical) !important;
+}
 
 @keyframes introAura { to { transform: rotate(1turn); } }
 @keyframes introSweep { to { transform: translateX(100%); } }

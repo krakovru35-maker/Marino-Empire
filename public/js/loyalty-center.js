@@ -2,12 +2,31 @@
   'use strict';
 
   const CLAIM_COSTS = Object.freeze({ free_spin: 30, free_bet: 45 });
+  const REWARD_CATALOG = Object.freeze([
+    { catalog_code: 'free_spin_1', reward_type: 'free_spin', display_name: '1 Free Spin', amount: 1, cost_claim_coin: 30, active: true },
+    { catalog_code: 'free_spin_3', reward_type: 'free_spin', display_name: '3 Free Spin', amount: 3, cost_claim_coin: 84, active: true },
+    { catalog_code: 'free_spin_5', reward_type: 'free_spin', display_name: '5 Free Spin', amount: 5, cost_claim_coin: 135, active: true },
+    { catalog_code: 'free_bet_1', reward_type: 'free_bet', display_name: '1 Free Bet', amount: 1, cost_claim_coin: 45, active: true },
+    { catalog_code: 'free_bet_3', reward_type: 'free_bet', display_name: '3 Free Bet', amount: 3, cost_claim_coin: 126, active: true }
+  ]);
+  const EQUIPMENT_CATALOG = Object.freeze([
+    { item_key: 'steel_pickaxe', item_name: 'Çelik Kazma', description: 'Kazım başına +1 CC potansiyeli', icon: '⛏', cost_claim_coin: 40, required_lifetime_mined: 60, owned: false },
+    { item_key: 'deep_scanner', item_name: 'Derin Tarayıcı', description: 'Bekleme süresini 2 dakika azaltır', icon: '⌁', cost_claim_coin: 90, required_lifetime_mined: 180, owned: false },
+    { item_key: 'diamond_drill', item_name: 'Elmas Matkap', description: 'Kazım başına +2 CC potansiyeli', icon: '◆', cost_claim_coin: 220, required_lifetime_mined: 500, owned: false },
+    { item_key: 'quantum_rig', item_name: 'Kuantum Sondajı', description: '+3 CC ve 4 dakika hız', icon: '⚙', cost_claim_coin: 600, required_lifetime_mined: 1200, owned: false }
+  ]);
+  const ACTIVITY_TASKS = Object.freeze([
+    { task_key: 'agent_connection', task_name: 'Ajan Bağlantısı', description: 'Telegram botunu başlat ve hesabını eşleştir.', task_type: 'onboarding', reward_claim_coin: 3, goal: 1, progress: 0 },
+    { task_key: 'account_2fa', task_name: 'Kasayı Sağlama Al', description: 'SMS 2FA özelliğini etkinleştir.', task_type: 'security', reward_claim_coin: 5, goal: 1, progress: 0 },
+    { task_key: 'daily_safe_checkin', task_name: 'Günün İlk Kontrolü', description: 'Günlük hesap güvenliği kontrolünü tamamla.', task_type: 'daily', reward_claim_coin: 1, goal: 1, progress: 0 },
+    { task_key: 'seven_day_checkin', task_name: '7 Günlük İstikrar', description: 'Yedi günlük güvenli giriş kontrolünü tamamla.', task_type: 'weekly', reward_claim_coin: 10, goal: 7, progress: 0 }
+  ]);
   const state = {
     loaded: false,
     loading: false,
     profile: null,
     wallet: { claim_coin: 0, lifetime_mined: 0, mined_today: 0, next_mine_at: null, daily_cap: 18 },
-    requests: [],
+    requests: [], rewardCatalog: REWARD_CATALOG, equipmentCatalog: EQUIPMENT_CATALOG, activityTasks: ACTIVITY_TASKS,
     costs: CLAIM_COSTS,
     promptShown: false
   };
@@ -28,14 +47,16 @@
     const preview = {
       profile: null,
       wallet: { claim_coin: 12, lifetime_mined: 88, mined_today: 4, next_mine_at: null, daily_cap: 18 },
+      rewardCatalog: REWARD_CATALOG.map(item => ({ ...item })), equipmentCatalog: EQUIPMENT_CATALOG.map(item => ({ ...item })), activityTasks: ACTIVITY_TASKS.map(item => ({ ...item })),
       requests: [
         { id: 'preview-1', reward_type: 'free_spin', amount: 1, cost_claim_coin: 30, status: 'pending', site_username: 'kaanbm', created_at: new Date().toISOString() }
       ]
     };
     return {
       player(action, payload = {}) {
-        if (action === 'state') return { ok: true, profile: preview.profile, wallet: preview.wallet, requests: preview.requests, costs: CLAIM_COSTS, server_time: new Date().toISOString() };
+        if (action === 'state') return { ok: true, profile: preview.profile, wallet: preview.wallet, requests: preview.requests, reward_catalog: preview.rewardCatalog, equipment_catalog: preview.equipmentCatalog, activity_tasks: preview.activityTasks, server_time: new Date().toISOString() };
         if (action === 'bind_site_username') {
+          if (preview.profile?.site_username) throw Error('site_username_admin_only');
           const username = String(payload.site_username || '').trim();
           if (!validUsername(username)) throw Error('invalid_site_username');
           preview.profile = { site_username: username, locked: true, updated_at: new Date().toISOString() };
@@ -46,10 +67,20 @@
           preview.wallet.claim_coin += 2; preview.wallet.lifetime_mined += 2; preview.wallet.mined_today += 2;
           return { ok: true, mined: 2, wallet: preview.wallet, message: '+2 Claim Coin' };
         }
+        if (action === 'buy_mining_item') {
+          const item = preview.equipmentCatalog.find(entry => entry.item_key === payload.item_key);
+          if (!item || item.owned || preview.wallet.lifetime_mined < item.required_lifetime_mined || preview.wallet.claim_coin < item.cost_claim_coin) throw Error('item_locked');
+          preview.wallet.claim_coin -= item.cost_claim_coin; item.owned = true; return this.player('state');
+        }
+        if (action === 'claim_activity_reward') {
+          const task = preview.activityTasks.find(entry => entry.task_key === payload.task_key);
+          if (!task?.verified || task.claimed) throw Error('task_not_verified');
+          task.claimed = true; preview.wallet.claim_coin += task.reward_claim_coin; return this.player('state');
+        }
         if (action === 'create_reward_claim') {
-          const rewardType = payload.reward_type === 'free_bet' ? 'free_bet' : 'free_spin';
-          const amount = Math.max(1, Math.min(10, Number(payload.amount || 1)));
-          const cost = CLAIM_COSTS[rewardType] * amount;
+          const item = preview.rewardCatalog.find(entry => entry.catalog_code === payload.catalog_code && entry.active);
+          if (!item) throw Error('reward_not_found');
+          const { reward_type: rewardType, amount, cost_claim_coin: cost } = item;
           if (preview.wallet.claim_coin < cost) throw Error('insufficient_claim_coin');
           preview.wallet.claim_coin -= cost;
           preview.requests.unshift({ id: uuid(), reward_type: rewardType, amount, cost_claim_coin: cost, status: 'pending', site_username: preview.profile.site_username, created_at: new Date().toISOString() });
@@ -59,6 +90,10 @@
       },
       admin(action, payload = {}) {
         if (action === 'claims_list') return { ok: true, items: preview.requests };
+        if (action === 'catalog_list') return { ok: true, rewards: preview.rewardCatalog, tasks: preview.activityTasks };
+        if (action === 'reward_catalog_update') { const item=preview.rewardCatalog.find(entry=>entry.catalog_code===payload.catalog_code);if(item){item.cost_claim_coin=Number(payload.cost_claim_coin);item.active=payload.active!==false}return {ok:true,item} }
+        if (action === 'site_account_update') { if(preview.profile?.site_username===payload.current_site_username)preview.profile.site_username=payload.new_site_username;preview.requests.forEach(item=>{if(item.site_username===payload.current_site_username)item.site_username=payload.new_site_username});return {ok:true} }
+        if (action === 'activity_task_verify') { const task=preview.activityTasks.find(entry=>entry.task_key===payload.task_key);if(task){task.progress=Math.min(task.goal,Number(payload.progress));task.verified=task.progress>=task.goal}return {ok:true} }
         if (action === 'claim_set_status') {
           const request = preview.requests.find(item => item.id === payload.request_id);
           if (request) request.status = payload.status || 'approved';
@@ -77,6 +112,9 @@
       state.profile = data?.profile || null;
       state.wallet = data?.wallet || state.wallet;
       state.requests = Array.isArray(data?.requests) ? data.requests : [];
+      state.rewardCatalog = Array.isArray(data?.reward_catalog) ? data.reward_catalog : REWARD_CATALOG;
+      state.equipmentCatalog = Array.isArray(data?.equipment_catalog) ? data.equipment_catalog : EQUIPMENT_CATALOG;
+      state.activityTasks = Array.isArray(data?.activity_tasks) ? data.activity_tasks : ACTIVITY_TASKS;
       state.costs = data?.costs || CLAIM_COSTS;
       state.loaded = true;
       render();
@@ -119,7 +157,7 @@
   async function requestReward(rewardType, amount = 1) {
     if (!state.profile?.site_username) return maybePromptUsername(true);
     try {
-      const data = await bridge().invoke('create_reward_claim', { reward_type: rewardType, amount: Number(amount || 1) }, uuid());
+      const data = await bridge().invoke('create_reward_claim', { catalog_code: rewardType }, uuid());
       state.wallet = data?.wallet || state.wallet;
       state.requests = Array.isArray(data?.requests) ? data.requests : state.requests;
       bridge()?.toast?.('Talep yetkili paneline gönderildi.');
@@ -127,6 +165,24 @@
     } catch {
       bridge()?.toast?.('Talep oluşturulamadı. Claim Coin bakiyeni ve limitleri kontrol et.');
     }
+  }
+
+  async function buyEquipment(itemKey) {
+    try { const data=await bridge().invoke('buy_mining_item',{item_key:itemKey},uuid());syncData(data);bridge()?.toast?.('Mining ekipmanı satın alındı.');render() }
+    catch { bridge()?.toast?.('Ekipman açılamadı. Claim Coin ve toplam kazım şartını kontrol et.') }
+  }
+
+  async function claimActivity(taskKey) {
+    try { const data=await bridge().invoke('claim_activity_reward',{task_key:taskKey},uuid());syncData(data);bridge()?.toast?.('Doğrulanmış görev ödülü alındı.');render() }
+    catch { bridge()?.toast?.('Görev henüz site veya yönetici tarafından doğrulanmadı.') }
+  }
+
+  function syncData(data) {
+    state.profile=data?.profile||state.profile; state.wallet=data?.wallet||state.wallet;
+    state.requests=Array.isArray(data?.requests)?data.requests:state.requests;
+    state.rewardCatalog=Array.isArray(data?.reward_catalog)?data.reward_catalog:state.rewardCatalog;
+    state.equipmentCatalog=Array.isArray(data?.equipment_catalog)?data.equipment_catalog:state.equipmentCatalog;
+    state.activityTasks=Array.isArray(data?.activity_tasks)?data.activity_tasks:state.activityTasks;
   }
 
   function requestRows() {
@@ -145,6 +201,19 @@
     return goals.map(([label, done]) => `<div class="claim-goal-row ${done ? 'is-done' : ''}"><span>${done ? '&#10003;' : '&#9675;'}</span><b>${escape(label)}</b></div>`).join('');
   }
 
+  function equipmentRows() {
+    const balance=Number(state.wallet?.claim_coin||0),lifetime=Number(state.wallet?.lifetime_mined||0);
+    return state.equipmentCatalog.map(item=>{const locked=lifetime<Number(item.required_lifetime_mined||0),disabled=item.owned||locked||balance<Number(item.cost_claim_coin||0);return `<article class="claim-equipment ${item.owned?'is-owned':''}"><i>${escape(item.icon||'⛏')}</i><div><b>${escape(item.item_name)}</b><small>${escape(item.description)}</small><em>${locked?`${fmt(item.required_lifetime_mined)} toplam kazım gerekli`:`${fmt(item.cost_claim_coin)} CC`}</em></div><button type="button" data-claim-equipment="${escape(item.item_key)}" ${disabled?'disabled':''}>${item.owned?'ALINDI':locked?'KİLİTLİ':'SATIN AL'}</button></article>`}).join('');
+  }
+
+  function activityRows() {
+    return state.activityTasks.map(task=>{const progress=Math.min(Number(task.progress||0),Number(task.goal||1)),ready=Boolean(task.verified)&&!task.claimed;return `<article class="claim-activity ${task.claimed?'is-done':''}"><div><span>${escape(task.task_type)}</span><b>${escape(task.task_name)}</b><p>${escape(task.description)}</p><div class="claim-activity-progress"><i style="width:${Math.min(100,progress/Number(task.goal||1)*100)}%"></i></div><small>${progress}/${Number(task.goal||1)} · +${fmt(task.reward_claim_coin)} CC</small></div><button type="button" data-claim-activity="${escape(task.task_key)}" ${ready?'':'disabled'}>${task.claimed?'ALINDI':ready?'ÖDÜLÜ AL':'DOĞRULAMA'}</button></article>`}).join('');
+  }
+
+  function rewardRows(username,balance) {
+    return state.rewardCatalog.filter(item=>item.active!==false).map(item=>`<button type="button" data-claim-request="${escape(item.catalog_code)}" ${balance>=Number(item.cost_claim_coin)&&username?'':'disabled'}><b>${escape(item.display_name)}</b><small>${fmt(item.cost_claim_coin)} CC</small></button>`).join('');
+  }
+
   function cardMarkup() {
     const username = state.profile?.site_username;
     const costs = state.costs || CLAIM_COSTS;
@@ -154,7 +223,7 @@
       <p>Claim Coin zor kazanılır; Free Spin ve Free Bet talepleri bağlı site kullanıcı adınla yetkili paneline düşer.</p>
       <div class="claim-site-lock ${username ? 'is-bound' : ''}">
         <div><small>Site üyeliği</small><b>${username ? escape(username) : 'Bağlantı gerekli'}</b></div>
-        <button type="button" data-claim-bind>${username ? 'Güncelle' : 'Bağla'}</button>
+        ${username?'<span class="claim-admin-lock">Yalnız yönetici düzeltebilir</span>':'<button type="button" data-claim-bind>Bağla</button>'}
       </div>
       <div class="claim-mining-stats">
         <div><small>Bugün</small><b>${fmt(state.wallet?.mined_today || 0)} / ${fmt(state.wallet?.daily_cap || 18)}</b></div>
@@ -163,10 +232,9 @@
       </div>
       <button type="button" class="claim-mine-button" data-claim-mine ${username ? '' : 'disabled'}>⛏️ Claim Coin Kaz</button>
       <div class="claim-goals"><h4>Mining Hedefleri</h4>${goalRows()}</div>
-      <div class="claim-reward-grid">
-        <button type="button" data-claim-request="free_spin" ${balance >= Number(costs.free_spin || 30) && username ? '' : 'disabled'}><b>Free Spin Talep</b><small>${fmt(costs.free_spin || 30)} CC / adet</small></button>
-        <button type="button" data-claim-request="free_bet" ${balance >= Number(costs.free_bet || 45) && username ? '' : 'disabled'}><b>Free Bet Talep</b><small>${fmt(costs.free_bet || 45)} CC / adet</small></button>
-      </div>
+      <section class="claim-section"><h4>Mining Ekipmanları</h4><p>Geliştirmeler Claim Coin ve toplam kazım şartı ister.</p><div class="claim-equipment-list">${equipmentRows()}</div></section>
+      <section class="claim-section"><h4>Doğrulanan Görevler</h4><p>Ödül yalnız site veya yönetici doğrulamasından sonra açılır.</p><div class="claim-activity-list">${activityRows()}</div></section>
+      <section class="claim-section"><h4>Free Spin / Free Bet Fiyatları</h4><div class="claim-reward-grid">${rewardRows(username,balance)}</div></section>
       <div class="claim-request-list"><h4>Son Talepler</h4>${requestRows()}</div>
     </section>`;
   }
@@ -207,14 +275,23 @@
 
   function bind() {
     document.addEventListener('click', event => {
+      if (event.target.closest('#btnOpenClaimMining')) {
+        q('.nav-btn[data-tab="store"]')?.click();
+        setTimeout(() => { if (state.loaded) render(); else load(); q('#claimMiningMount')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80);
+        return;
+      }
       if (event.target.closest('[data-claim-bind]')) return maybePromptUsername(true);
       if (event.target.closest('[data-claim-mine]')) return mine();
       const request = event.target.closest('[data-claim-request]');
-      if (request) return requestReward(request.dataset.claimRequest, 1);
+      if (request) return requestReward(request.dataset.claimRequest);
+      const equipment=event.target.closest('[data-claim-equipment]');if(equipment)return buyEquipment(equipment.dataset.claimEquipment);
+      const activity=event.target.closest('[data-claim-activity]');if(activity)return claimActivity(activity.dataset.claimActivity);
       if (event.target.closest('[data-claim-username-save]')) return bindUsername(q('#claimUsernameInput')?.value || '');
       if (event.target.closest('[data-claim-username-later]')) return closePrompt();
     });
     document.addEventListener('marino:authenticated', () => setTimeout(load, 250));
+    document.addEventListener('marino:app-ready', () => setTimeout(load, 0));
+    if (bridge()?.preview) setTimeout(load, 0);
     setInterval(() => { if (state.loaded) render(); }, 30000);
   }
 
