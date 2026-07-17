@@ -1835,10 +1835,6 @@
     </main>
 
     <main id="view-store">
-      <div class="page-head">
-        <h2>Vegas Casino & Kasa</h2>
-        <p>Şansını dene, servetini katla veya kaybet!</p>
-      </div>
       <div id="listStore" class="list-scroll"></div>
     </main>
 
@@ -3108,46 +3104,8 @@
 
     function renderStore() {
       if (!S.game) return;
-      const items = S.game.store || [];
-      const rs = S.game.reward_status || {};
-      const played = S.game.daily_login?.mini_games_played || 0;
-
-      let html = `<div class="alert-box"><b>Ödül Limiti:</b> Haftalık ${rs.weekly_used || 0}/3 | Bugün ${rs.daily_used || 0}/1</div>`;
-
-      html += '<div class="sec-title">Vezne (Çip İşlemleri)</div>';
-      html += `<div class="item-row"><div class="item-ico" style="background:transparent"><div style="width:40px;height:40px;border-radius:50%;border:4px dashed #ffd13b;background:#1e2333;color:#ffd13b;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;box-shadow:0 4px 10px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.8)">ÇİP</div></div><div class="item-info"><div class="item-title">Casino Çipi Satın Al</div><div class="item-sub">100 Çip = 100.000 Coin</div><div class="item-sub">Bakiye: ${fmt(S.game.state.chips)} Çip</div></div><button class="action-btn gold" onclick="buyChipsPopup()">Çip Satın Al</button></div>`;
-
-      html += '<div class="sec-title">Gerçek Casino Games</div>';
-      html += `<div class="item-row"><div class="item-ico">🍒</div><div class="item-info"><div class="item-title">Klasik Slot (Coin)</div><div class="item-sub">Kasa Payı: %5</div></div><button class="action-btn gold" onclick="openMini('slot','Klasik Slot')">Oyna</button></div>`;
-      html += `<div class="item-row"><div class="item-ico">🌑</div><div class="item-info"><div class="item-title">VIP Rulet (Çip)</div><div class="item-sub">Avrupa Masası • Tam Bahis</div></div><button class="action-btn gold" onclick="openMini('roulette','VIP Rulet')">Oyna</button></div>`;
-      html += `<div class="item-row"><div class="item-ico">🃏</div><div class="item-info"><div class="item-title">Blackjack (Çip)</div><div class="item-sub">Vegas Rules • Canlı</div></div><button class="action-btn gold" onclick="openMini('blackjack','VIP Blackjack')">Oyna</button></div>`;
-      html += `<div class="item-row"><div class="item-ico" style="font-size:24px">♠️</div><div class="item-info"><div class="item-title">Casino Stud Poker (Çip)</div><div class="item-sub">5-Card Stud • Yüksek Kazanç</div></div><button class="action-btn gold" onclick="openMini('poker','VIP Poker')">Oyna</button></div>`;
-      html += `<div class="item-row"><div class="item-ico" style="font-size:24px">🐎</div><div class="item-info"><div class="item-title">Gerçek At Yarışı (Çip)</div><div class="item-sub">6 Kulvarlı • Canlı Animasyon</div></div><button class="action-btn gold" onclick="openMini('horse','At Yarışı')">Oyna</button></div>`;
-
-      html += '<div class="sec-title">Sanal Lig (Spor Bahisleri)</div>';
-      html += `<div class="item-row"><div class="item-ico" style="background:#1e2333; position:relative; overflow:hidden">
-             <img src="./assets/teams/gs.png" style="position:absolute; width:28px; height:28px; top:-2px; left:-2px; z-index:2; filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.8))">
-             <img src="./assets/teams/fb.png" style="position:absolute; width:28px; height:28px; bottom:-2px; right:-2px; z-index:1; filter:drop-shadow(-2px -2px 2px rgba(0,0,0,0.8))">
-           </div><div class="item-info"><div class="item-title">Canlı İddaa Bülteni</div><div class="item-sub">Gerçek Zamanlı Motor</div></div><button class="action-btn gold" onclick="openMini('sports','Sanal Sporlar')">Canlı İzle</button></div>`;
-
-      html += '<div class="sec-title">Şans Oyunları (Bilet İle)</div>';
-      html += `<div class="alert-box green"><b>Günlük Limit:</b> ${played}/5 oynandı</div>`;
-      const mgs = [['card', 'Kart Çevir', 25, '🃏'], ['wheel', 'Şans Çarkı', 35, '🎡'], ['vault', 'Kasa Aç', 50, '🔐']];
-      mgs.forEach(g => {
-        html += `<div class="item-row"><div class="item-ico">${g[3]}</div><div class="item-info"><div class="item-title">${g[1]}</div><div class="item-sub">Giriş: 🎟️ ${g[2]} bilet</div></div><button class="action-btn gold" onclick="openMini('${g[0]}','${g[1]}')" ${played >= 5 ? 'disabled' : ''}>Oyna</button></div>`;
-      });
-
-      if (items.length > 0) {
-        html += '<div class="sec-title">Gerçek Ödüller</div>';
-        items.forEach(i => {
-          html += `<div class="item-row"><div class="item-ico">🎟️</div><div class="item-info"><div class="item-title">${i.item_name}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(i.cost_coin)} &nbsp; 🎟️ ${i.cost_token} bilet</div></div><button class="action-btn" onclick="doAction('request_reward',{p_item_code:'${i.item_code}'})">Talep Et</button></div>`;
-        });
-      } else {
-        html += '<div class="sec-title">Gerçek Ödüller</div>';
-        html += '<div class="alert-box" style="background:rgba(255,255,255,0.02); color:#888; border-dash:2px">Henüz eklenecek ödül bulunmuyor.</div>';
-      }
-
-      q('#listStore').innerHTML = html;
+      q('#listStore').replaceChildren();
+      window.MarinoCasinoLobby?.render?.();
     }
 
     function mask(s) {

@@ -6,6 +6,7 @@ const claim = fs.readFileSync('public/js/loyalty-center.js','utf8');
 const claimCss = fs.readFileSync('public/styles/loyalty-center.css','utf8');
 const polish = fs.readFileSync('public/styles/mobile-boot-polish.css','utf8');
 const admin = fs.readFileSync('public/js/admin-operations.js','utf8');
+const html = fs.readFileSync('public/index.html','utf8');
 const migration = fs.readFileSync('supabase/migrations/202607180006_claim_mining_equipment_catalog.sql','utf8');
 
 test('bound site usernames are player immutable and admin-correctable only',()=>{
@@ -65,4 +66,9 @@ test('local preview boots mining after deferred module load',()=>{
   assert.match(claim,/addEventListener\('marino:app-ready', \(\) => setTimeout\(load, 0\)\)/);
   assert.match(claim,/if \(bridge\(\)\?\.preview\) setTimeout\(load, 0\)/);
   assert.match(claim,/#btnOpenClaimMining[\s\S]*\.nav-btn\[data-tab="store"\]/);
+});
+
+test('legacy ticket vault and reward cards are retired from the Store view',()=>{
+  assert.doesNotMatch(html,/Vegas Casino & Kasa|Gerçek Ödüller|Şans Oyunları \(Bilet İle\)|Kasa Aç/);
+  assert.match(html,/function renderStore\(\) \{[\s\S]*replaceChildren\(\)[\s\S]*MarinoCasinoLobby\?\.render\?\.\(\)/);
 });
