@@ -1708,24 +1708,26 @@
         </div>
       </div>
 
-      <!-- League Badge -->
-      <div class="league-wrap">
-        <div onclick="openLeagues()" id="leagueBadge"
-          style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.6); padding:8px 16px; border-radius:99px; border:1px solid #ffd13b; cursor:pointer; transition:0.2s; box-shadow:0 4px 15px rgba(0,0,0,0.5)">
-          <span id="leagueIcon">🥉</span>
-          <span id="leagueName" style="font-weight:900; font-size:12px; color:#ffd13b">BRONZ LİGİ</span>
-          <span style="color:var(--text-muted); font-size:10px">❯</span>
+      <div class="hero-status-row">
+        <!-- League Badge -->
+        <div class="league-wrap">
+          <div onclick="openLeagues()" id="leagueBadge"
+            style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.6); padding:8px 16px; border-radius:99px; border:1px solid #ffd13b; cursor:pointer; transition:0.2s; box-shadow:0 4px 15px rgba(0,0,0,0.5)">
+            <span id="leagueIcon">🥉</span>
+            <span id="leagueName" style="font-weight:900; font-size:12px; color:#ffd13b">BRONZ LİGİ</span>
+            <span style="color:var(--text-muted); font-size:10px">❯</span>
+          </div>
         </div>
-      </div>
 
-      <!-- Rank / Level -->
-      <div class="rank-shell">
-        <div class="rank-row">
-          <span class="rank-name">SEVİYE <strong id="valLvl">1</strong></span>
-          <span class="rank-lvl"><span id="valXp">0</span> XP</span>
-        </div>
-        <div class="progress-bg">
-          <div class="progress-fill" id="valProg" style="width: 5%;"></div>
+        <!-- Rank / Level -->
+        <div class="rank-shell">
+          <div class="rank-row">
+            <span class="rank-name">SEVİYE <strong id="valLvl">1</strong></span>
+            <span class="rank-lvl"><span id="valXp">0</span> XP</span>
+          </div>
+          <div class="progress-bg">
+            <div class="progress-fill" id="valProg" style="width: 5%;"></div>
+          </div>
         </div>
       </div>
 
@@ -1768,15 +1770,8 @@
         </button>
       </div>
 
-      <button class="upgrade-target" id="btnUpgradeTarget" type="button">
-        <span class="upgrade-target-kicker">SIRADAKİ HEDEF</span>
-        <span class="upgrade-target-title">İmparatorluğunu büyüt</span>
-        <span class="upgrade-target-sub">Yeni gelir kaynaklarını aç</span>
-        <span class="upgrade-target-arrow" aria-hidden="true"></span>
-      </button>
-
       <button class="empire-hub-trigger" id="btnEmpireHub" type="button" aria-label="Empire Hub'ı aç">
-        <span>HIZLI MENÜ</span><small>Mining, boost, görevler ve günlük içerik</small><span aria-hidden="true">›</span>
+        <span>KONTROL MERKEZİ</span><small>Tüm oyun araçları tek yerde</small><span aria-hidden="true">›</span>
       </button>
       <div class="empire-tier-transition" id="empireTierTransition" role="status" aria-live="polite" hidden>
         <strong>İmparatorluğun büyüdü</strong><span id="empireTierName"></span>
@@ -1798,6 +1793,17 @@
             <button class="command-menu-button" data-command-tab="tasks" type="button"><span>📋</span><b>Görevler</b><small>İlerleme ve ödüller</small></button>
             <button class="command-menu-button" data-command-tab="store" type="button"><span>🎁</span><b>Ödül Kasası</b><small>Casino ve talepler</small></button>
           </div>
+          <button class="upgrade-target command-upgrade-target" id="btnUpgradeTarget" data-command-tab="buildings" type="button">
+            <span class="upgrade-target-kicker">SIRADAKİ HEDEF</span>
+            <span class="upgrade-target-title">İmparatorluğunu büyüt</span>
+            <span class="upgrade-target-sub">Yeni gelir kaynaklarını aç</span>
+            <span class="upgrade-target-arrow" aria-hidden="true"></span>
+          </button>
+          <button class="command-overview" id="btnRewardVault" type="button" aria-label="Ödül Kasasını aç">
+            <span><small>GÖREV</small><b id="hubReadyTasks">0 hazır</b></span>
+            <span><small>MRP</small><b id="hubRewardPoints">0</b></span>
+            <span><small>HAKLAR</small><b id="homeEntitlementSummary">0 Spin · 0 Bet</b></span>
+          </button>
           <div class="hk-floats empire-hub-actions">
             <article class="content-hub-card"><button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
               <div class="hk-float-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="10" height="14" rx="2"/><path d="m9 9 2 3-2 3-2-3 2-3Zm6-2 5 3v10H9"/></svg></div>

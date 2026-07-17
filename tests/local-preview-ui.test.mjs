@@ -41,8 +41,21 @@ test('compact home opens one command sheet containing the gameplay shortcuts', (
   assert.match(html, /data-command-tab="buildings"/);
   assert.match(html, /data-command-tab="tasks"/);
   assert.match(html, /data-command-tab="store"/);
+  assert.match(html, /class="hero-status-row"/);
+  assert.match(html, /id="btnUpgradeTarget"[\s\S]*class="command-overview"/);
   assert.equal([...html.matchAll(/id="btnOpenBoost"/g)].length, 1);
   assert.equal([...html.matchAll(/id="btnOpenAirdrop"/g)].length, 1);
+});
+
+test('home remains character-first and secondary status rows stay inside the command sheet', () => {
+  const phase2b = fs.readFileSync('public/js/phase-2b.js', 'utf8');
+  const polish = fs.readFileSync('public/styles/mobile-boot-polish.css', 'utf8');
+  assert.doesNotMatch(phase2b, /createElement\('button'\)[\s\S]{0,160}empire-loop-pulse/);
+  assert.doesNotMatch(phase2b, /className='reward-vault-trigger'/);
+  assert.match(phase2b, /#hubReadyTasks/);
+  assert.match(phase2b, /#hubRewardPoints/);
+  assert.match(polish, /--character-size: clamp\(230px, min\(88vw, 52svh\), 380px\)/);
+  assert.match(polish, /\.tap-container \{[\s\S]*?min-height: 0;/);
 });
 
 test('protected Auth, RPC and economic contracts remain present', () => {

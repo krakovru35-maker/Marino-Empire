@@ -123,23 +123,17 @@
   }
 
   function installHomePulse() {
-    if (document.querySelector('#empireLoopPulse')) return;
-    const hub = document.querySelector('#btnEmpireHub');
-    if (!hub) return;
-    const pulse = document.createElement('button');
-    pulse.type='button'; pulse.id='empireLoopPulse'; pulse.className='empire-loop-pulse';
-    pulse.setAttribute('aria-label','Casino empire ilerlemesini aç');
-    hub.insertAdjacentElement('afterend', pulse);
-    pulse.addEventListener('click', () => document.querySelector('.nav-btn[data-tab="tasks"]')?.click());
-    const rewardButton=document.createElement('button');rewardButton.type='button';rewardButton.id='btnRewardVault';rewardButton.className='reward-vault-trigger';rewardButton.setAttribute('aria-label','Ödül Kasasını aç');rewardButton.innerHTML='<span>ÖDÜL KASASI</span><small id="homeEntitlementSummary">Sanal haklar • nakit değeri yoktur</small><i>›</i>';pulse.insertAdjacentElement('afterend',rewardButton);rewardButton.addEventListener('click',openRewardStore);
+    // Home stays character-first. Progress and reward shortcuts live in the command sheet.
+    const rewardButton=document.querySelector('#btnRewardVault');
+    if(rewardButton&&!rewardButton.dataset.bound){rewardButton.dataset.bound='true';rewardButton.addEventListener('click',()=>{document.querySelector('#sheetEmpireHub')?.classList.remove('show');openRewardStore()})}
   }
 
   function renderHomePulse() {
     installHomePulse();
-    const pulse = document.querySelector('#empireLoopPulse');
-    if (!pulse || !state.snapshot) return;
+    if (!state.snapshot) return;
     const ready = TASKS.filter(taskReady).length;
-    pulse.innerHTML = `<span><small>SAATLİK</small><b>+${fmt(state.snapshot.hourlyIncome)}</b></span><span><small>GÖREV</small><b>${ready} hazır</b></span><span><small>MRP</small><b>${fmt(state.rewardPoints)}</b></span><i aria-hidden="true">›</i>`;
+    const readyTasks=document.querySelector('#hubReadyTasks');if(readyTasks)readyTasks.textContent=`${ready} hazır`;
+    const rewardPoints=document.querySelector('#hubRewardPoints');if(rewardPoints)rewardPoints.textContent=fmt(state.rewardPoints);
     const summary=document.querySelector('#homeEntitlementSummary');if(summary)summary.textContent=`${state.entitlements.spin} Spin • ${state.entitlements.bet} Bet • Hak`;
   }
 
