@@ -42,11 +42,11 @@ test('oyuncu skoru arttıkça sırası yükselir',()=>{
 
 test('gerçek mod kalıcı leaderboard üretmez ve preview kontrolü zorunludur',()=>{
   assert.match(source,/if\(!event\.detail\?\.preview\|\|!preview\(\)\)return/);
-  assert.match(source,/Salt okunur demo/);
+  assert.match(source,/Salt okunur önizleme/);
   assert.doesNotMatch(source,/marino_secure_rpc|tap_coin|fetch\s*\(/);
 });
 
-test('sorumlu oyun ve demo etiketleri görünürdür',()=>{
+test('sorumlu oyun ve önizleme etiketleri görünürdür',()=>{
   assert.match(source,/Bahis miktarı, kazanç veya kayıp skoru etkilemez/);
   assert.match(source,/NAKİT DEĞERİ YOKTUR/);
   assert.match(source,/20 dakikada mola önerilir/);

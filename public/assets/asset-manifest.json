@@ -196,10 +196,10 @@
       "id": "scatter_anticipation", "file": "audio/sfx/scatter_anticipation.ogg", "type": "audio/ogg", "usage": "Fortune Slots scatter anticipation", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
     },
     {
-      "id": "small_win", "file": "audio/sfx/small_win.ogg", "type": "audio/ogg", "usage": "Fortune Slots small demo win", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+      "id": "small_win", "file": "audio/sfx/small_win.ogg", "type": "audio/ogg", "usage": "Fortune Slots small önizleme win", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
     },
     {
-      "id": "big_win", "file": "audio/sfx/big_win.ogg", "type": "audio/ogg", "usage": "Fortune Slots large demo win", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
+      "id": "big_win", "file": "audio/sfx/big_win.ogg", "type": "audio/ogg", "usage": "Fortune Slots large önizleme win", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
     },
     {
       "id": "free_spin_start", "file": "audio/sfx/free_spin_start.ogg", "type": "audio/ogg", "usage": "Fortune Slots free spin start", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tone", "available": false
@@ -217,7 +217,7 @@
       "id": "roulette_ball", "file": "audio/sfx/ball_[tick|drop].ogg", "type": "audio/ogg", "usage": "European Roulette ball movement and pocket drop", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Pitched procedural Web Audio tones", "available": false
     },
     {
-      "id": "roulette_result", "file": "audio/sfx/roulette_[win|lose].ogg", "type": "audio/ogg", "usage": "European Roulette demo result", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tones", "available": false
+      "id": "roulette_result", "file": "audio/sfx/roulette_[win|lose].ogg", "type": "audio/ogg", "usage": "European Roulette önizleme result", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio tones", "available": false
     },
     {
       "id": "reel_loop", "file": "audio/sfx/reel_loop.ogg", "type": "audio/ogg", "usage": "Fortune Slots layered reel motion bed", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio sweep", "available": false
@@ -238,7 +238,7 @@
       "id": "blackjack_player_actions", "file": "audio/sfx/blackjack_[hit|stand|double|split].ogg", "type": "audio/ogg", "usage": "Blackjack Hit, Stand, Double and Split feedback", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Four distinct procedural Web Audio action tones", "available": false
     },
     {
-      "id": "blackjack_results", "file": "audio/sfx/[blackjack_win|normal_win|push|bust].ogg", "type": "audio/ogg", "usage": "Blackjack demo result ceremonies", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio result tones", "available": false
+      "id": "blackjack_results", "file": "audio/sfx/[blackjack_win|normal_win|push|bust].ogg", "type": "audio/ogg", "usage": "Blackjack önizleme result ceremonies", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Layered procedural Web Audio result tones", "available": false
     },
     {
       "id": "dealer_reveal", "file": "audio/sfx/dealer_reveal.ogg", "type": "audio/ogg", "usage": "Blackjack dealer hole-card reveal", "source": "Pending commissioned original", "license": "Not yet supplied; do not distribute", "sizeBytes": 0, "fallback": "Procedural Web Audio reveal tone", "available": false
