@@ -21,6 +21,8 @@ test('Claim Coin UI is loaded as a dedicated Store module', () => {
   assert.match(claimJs, /\^\[A-Za-z0-9_\.-\]\{3,32\}\$/);
   assert.match(claimCss, /claim-mining-card/);
   assert.match(claimCss, /claim-username-overlay/);
+  assert.match(claimJs, /function goalRows\(\)/);
+  assert.match(claimJs, /Mining Hedefleri/);
 });
 
 test('frontend claim flow stays behind authenticated bridge and does not mint offline value', () => {

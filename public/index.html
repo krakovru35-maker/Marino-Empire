@@ -1782,6 +1782,9 @@
         <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
           <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
         </button>
+        <button class="quick-pill mine" id="btnOpenClaimMining" data-testid="open-claim-mining-btn">
+          <span class="ico">⛏️</span><span>MINING</span>
+        </button>
       </div>
       <button class="empire-hub-trigger" id="btnEmpireHub" type="button" aria-label="Empire Hub'ı aç">
         <span>EMPIRE HUB</span><small>İstatistikler ve günlük şifreler</small><span aria-hidden="true">›</span>
@@ -2270,7 +2273,7 @@
       intro.classList.add(firstInstall ? 'is-first-install' : 'is-repeat');
       intro.classList.toggle('is-reduced', reducedMotion);
       const video = q('#introVid');
-      if (video && firstInstall && !reducedMotion && !skipPermanently) {
+      if (video && !reducedMotion && !skipPermanently) {
         const videoSrc = video.dataset.src;
         if (videoSrc) {
           video.src = videoSrc;
@@ -2666,6 +2669,20 @@
         if (error) throw error;
         return data;
       },
+      modules: async (action, payload = {}, requestId = null) => {
+        if (isLocalPreview) return { ok: true, items: [], settings: {}, recipients: 0 };
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.rpc('marino_admin_modules_rpc', { p_action: action, p_payload: payload, p_request_id: requestId || uid() });
+        if (error) throw error;
+        return data;
+      },
+      broadcast: async (payload = {}) => {
+        if (isLocalPreview) return { ok: true, dry_run: payload.dry_run !== false, recipients: 12, sent: payload.dry_run === false ? 12 : 0, failed: 0 };
+        if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) throw new Error('authentication_required');
+        const { data, error } = await db.functions.invoke('telegram-broadcast', { body: payload });
+        if (error) throw error;
+        return data;
+      },
       me: async () => {
         if (isLocalPreview) return { is_admin: true, role: 'super_admin', is_owner: true, permissions: [] };
         if (!S.authenticated || S.authBlockedReason || !await ensureFreshSession()) return { is_admin: false, permissions: [] };
@@ -2912,6 +2929,45 @@
       } finally {
         tapInFlightCount = 0;
         if (queuedTapCount > 0) scheduleTapFlush();
+      }
+    }
+
+    const AUTO_TAP_INTERVAL_MS = 15000;
+    let autoTapTimer = null;
+    let autoTapInFlight = false;
+
+    function stopAutoTapLoop() {
+      if (autoTapTimer) clearInterval(autoTapTimer);
+      autoTapTimer = null;
+    }
+
+    async function performAutoTapTick() {
+      if (isLocalPreview || autoTapInFlight || document.visibilityState === 'hidden' || !S.game?.state) return;
+      const activeUntil = Number(permBoostState().auto_tap_end || 0);
+      if (!activeUntil || activeUntil <= Date.now()) {
+        stopAutoTapLoop();
+        renderBoosts();
+        return;
+      }
+      if (Number(S.game.state.en || 0) < 1 || S.authBlockedReason || !S.authenticated) return;
+      autoTapInFlight = true;
+      try {
+        const data = await rpc('tap_coin', { p_taps: 1 });
+        if (data?.state) processState(data);
+        renderTop();
+      } catch (error) {
+        if (!S.authBlockedReason) console.warn('Auto tap rejected', { code: String(error?.code || 'request_failed') });
+      } finally {
+        autoTapInFlight = false;
+      }
+    }
+
+    function syncAutoTapLoop() {
+      const active = Number(permBoostState().auto_tap_end || 0) > Date.now();
+      if (!active) return stopAutoTapLoop();
+      if (!autoTapTimer) {
+        autoTapTimer = setInterval(performAutoTapTick, AUTO_TAP_INTERVAL_MS);
+        setTimeout(performAutoTapTick, 1200);
       }
     }
 
@@ -4549,6 +4605,7 @@
               const p2 = permBoostState();
               p2.auto_tap_end = res.until ? new Date(res.until).getTime() : (Date.now() + 12*3600*1000);
               savePermBoostState(p2);
+              syncAutoTapLoop();
               S.game.state.coin -= Number(res.cost || 5000);
             } else {
               return toast('Sunucu onayı alınamadı. Bakiye değiştirilmedi.');
@@ -4668,6 +4725,11 @@
       wire('#btnDailyCipher', openCipher);
       wire('#btnOpenBoost', openBoost);
       wire('#btnOpenAirdrop', openAirdrop);
+      wire('#btnOpenClaimMining', () => {
+        showTab('store');
+        window.MarinoClaimMining?.sync?.();
+        setTimeout(() => q('#claimMiningMount')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+      });
       wire('#btnComboConfirm', confirmCombo);
       wire('#btnCipherBack', cipherBack);
       wire('#btnCipherSubmit', cipherSubmit);
@@ -4679,8 +4741,8 @@
       setInterval(refreshCombocipherBadges, 1000);
       // Fetch server state once on init, then every 60s (never in local preview).
       if (!isLocalPreview) {
-        hkRefreshState().then(() => { refreshCombocipherBadges(); });
-        setInterval(() => { hkRefreshState(); }, 60000);
+        hkRefreshState().then(() => { refreshCombocipherBadges(); syncAutoTapLoop(); });
+        setInterval(() => { hkRefreshState().then(syncAutoTapLoop); }, 60000);
       }
     }
     // Run after main init() has bound DOM

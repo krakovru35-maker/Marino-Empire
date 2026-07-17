@@ -159,7 +159,6 @@ html[data-app-state="ready"] .nav-bar {
   pointer-events: none;
 }
 
-.intro-overlay.is-repeat .intro-hero,
 .intro-overlay.is-reduced .intro-hero { display: none; }
 
 .intro-content {

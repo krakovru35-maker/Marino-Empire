@@ -135,6 +135,16 @@
     return state.requests.slice(0, 4).map(item => `<div class="claim-request-row"><span>${escape(labels[item.reward_type] || item.reward_type)} x${Number(item.amount || 1)}</span><b class="status-${escape(item.status)}">${escape(item.status)}</b></div>`).join('');
   }
 
+  function goalRows() {
+    const goals = [
+      ['Site üyeliğini bağla', Boolean(state.profile?.site_username)],
+      ['İlk Claim Coin kazımını tamamla', Number(state.wallet?.lifetime_mined || 0) > 0],
+      ['Toplam 10 Claim Coin kaz', Number(state.wallet?.lifetime_mined || 0) >= 10],
+      ['Free Spin veya Free Bet talebi aç', state.requests.length > 0]
+    ];
+    return goals.map(([label, done]) => `<div class="claim-goal-row ${done ? 'is-done' : ''}"><span>${done ? '&#10003;' : '&#9675;'}</span><b>${escape(label)}</b></div>`).join('');
+  }
+
   function cardMarkup() {
     const username = state.profile?.site_username;
     const costs = state.costs || CLAIM_COSTS;
@@ -152,6 +162,7 @@
         <div><small>Toplam</small><b>${fmt(state.wallet?.lifetime_mined || 0)}</b></div>
       </div>
       <button type="button" class="claim-mine-button" data-claim-mine ${username ? '' : 'disabled'}>⛏️ Claim Coin Kaz</button>
+      <div class="claim-goals"><h4>Mining Hedefleri</h4>${goalRows()}</div>
       <div class="claim-reward-grid">
         <button type="button" data-claim-request="free_spin" ${balance >= Number(costs.free_spin || 30) && username ? '' : 'disabled'}><b>Free Spin Talep</b><small>${fmt(costs.free_spin || 30)} CC / adet</small></button>
         <button type="button" data-claim-request="free_bet" ${balance >= Number(costs.free_bet || 45) && username ? '' : 'disabled'}><b>Free Bet Talep</b><small>${fmt(costs.free_bet || 45)} CC / adet</small></button>

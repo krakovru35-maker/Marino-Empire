@@ -19,6 +19,10 @@
 .claim-reward-grid small{margin-top:3px;color:#082130;letter-spacing:0}
 .claim-request-list{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)}
 .claim-request-list h4{margin:0 0 7px;color:#dfe8f5;font-size:11px}
+.claim-goals{margin-top:10px;padding:10px;border:1px solid rgba(153,112,255,.2);border-radius:13px;background:rgba(82,54,145,.08)}
+.claim-goals h4{margin:0 0 7px;color:#e2d8ff;font-size:11px}
+.claim-goal-row{display:grid;grid-template-columns:20px 1fr;gap:6px;align-items:center;padding:5px 0;color:#8f9cad;font-size:10px}
+.claim-goal-row span{display:grid;place-items:center;width:18px;height:18px;border:1px solid rgba(255,255,255,.13);border-radius:50%}.claim-goal-row.is-done{color:#83edb1}.claim-goal-row.is-done span{border-color:rgba(72,224,133,.35);background:rgba(72,224,133,.1)}
 .claim-request-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;color:#b8c5d5;font-size:10px}
 .claim-request-row b{padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.07);color:#d8e4f0;font-size:8px;text-transform:uppercase}
 .claim-request-row .status-approved,.claim-request-row .status-fulfilled{background:rgba(76,224,139,.14);color:#8df0b6}
