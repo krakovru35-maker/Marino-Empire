@@ -80,7 +80,6 @@ html:not([data-app-state="ready"]) #app {
 #view-home > .rank-shell,
 #view-home > .bottom-controls,
 #view-home > .upgrade-target,
-#view-home > .home-quick-actions,
 #view-home > .empire-hub-trigger {
   z-index: var(--layer-hud) !important;
 }
@@ -236,7 +235,6 @@ html[data-app-state="ready"] .nav-bar {
   }
   .bottom-controls { margin-top: -2px !important; }
   .upgrade-target { min-height: 41px !important; margin-bottom: 4px !important; }
-  .home-quick-actions { padding-bottom: 3px !important; }
   .empire-hub-trigger { min-height: 25px !important; margin-bottom: 3px !important; }
 }
 
@@ -250,7 +248,6 @@ html[data-app-state="ready"] .nav-bar {
   .bottom-controls { padding-bottom: 2px !important; }
   .energy-box, .boost-btn { height: 37px !important; min-height: 37px !important; }
   .upgrade-target { min-height: 36px !important; }
-  .home-quick-actions .quick-pill { min-height: 25px !important; }
   .empire-hub-trigger { min-height: 23px !important; }
 }
 

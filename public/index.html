@@ -1775,19 +1775,8 @@
         <span class="upgrade-target-arrow" aria-hidden="true"></span>
       </button>
 
-      <div class="quick-bar home-quick-actions">
-        <button class="quick-pill boost" id="btnOpenBoost" data-testid="open-boost-btn">
-          <span class="ico">🚀</span><span data-i18n="boost">BOOST</span>
-        </button>
-        <button class="quick-pill air" id="btnOpenAirdrop" data-testid="open-airdrop-btn">
-          <span class="ico">🪂</span><span data-i18n="airdrop">AIRDROP</span>
-        </button>
-        <button class="quick-pill mine" id="btnOpenClaimMining" data-testid="open-claim-mining-btn">
-          <span class="ico">⛏️</span><span>MINING</span>
-        </button>
-      </div>
       <button class="empire-hub-trigger" id="btnEmpireHub" type="button" aria-label="Empire Hub'ı aç">
-        <span>EMPIRE HUB</span><small>İstatistikler ve günlük şifreler</small><span aria-hidden="true">›</span>
+        <span>HIZLI MENÜ</span><small>Mining, boost, görevler ve günlük içerik</small><span aria-hidden="true">›</span>
       </button>
       <div class="empire-tier-transition" id="empireTierTransition" role="status" aria-live="polite" hidden>
         <strong>İmparatorluğun büyüdü</strong><span id="empireTierName"></span>
@@ -1799,8 +1788,16 @@
       <div class="sheet empire-hub-sheet">
         <div class="sheet-handle"></div>
         <button class="sheet-close" data-close="sheetEmpireHub" aria-label="Empire Hub'ı kapat">✕</button>
-        <h3>Empire Hub</h3>
+        <h3>Hızlı Menü</h3>
         <div class="empire-hub-panel">
+          <div class="command-menu-grid" aria-label="Hızlı oyun menüsü">
+            <button class="command-menu-button boost" id="btnOpenBoost" data-testid="open-boost-btn" type="button"><span>🚀</span><b>Boost</b><small>Güçlendirmeler</small></button>
+            <button class="command-menu-button air" id="btnOpenAirdrop" data-testid="open-airdrop-btn" type="button"><span>🪂</span><b>Airdrop</b><small>Cüzdan durumu</small></button>
+            <button class="command-menu-button mine" id="btnOpenClaimMining" data-testid="open-claim-mining-btn" type="button"><span>⛏️</span><b>Mining</b><small>Claim Coin kaz</small></button>
+            <button class="command-menu-button" data-command-tab="buildings" type="button"><span>🏢</span><b>Binalar</b><small>İmparatorluğu büyüt</small></button>
+            <button class="command-menu-button" data-command-tab="tasks" type="button"><span>📋</span><b>Görevler</b><small>İlerleme ve ödüller</small></button>
+            <button class="command-menu-button" data-command-tab="store" type="button"><span>🎁</span><b>Ödül Kasası</b><small>Casino ve talepler</small></button>
+          </div>
           <div class="hk-floats empire-hub-actions">
             <article class="content-hub-card"><button class="hk-float-btn" id="btnDailyCombo" data-testid="daily-combo-btn">
               <div class="hk-float-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="10" height="14" rx="2"/><path d="m9 9 2 3-2 3-2-3 2-3Zm6-2 5 3v10H9"/></svg></div>
@@ -2372,6 +2369,10 @@
       q('#btnSettings').onclick = () => { au.click(); q('#sheetSettings').classList.add('show'); };
       q('#btnProfile').onclick = () => { au.click(); renderProfile(); q('#sheetProfile').classList.add('show'); };
       q('#btnEmpireHub').onclick = () => { au.click(); q('#sheetEmpireHub').classList.add('show'); };
+      document.querySelectorAll('[data-command-tab]').forEach(button => button.onclick = () => {
+        q('#sheetEmpireHub').classList.remove('show');
+        showTab(button.dataset.commandTab);
+      });
       q('#btnPrestige').onclick = handlePrestige;
       q('#closeMini').onclick = () => {
         au.click(); q('#fsMini').classList.remove('show');
@@ -3095,7 +3096,7 @@
       const tasks=S.taskCatalog.length?S.taskCatalog:fallback;
       const socialLinks={soc_tg:'https://t.me/betmarinocom',soc_tw:'https://x.com/marinoetkinlik'};
       const sections=[['achievement','Sosyal & Başarımlar'],['daily','Günlük Görevler'],['weekly','Haftalık Görevler'],['level',`Seviye Görevleri (Sv. ${s.lvl})`],['event','Etkinlik Görevleri']];
-      sections.forEach(([type,title])=>{const group=tasks.filter(task=>task.task_type===type);if(!group.length)return;html+=`<div class="sec-title">${safeHtml(title)}</div>`;group.forEach(task=>{const id=String(task.task_key).toLowerCase(),isD=done.includes(id),level=Number(task.required_level||1),lock=level>s.lvl,link=socialLinks[id],icon=lock?'🔒':isD?'✅':type==='daily'?'📅':type==='level'?'🔸':'🏅';const action=link?`if(window.Telegram?.WebApp?.openLink)window.Telegram.WebApp.openLink('${link}');else window.open('${link}','_blank');doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`: `doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`;html+=`<div class="item-row"><div class="item-ico">${icon}</div><div class="item-info"><div class="item-title">${safeHtml(task.task_name)}</div><div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(task.reward_coin)} Coin${level>1?` · Sv. ${level}`:''}</div></div><button class="action-btn ${lock||isD?'':'gold'}" onclick="${action}" ${lock||isD?'disabled':''}>${lock?'Kilitli':isD?'Alındı':link?'Git & Al':'Al'}</button></div>`})});
+      sections.forEach(([type,title])=>{const group=tasks.filter(task=>task.task_type===type);if(!group.length)return;html+=`<div class="sec-title">${safeHtml(title)}</div>`;group.forEach(task=>{const id=String(task.task_key).toLowerCase(),isD=done.includes(id),level=Number(task.required_level||1),progress=Math.max(0,Number(task.progress||0)),goal=Math.max(0,Number(task.goal||0)),progressBlocked=goal>0&&progress<goal,lock=level>s.lvl,disabled=lock||isD||progressBlocked,link=socialLinks[id],icon=lock?'🔒':isD?'✅':type==='daily'?'📅':type==='level'?'🔸':'🏅';const action=link?`if(window.Telegram?.WebApp?.openLink)window.Telegram.WebApp.openLink('${link}');else window.open('${link}','_blank');doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`: `doAction('marino_claim_task',{p_task_id:'${id}',p_level_no:${level}})`;const progressMarkup=goal>0?`<div class="server-task-progress"><i style="width:${Math.min(100,(progress/goal)*100)}%"></i></div><div class="item-sub server-task-count">Sunucu ilerlemesi: ${Math.min(progress,goal)}/${goal}</div>`:'';html+=`<div class="item-row"><div class="item-ico">${icon}</div><div class="item-info"><div class="item-title">${safeHtml(task.task_name)}</div>${task.description?`<div class="item-sub">${safeHtml(task.description)}</div>`:''}<div class="item-sub"><img src="./assets/currency/marino-coin.png"> ${fmt(task.reward_coin)} Coin${level>1?` · Sv. ${level}`:''}</div>${progressMarkup}</div><button class="action-btn ${disabled?'':'gold'}" onclick="${action}" ${disabled?'disabled':''}>${lock?'Kilitli':isD?'Alındı':progressBlocked?`${Math.min(progress,goal)}/${goal}`:link?'Git & Al':'Al'}</button></div>`})});
       q('#listTasks').innerHTML = html;
     }
 
@@ -4723,9 +4724,10 @@
       const wire = (sel, fn) => { const el = q(sel); if (el) el.onclick = fn; };
       wire('#btnDailyCombo', openCombo);
       wire('#btnDailyCipher', openCipher);
-      wire('#btnOpenBoost', openBoost);
-      wire('#btnOpenAirdrop', openAirdrop);
+      wire('#btnOpenBoost', () => { q('#sheetEmpireHub').classList.remove('show'); openBoost(); });
+      wire('#btnOpenAirdrop', () => { q('#sheetEmpireHub').classList.remove('show'); openAirdrop(); });
       wire('#btnOpenClaimMining', () => {
+        q('#sheetEmpireHub').classList.remove('show');
         showTab('store');
         window.MarinoClaimMining?.sync?.();
         setTimeout(() => q('#claimMiningMount')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
