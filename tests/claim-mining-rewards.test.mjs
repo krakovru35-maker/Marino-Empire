@@ -5,15 +5,15 @@ import fs from 'node:fs';
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 
 const html = read('public/index.html');
-const claimJs = read('public/js/claim-mining.js');
-const claimCss = read('public/styles/claim-mining.css');
+const claimJs = read('public/js/loyalty-center.js');
+const claimCss = read('public/styles/loyalty-center.css');
 const adminCenter = read('public/js/admin-center.js');
 const adminOps = read('public/js/admin-operations.js');
 const migration = read('supabase/migrations/202607180003_claim_coin_mining_rewards.sql');
 
 test('Claim Coin UI is loaded as a dedicated Store module', () => {
-  assert.match(html, /styles\/claim-mining\.css/);
-  assert.match(html, /js\/claim-mining\.js/);
+  assert.match(html, /styles\/loyalty-center\.css/);
+  assert.match(html, /js\/loyalty-center\.js/);
   assert.match(claimJs, /claimMiningMount/);
   assert.match(claimJs, /bind_site_username/);
   assert.match(claimJs, /mine_claim_coin/);

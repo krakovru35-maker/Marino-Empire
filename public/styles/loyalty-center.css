@@ -7,6 +7,7 @@
 .claim-site-lock{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.035)}
 .claim-site-lock.is-bound{border-color:rgba(83,224,143,.24);background:rgba(63,223,130,.055)}
 .claim-site-lock b{display:block;margin-top:2px;color:#fff;font-size:13px}
+.claim-admin-lock{max-width:126px;color:#79dff2;font-size:8px;font-weight:900;line-height:1.35;text-align:right}
 .claim-site-lock button,.claim-mine-button,.claim-reward-grid button,.claim-username-modal button{border:0;border-radius:12px;background:linear-gradient(135deg,#ffe37c,#d7a51f);color:#16120a;font-size:10px;font-weight:900;min-height:38px;padding:0 12px}
 .claim-mining-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}
 .claim-mining-stats div{padding:8px 4px;border-radius:12px;background:rgba(255,255,255,.04);text-align:center}
@@ -28,6 +29,12 @@
 .claim-request-row .status-approved,.claim-request-row .status-fulfilled{background:rgba(76,224,139,.14);color:#8df0b6}
 .claim-request-row .status-rejected{background:rgba(255,103,103,.14);color:#ffaaa8}
 .claim-empty{margin:0!important;color:#718095!important}
+.claim-section{margin-top:11px;padding:11px;border:1px solid rgba(88,211,238,.13);border-radius:14px;background:rgba(7,17,27,.64)}
+.claim-section>h4{margin:0;color:#e8f5ff;font-size:12px}.claim-section>p{margin:4px 0 9px;color:#718196;font-size:8px}
+.claim-equipment-list,.claim-activity-list{display:grid;gap:7px}.claim-equipment{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;padding:8px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(255,255,255,.025)}
+.claim-equipment>i{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(255,211,73,.2);border-radius:11px;background:rgba(255,209,59,.07);color:#ffe073;font-size:20px;font-style:normal}.claim-equipment b,.claim-equipment small,.claim-equipment em{display:block}.claim-equipment b{color:#fff;font-size:10px}.claim-equipment small{margin-top:2px;color:#8291a5;font-size:7px;letter-spacing:0}.claim-equipment em{margin-top:4px;color:#ffe073;font-size:7px;font-style:normal;font-weight:900}.claim-equipment button,.claim-activity button{min-height:34px;padding:0 8px;border:1px solid rgba(255,211,73,.25);border-radius:9px;background:rgba(255,209,59,.1);color:#ffe27b;font-size:7px;font-weight:900}.claim-equipment button:disabled,.claim-activity button:disabled{border-color:rgba(255,255,255,.06);background:rgba(255,255,255,.025);color:#68768a}.claim-equipment.is-owned{border-color:rgba(76,224,139,.18)}
+.claim-activity{display:grid;grid-template-columns:1fr auto;align-items:center;gap:9px;padding:9px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(255,255,255,.025)}.claim-activity span{color:#67dced;font-size:6px;font-weight:900;text-transform:uppercase}.claim-activity b{display:block;margin-top:2px;color:#fff;font-size:10px}.claim-activity p{margin:3px 0!important;font-size:7px!important}.claim-activity small{margin-top:3px;color:#9ba8ba;letter-spacing:0}.claim-activity-progress{height:4px;margin-top:6px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}.claim-activity-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#4fd9f2,#ffe071)}.claim-activity.is-done{opacity:.68}
+.claim-reward-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.claim-reward-grid button:last-child:nth-child(odd){grid-column:1/-1}
 .claim-username-overlay{position:fixed;inset:0;z-index:400000;display:grid;place-items:center;padding:18px;background:rgba(0,5,12,.76);backdrop-filter:blur(8px)}
 .claim-username-modal{width:min(100%,360px);padding:20px;border:1px solid rgba(255,211,83,.28);border-radius:22px;background:linear-gradient(145deg,#172333,#060c14);box-shadow:0 24px 70px rgba(0,0,0,.75)}
 .claim-username-modal>span{color:#6ee7ff;font-size:9px;font-weight:900;letter-spacing:.16em}
@@ -36,5 +43,5 @@
 .claim-username-modal input{width:100%;min-height:44px;margin:8px 0 12px;padding:0 12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.05);color:#fff;font-size:15px}
 .claim-username-modal div{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .claim-username-modal div button:last-child{background:rgba(255,255,255,.07);color:#b9c5d5}
-@media(max-width:360px){.claim-reward-grid{grid-template-columns:1fr}.claim-mining-stats{grid-template-columns:1fr 1fr}.claim-mining-card h3{font-size:15px}}
+@media(max-width:360px){.claim-reward-grid{grid-template-columns:1fr}.claim-reward-grid button:last-child:nth-child(odd){grid-column:auto}.claim-mining-stats{grid-template-columns:1fr 1fr}.claim-mining-card h3{font-size:15px}.claim-equipment{grid-template-columns:32px 1fr}.claim-equipment>i{width:32px;height:32px}.claim-equipment>button{grid-column:1/-1}.claim-admin-lock{max-width:110px}}
 @media(prefers-reduced-motion:reduce){.claim-mining-card,.claim-username-overlay{backdrop-filter:none;box-shadow:none}}
